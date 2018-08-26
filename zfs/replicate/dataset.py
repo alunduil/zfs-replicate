@@ -48,3 +48,24 @@ def create(name: DataSet, ssh_command: Optional[str()]=None):
 
 def _create(name: DataSet) -> str():
     return "/usr/bin/env zfs create -o readonly=on {}".format(name)
+
+
+def destroy(name: DataSet, ssh_command: Optional[str()]=None):
+    """Destroy a dataset."""
+
+    command = _destroy(name)
+
+    if ssh_command is not None:
+        command = ssh_command + " " + command
+
+    proc = subprocess.open(command)
+
+    _, error = proc.communicate()
+    if proc.returncode:
+        raise RuntimeError(
+            "unable to destroy dataset: {}: {}".format(name, error)
+            )
+
+
+def _destroy(name: DataSet) -> str():
+    return "/usr/bin/env zfs destroy -r '{}'".format(name)

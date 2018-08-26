@@ -25,3 +25,19 @@ def test_inits_monotonic_length(elements):
     lengths = [len(xs) for xs in inits(elements)]
 
     assert lengths == range(len(elements) + 1)
+
+@given(lists(integers()), lists(integers))
+def test_venn_subsets(lefts, rights):
+    """all combinations of venn with subsets"""
+
+    assert venn(lefts, lefts + rights) == ([], lefts, rights)
+    assert venn(lefts + rights, rights) == (lefts, rights, [])
+
+@given(lists(integers()))
+def test_venn_disjoint(both):
+    """venn with disjoint"""
+
+    lefts = filter(lambda x: x % 2 == 0, both)
+    rights = filter(lambda x: x % 2 != 0, both)
+
+    assert venn(lefts, rights) == (lefts, [], rights)

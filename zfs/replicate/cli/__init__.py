@@ -9,9 +9,18 @@ from . import option
 from .. import snapshot
 from .. import ssh
 from .. import task
-from .. import time
 
 @click.command()
+@click.option(
+    "--verbose", "-v",
+    is_flag=True,
+    help="Print additional output.",
+    )
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Generate replication tasks but do not execute them.",
+    )
 @click.option(
     "--follow-delete",
     is_flag=True,
@@ -78,6 +87,8 @@ plzip = best compression
     help="Send snapshots of LOCAL_DATASET to HOST.",
     )
 def main(
+        verbose: bool(),
+        dry_run: bool(),
         follow_delete: bool(),
         recursive: bool(),
         port: int(),
@@ -93,10 +104,14 @@ def main(
 
     ssh_command = ssh.command(cipher, login, identity_file, port, host)
 
-    click.echo("checking dataset {}".format(local))
-    l_snaps = snapshot.list(local, recursive=recursive)
+    if verbose:
+        click.echo("checking dataset {}".format(local))
 
-    click.echo("found {} local snapshots".format(len(l_snaps)))
+    l_snaps = snapshot.list(local, recursive=recursive)
+    # TODO Exclusions from snapshots to replicate.
+
+    if verbose:
+        click.echo("found {} local snapshots".format(len(l_snaps)))
 
     r_dataset = dataset.remote_name(remote, local)
     dataset.create(r_dataset, ssh_command=ssh_command)
@@ -106,21 +121,24 @@ def main(
     # if not readonly_remote_dataset(r_dataset):
     #    pass
 
+    if verbose:
+        click.echo("checking snapshots on {}".format(host))
+
     # TODO Localize dataset names.
     r_snaps = snapshot.list(remote, recursive=recursive, ssh_command=ssh_command)
 
-    click.echo("found {} remote snapshots".format(len(r_snaps)))
+    if verbose:
+        click.echo("found {} remote snapshots".format(len(r_snaps)))
 
     tasks = task.generate(l_snaps, r_snaps, follow_delete=follow_delete)
 
-    click.echo("performing {} replication tasks".format(len(tasks)))
+    if verbose:
+        click.echo(task.report(tasks))
 
-    click.echo(task.report(tasks))
-    task.execute(
-        tasks,
-        follow_delete=follow_delete,
-        compression=compression,
-        ssh_command=ssh_command
-        )
-
-    #zfscmd = env_zfs(fs = local, recursive = recursive)
+    if not dry_run:
+        task.execute(
+            tasks,
+            follow_delete=follow_delete,
+            compression=compression,
+            ssh_command=ssh_command
+            )
