@@ -4,6 +4,7 @@ from typing import Sequence, TypeVar
 
 A = TypeVar("A")
 
+
 def inits(elements: Sequence[A]) -> Sequence[Sequence[A]]:
     """All initial segments of the given list.
 

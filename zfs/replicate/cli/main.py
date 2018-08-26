@@ -1,4 +1,4 @@
-"""CLI for ZFS Snapshot Replicator."""
+"""Main function zfs-replicate."""
 
 import click
 
@@ -97,38 +97,39 @@ def main(
         cipher: option.Cipher,
         compression: option.Compression,
         host: str(),
-        remote: DataSet,
-        local: DataSet,
+        remote: FileSystem,
+        local: FileSystem,
     ): # pylint: disable=too-many-arguments,too-many-locals
     """Main entry point into zfs-replicate."""
 
     ssh_command = ssh.command(cipher, login, identity_file, port, host)
 
     if verbose:
-        click.echo("checking dataset {}".format(local))
+        click.echo(f"checking filesystem {local}")
 
     l_snaps = snapshot.list(local, recursive=recursive)
     # TODO Exclusions from snapshots to replicate.
 
     if verbose:
-        click.echo("found {} local snapshots".format(len(l_snaps)))
+        click.echo(f"found {len(l_snaps)} local snapshots")
 
     r_dataset = dataset.remote_name(remote, local)
     dataset.create(r_dataset, ssh_command=ssh_command)
-    # TODO integrate into previous dataset.remote_readonly(remote)
+    # TODO integrate into previous
+    #dataset.remote_readonly(remote)
 
     # TODO figure out truenas stuff
-    # if not readonly_remote_dataset(r_dataset):
-    #    pass
+    #if not readonly_remote_dataset(r_dataset):
+    #   pass
 
     if verbose:
-        click.echo("checking snapshots on {}".format(host))
+        click.echo(f"checking snapshots on {host}")
 
     # TODO Localize dataset names.
     r_snaps = snapshot.list(remote, recursive=recursive, ssh_command=ssh_command)
 
     if verbose:
-        click.echo("found {} remote snapshots".format(len(r_snaps)))
+        click.echo(f"found {len(r_snaps)} remote snapshots")
 
     tasks = task.generate(l_snaps, r_snaps, follow_delete=follow_delete)
 
