@@ -30,5 +30,5 @@ def venn(lefts: Sequence[A], rights: Sequence[A]) -> (Sequence[A], Sequence[A], 
     return (
         filter(lambda x: x not in rights, lefts),
         filter(lambda x: x in rights, lefts),
-        filter(lambda x: x not in lefts, rights)
-        )
+        filter(lambda x: x not in lefts, rights),
+    )

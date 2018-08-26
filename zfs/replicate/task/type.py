@@ -11,4 +11,5 @@ class Action(Enum):
     DESTROY = auto()
     SEND = auto()
 
+
 Task = collections.namedtuple("Task", [])

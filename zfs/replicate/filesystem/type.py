@@ -2,4 +2,4 @@
 
 import collections
 
-FileSystem = collections.namedtuple('FileSystem', [])
+FileSystem = collections.namedtuple("FileSystem", [])

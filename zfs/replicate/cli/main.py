@@ -7,43 +7,21 @@ from ..dataset import DataSet
 
 
 @click.command()
+@click.option("--verbose", "-v", is_flag=True, help="Print additional output.")
+@click.option("--dry-run", is_flag=True, help="Generate replication tasks but do not execute them.")
 @click.option(
-    "--verbose", "-v",
-    is_flag=True,
-    help="Print additional output.",
-    )
+    "--follow-delete", is_flag=True, help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS"
+)
+@click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")
+@click.option("--port", "-p", type=click.IntRange(1, 65535), default=22, help="Connect to SSH on PORT.")
+@click.option("--login", "-l", "--user", "-u", metavar="USER", help="Connect to SSH as USER.")
 @click.option(
-    "--dry-run",
-    is_flag=True,
-    help="Generate replication tasks but do not execute them.",
-    )
-@click.option(
-    "--follow-delete",
-    is_flag=True,
-    help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS",
-    )
-@click.option(
-    "--recursive",
-    is_flag=True,
-    help="Recursively replicate snapshots."
-    )
-@click.option(
-    "--port", "-p",
-    type=click.IntRange(1, 65535),
-    default=22,
-    help="Connect to SSH on PORT.",
-    )
-@click.option(
-    "--login", "-l", "--user", "-u",
-    metavar="USER",
-    help="Connect to SSH as USER.",
-    )
-@click.option(
-    "-i", "--identity-file",
+    "-i",
+    "--identity-file",
     type=click.Path(exists=True, dir_okay=False),
     required=True,
     help="SSH identity file to use.",
-    )
+)
 @click.option(
     "--cipher",
     type=option.Cipher,
@@ -53,7 +31,7 @@ disabled = no ciphers
 fast     = only fast ciphers
 standard = default ciphers
 """,
-    )
+)
 @click.option(
     "--compression",
     type=option.Compression,
@@ -64,38 +42,24 @@ lz4   = fastest
 pigz  = all rounder
 plzip = best compression
 """,
-    )
-@click.argument(
-    "host",
-    required=True,
-    help="Replicate snapshots to HOST.",
-    )
-@click.argument(
-    "remote",
-    required=True,
-    metavar="REMOTE_DATASET",
-    help="Send snapshots to REMOTE_DATASET on HOST.",
-    )
-@click.argument(
-    "local",
-    required=True,
-    metavar="LOCAL_DATASET",
-    help="Send snapshots of LOCAL_DATASET to HOST.",
-    )
+)
+@click.argument("host", required=True, help="Replicate snapshots to HOST.")
+@click.argument("remote", required=True, metavar="REMOTE_DATASET", help="Send snapshots to REMOTE_DATASET on HOST.")
+@click.argument("local", required=True, metavar="LOCAL_DATASET", help="Send snapshots of LOCAL_DATASET to HOST.")
 def main(
-        verbose: bool(),
-        dry_run: bool(),
-        follow_delete: bool(),
-        recursive: bool(),
-        port: int(),
-        login: str(),
-        identity_file: str(),
-        cipher: option.Cipher,
-        compression: option.Compression,
-        host: str(),
-        remote: FileSystem,
-        local: FileSystem,
-    ): # pylint: disable=too-many-arguments,too-many-locals
+    verbose: bool(),
+    dry_run: bool(),
+    follow_delete: bool(),
+    recursive: bool(),
+    port: int(),
+    login: str(),
+    identity_file: str(),
+    cipher: option.Cipher,
+    compression: option.Compression,
+    host: str(),
+    remote: FileSystem,
+    local: FileSystem,
+):  # pylint: disable=too-many-arguments,too-many-locals
     """Main entry point into zfs-replicate."""
 
     ssh_command = ssh.command(cipher, login, identity_file, port, host)
@@ -112,10 +76,10 @@ def main(
     r_dataset = dataset.remote_name(remote, local)
     dataset.create(r_dataset, ssh_command=ssh_command)
     # TODO integrate into previous
-    #dataset.remote_readonly(remote)
+    # dataset.remote_readonly(remote)
 
     # TODO figure out truenas stuff
-    #if not readonly_remote_dataset(r_dataset):
+    # if not readonly_remote_dataset(r_dataset):
     #   pass
 
     if verbose:
@@ -133,9 +97,4 @@ def main(
         click.echo(task.report(tasks))
 
     if not dry_run:
-        task.execute(
-            tasks,
-            follow_delete=follow_delete,
-            compression=compression,
-            ssh_command=ssh_command
-            )
+        task.execute(tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command)

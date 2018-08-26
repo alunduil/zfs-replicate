@@ -9,11 +9,9 @@ from .type import Snapshot
 
 
 @functools.lru_cache()
-def list( # pylint: disable=redefined-builtin
-        filesystem: FileSystem,
-        recursive: bool(),
-        ssh_command: Optional[str()]=None
-    ) -> List[Snapshot]:
+def list(  # pylint: disable=redefined-builtin
+    filesystem: FileSystem, recursive: bool(), ssh_command: Optional[str()] = None
+) -> List[Snapshot]:
     """List ZFS snapshots."""
 
     command = _list(filesystem, recursive)
@@ -34,13 +32,7 @@ def list( # pylint: disable=redefined-builtin
 def _list(filesystem: FileSystem, recursive: bool()) -> str():
     """ZFS List Snapshot command."""
 
-    options = [
-        "-H",
-        "-t snapshot",
-        "-p",
-        "-o name,creation",
-        "-r",
-        ]
+    options = ["-H", "-t snapshot", "-p", "-o name,creation", "-r"]
 
     if not recursive:
         options.append("-d 1")

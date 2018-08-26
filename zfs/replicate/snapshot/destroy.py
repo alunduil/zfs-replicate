@@ -6,7 +6,7 @@ from .. import subprocess
 from .type import Snapshot
 
 
-def destroy(snapshot: Snapshot, ssh_command: Optional[str()]=None):
+def destroy(snapshot: Snapshot, ssh_command: Optional[str()] = None):
     """Destroy a snapshot."""
 
     command = _destroy(snapshot)

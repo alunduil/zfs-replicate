@@ -5,15 +5,15 @@ import subprocess
 from typing import List, Optional
 
 
-def open( # pylint: disable=redefined-builtin,too-many-arguments
-        command: List[str()],
-        allow_fork: bool()=False,
-        close_fds: bool()=True,
-        env: Optional[any()]=None,
-        stdout: any()=subprocess.PIPE,
-        stderr: any()=subprocess.PIPE,
-        start_new_session: bool()=False,
-    ) -> any():
+def open(  # pylint: disable=redefined-builtin,too-many-arguments
+    command: List[str()],
+    allow_fork: bool() = False,
+    close_fds: bool() = True,
+    env: Optional[any()] = None,
+    stdout: any() = subprocess.PIPE,
+    stderr: any() = subprocess.PIPE,
+    start_new_session: bool() = False,
+) -> any():
     """Wrapper around subprocess.Popen."""
 
     preexec_fn = None
@@ -28,9 +28,10 @@ def open( # pylint: disable=redefined-builtin,too-many-arguments
         close_fds=close_fds,
         preexec_fn=preexec_fn,
         env=env,
-        encoding='utf8',
+        encoding="utf8",
         start_new_session=start_new_session,
-        )
+    )
+
 
 def unblock_sigchld():
     """Remove SIGCHLD from handlers."""

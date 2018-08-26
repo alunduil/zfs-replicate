@@ -11,12 +11,14 @@ def test_inits_length(elements):
 
     assert len(inits(elements)) == len(elements) + 1
 
+
 @given(lists(integers(), min_size=2))
 def test_inits_heads(elements):
     """inits(elements)[:1] == [[], [elements[0]]"""
 
     assert inits(elements)[0] == []
     assert inits(elements)[1] == [elements[0]]
+
 
 @given(lists(integers()))
 def test_inits_monotonic_length(elements):
@@ -26,12 +28,14 @@ def test_inits_monotonic_length(elements):
 
     assert lengths == range(len(elements) + 1)
 
+
 @given(lists(integers()), lists(integers))
 def test_venn_subsets(lefts, rights):
     """all combinations of venn with subsets"""
 
     assert venn(lefts, lefts + rights) == ([], lefts, rights)
     assert venn(lefts + rights, rights) == (lefts, rights, [])
+
 
 @given(lists(integers()))
 def test_venn_disjoint(both):

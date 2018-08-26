@@ -11,10 +11,10 @@ Task = collections.namedtuple("Task", [])
 
 
 def generate(
-        local_snapshots: Dict[FileSystem, List[Snapshot]],
-        remote_snapshots: Dict[FileSystem, List[Snapshot]],
-        follow_delete: bool()=False
-    ) -> List[Task]:
+    local_snapshots: Dict[FileSystem, List[Snapshot]],
+    remote_snapshots: Dict[FileSystem, List[Snapshot]],
+    follow_delete: bool() = False,
+) -> List[Task]:
     """Generate Tasks for replicating local snapshots to remote snapshots."""
 
     tasks = []

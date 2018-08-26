@@ -6,7 +6,7 @@ check: test
 
 .PHONY: test
 test: clean develop
-	find ${PACKAGES} ${TEST_PACKAGES} -name '*.py' -exec mypy --strict "{}" +
+	find $(PACKAGES) $(TEST_PACKAGES) -name '*.py' -exec mypy --strict "{}" +
 	pytest
 
 .PHONY: clean
@@ -20,14 +20,16 @@ clean:
 .PHONY: lint
 lint: clean develop
 	isort -y --atomic -rc $(PACKAGES) $(TEST_PACKAGES)
-	pylint $(PACKAGES) $(TEST_PACKAGES)
+	black -l 120 --py36 $(PACKAGES) $(TEST_PACKAGES)
 
 .PHONY: develop
 develop: .shadows/develop
 
 .shadows/develop:
+	pip install black
 	pip install isort
 	pip install mypy
+
 	pip install -e .
 
 	mkdir -p .shadows

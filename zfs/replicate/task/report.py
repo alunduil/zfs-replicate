@@ -7,16 +7,9 @@ from ..filesystem import FileSystem
 from ..snapshot import Snapshot
 from .type import Action, Task
 
-LIMITS = {
-    "filesystem": 3,
-    "action": 4,
-    "snapshot": 12,
-    }
+LIMITS = {"filesystem": 3, "action": 4, "snapshot": 12}
 
-AFTERS = {
-    "filesystem": "action",
-    "action": "snapshot",
-    }
+AFTERS = {"filesystem": "action", "action": "snapshot"}
 
 
 def report(tasks: Sequence[Task]) -> str():
@@ -46,7 +39,7 @@ def _report_dataset(filesystems: Dict[FileSystem, Sequence[Task]]) -> str():
     return output
 
 
-def _report_action(actions: Dict[Action, Sequence[Task]], indentation: str()="") -> str():
+def _report_action(actions: Dict[Action, Sequence[Task]], indentation: str() = "") -> str():
     output = ""
 
     for action, tasks in actions:
@@ -62,7 +55,7 @@ def _report_action(actions: Dict[Action, Sequence[Task]], indentation: str()="")
     return output
 
 
-def _report_snapshot(snapshots: Dict[Snapshot, Sequence[Task]], indentation: str()="") -> str():
+def _report_snapshot(snapshots: Dict[Snapshot, Sequence[Task]], indentation: str() = "") -> str():
     output = ""
 
     for snapshot in snapshots:
@@ -71,7 +64,7 @@ def _report_snapshot(snapshots: Dict[Snapshot, Sequence[Task]], indentation: str
     return output
 
 
-def _counts(current: str(), tasks: Sequence[Task], indentation: str()="") -> str():
+def _counts(current: str(), tasks: Sequence[Task], indentation: str() = "") -> str():
     group = set([getattr(x, current) for x in tasks])
 
     output = f"{indentation}{current}:{len(group)}\n"

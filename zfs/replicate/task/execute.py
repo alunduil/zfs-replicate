@@ -8,7 +8,7 @@ from ..filesystem import FileSystem
 from .type import Action, Task
 
 
-def execute(tasks: Dict[FileSystem, List[Task]], ssh_command: Optional[str()]=None):
+def execute(tasks: Dict[FileSystem, List[Task]], ssh_command: Optional[str()] = None):
     """Execute all tasks."""
 
     sorted_items = sorted(tasks.items, key=lambda x: len(x[0].split("/")), reverse=True)
@@ -23,12 +23,12 @@ def execute(tasks: Dict[FileSystem, List[Task]], ssh_command: Optional[str()]=No
                 _send(action_tasks, ssh_command=ssh_command)
 
 
-def _create(tasks: List[Task], ssh_command: Optional[str()]=None):
+def _create(tasks: List[Task], ssh_command: Optional[str()] = None):
     for task in tasks:
         filesystem.create(task.filesystem, ssh_command=ssh_command)
 
 
-def _destroy(tasks: List[Task], ssh_command: Optional[str()]=None):
+def _destroy(tasks: List[Task], ssh_command: Optional[str()] = None):
     for task in tasks:
         if task.snapshot is None:
             filesystem.destroy(task.filesystem, ssh_command=ssh_command)
@@ -36,7 +36,7 @@ def _destroy(tasks: List[Task], ssh_command: Optional[str()]=None):
             snapshot.destroy(task.snapshot, ssh_command=ssh_command)
 
 
-def _send(tasks: List[Task], ssh_command: Optional[str()]=None):
+def _send(tasks: List[Task], ssh_command: Optional[str()] = None):
     if tasks:
         snapshot.send(tasks[0].snapshot, previous=None, ssh_command=ssh_command)
 
