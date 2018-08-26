@@ -2,10 +2,10 @@
 
 from typing import Sequence, TypeVar
 
-A = TypeVar("A")
+ElementType = TypeVar("ElementType")
 
 
-def inits(elements: Sequence[A]) -> Sequence[Sequence[A]]:
+def inits(elements: Sequence[ElementType]) -> Sequence[Sequence[ElementType]]:
     """All initial segments of the given list.
 
     The shortest lists are first.
@@ -18,7 +18,9 @@ def inits(elements: Sequence[A]) -> Sequence[Sequence[A]]:
     return [elements[:n] for n in range(len(elements) + 1)]
 
 
-def venn(lefts: Sequence[A], rights: Sequence[A]) -> (Sequence[A], Sequence[A], Sequence[A]):
+def venn(
+    lefts: Sequence[ElementType], rights: Sequence[ElementType]
+) -> (Sequence[ElementType], Sequence[ElementType], Sequence[ElementType]):
     """A venn diagram of the two sequences.
 
     A venn diagram shows the elements both sets contain individually as well as

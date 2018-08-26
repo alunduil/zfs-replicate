@@ -65,7 +65,7 @@ def _report_snapshot(snapshots: Dict[Snapshot, Sequence[Task]], indentation: str
 
 
 def _counts(current: str(), tasks: Sequence[Task], indentation: str() = "") -> str():
-    group = set([getattr(x, current) for x in tasks])
+    group = {getattr(x, current) for x in tasks}
 
     output = f"{indentation}{current}:{len(group)}\n"
 

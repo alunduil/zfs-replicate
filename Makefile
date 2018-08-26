@@ -1,13 +1,23 @@
 PACKAGES=zfs
 TEST_PACKAGES=zfs_test
 
+.PHONY: all
+all: lint check
+
 .PHONY: check
 check: test
 
 .PHONY: test
-test: clean develop
+test: clean
 	find $(PACKAGES) $(TEST_PACKAGES) -name '*.py' -exec mypy --strict "{}" +
 	pytest
+
+.PHONY: lint
+lint: clean
+	isort -y --atomic -rc $(PACKAGES) $(TEST_PACKAGES)
+	black -l 120 --py36 $(PACKAGES) $(TEST_PACKAGES)
+	pylint $(PACKAGES)
+	find $(TEST_PACKAGES) -name '*.py' -exec pylint "{}" +
 
 .PHONY: clean
 clean:
@@ -17,24 +27,3 @@ clean:
 	rm -rf dist
 	rm -rf *.egg-info
 
-.PHONY: lint
-lint: clean develop
-	isort -y --atomic -rc $(PACKAGES) $(TEST_PACKAGES)
-	black -l 120 --py36 $(PACKAGES) $(TEST_PACKAGES)
-
-.PHONY: develop
-develop: .shadows/develop
-
-.shadows/develop:
-	pip install black
-	pip install isort
-	pip install mypy
-
-	pip install -e .
-
-	mkdir -p .shadows
-	touch .shadows/develop
-
-.PHONY: sdist
-sdist:
-	python setup.py sdist
