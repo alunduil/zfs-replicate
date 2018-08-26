@@ -21,4 +21,3 @@ def send(snapshot: Snapshot, ssh_command: str(), previous: Optional[Snapshot]=No
             receive_command,
             shell=True,
             stdin=read_fd,
-            

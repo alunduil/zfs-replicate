@@ -23,14 +23,22 @@
 # OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 # SUCH DAMAGE.
 #
-from collections import defaultdict
-import pickle
 import datetime
 import logging
 import os
+import pickle
 import re
 import subprocess
 import sys
+from collections import defaultdict
+
+import django
+from freenasUI.common.locks import mntlock
+from freenasUI.common.pipesubr import pipeopen
+from freenasUI.common.system import get_sw_name, send_mail
+from freenasUI.common.timesubr import isTimeBetween
+from freenasUI.freeadmin.apppool import appPool
+from freenasUI.storage.models import REPL_RESULTFILE, Replication
 
 sys.path.extend([
     '/usr/local/www',
@@ -39,15 +47,8 @@ sys.path.extend([
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'freenasUI.settings')
 
-import django
 django.setup()
 
-from freenasUI.freeadmin.apppool import appPool
-from freenasUI.storage.models import Replication, REPL_RESULTFILE
-from freenasUI.common.timesubr import isTimeBetween
-from freenasUI.common.pipesubr import pipeopen
-from freenasUI.common.locks import mntlock
-from freenasUI.common.system import send_mail, get_sw_name
 
 
 #

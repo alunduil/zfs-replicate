@@ -2,13 +2,9 @@
 
 import click
 
+from .. import command, dataset, snapshot, ssh, task
 from ..dataset import DataSet
-from .. import command
-from .. import dataset
-from . import option
-from .. import snapshot
-from .. import ssh
-from .. import task
+
 
 @click.command()
 @click.option(

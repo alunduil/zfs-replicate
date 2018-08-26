@@ -2,6 +2,7 @@
 
 from enum import Enum
 
+
 class Cipher(Enum):
     """SSH Cipher."""
 

@@ -1,12 +1,10 @@
 """Task Execution."""
 
 import itertools
-
 from typing import Dict, List, Optional
 
+from .. import filesystem, snapshot
 from ..filesystem import FileSystem
-from .. import filesystem
-from .. import snapshot
 from .type import Action, Task
 
 

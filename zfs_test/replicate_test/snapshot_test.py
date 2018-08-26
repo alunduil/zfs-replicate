@@ -1,5 +1,6 @@
 from hypothesis import given
 
+
 @given(lists(snapshots()))
 def test_snapshots(snapshots):
     output = "\n".join([_output(s) for s in snapshots])

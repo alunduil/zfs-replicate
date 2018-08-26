@@ -2,8 +2,8 @@
 
 import signal
 import subprocess
-
 from typing import List, Optional
+
 
 def open( # pylint: disable=redefined-builtin,too-many-arguments
         command: List[str()],

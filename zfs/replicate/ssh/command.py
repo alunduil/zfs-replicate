@@ -2,6 +2,7 @@
 
 from .cipher import Cipher
 
+
 def command(
         cipher: Cipher,
         user: str(),

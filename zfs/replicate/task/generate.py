@@ -1,10 +1,9 @@
 """Replication Tasks."""
 
 import collections
-
 from typing import Dict, List
 
-from ..dataset import DataSet
+from ..filesystem import FileSystem
 from ..list import venn
 from ..snapshot import Snapshot
 
@@ -12,29 +11,29 @@ Task = collections.namedtuple("Task", [])
 
 
 def generate(
-        local_snapshots: Dict[DataSet, List[Snapshot]],
-        remote_snapshots: Dict[DataSet, List[Snapshot]],
+        local_snapshots: Dict[FileSystem, List[Snapshot]],
+        remote_snapshots: Dict[FileSystem, List[Snapshot]],
         follow_delete: bool()=False
     ) -> List[Task]:
     """Generate Tasks for replicating local snapshots to remote snapshots."""
 
     tasks = []
 
-    for dataset in local_snapshots:
-        if dataset not in remote_snapshots:
-            tasks.append(create(dataset))
+    for local_snapshot in local_snapshots:
+        if local_snapshot not in remote_snapshots:
+            tasks.append(create(TODO))
             tasks.extend(map(send, local_snapshots[dataset]))
             continue
 
-        lefts, commons, rights = venn(local_snapshots[dataset], remote_snapshots[dataset])
+        lefts, middles, rights = venn(local_snapshots[dataset], remote_snapshots[dataset])
 
         # TODO Any better way to write this?
-        if not commons:
+        if not middles:
             tasks.extend(map(destroy, rights))
 
         tasks.extend(map(send, lefts))
 
-        if commons and follow_delete:
+        if middles and follow_delete:
             tasks.extend(map(destroy, rights))
         # TODO ^^^
 
@@ -46,25 +45,25 @@ def generate(
     return tasks
 
 
-def create(dataset: DataSet) -> Task:
+def create(filesystem: FileSystem) -> Task:
     """Create a create Task."""
 
-    return Task(action="create", dataset=dataset, snapshot=None)
+    return Task(action="create", dataset=filesystem, snapshot=None)
 
 
-def remove(dataset: DataSet) -> Task:
+def remove(filesystem: FileSystem) -> Task:
     """Create a remove Task."""
 
-    return Task(action="remove", dataset=dataset, snapshot=None)
+    return Task(action="remove", filesystem=filesystem, snapshot=None)
 
 
 def send(snapshot: Snapshot) -> Task:
     """Create a send Task."""
 
-    return Task(action="send", dataset=snapshot.dataset, snapshot=snapshot)
+    return Task(action="send", filesystem=snapshot.filesystem, snapshot=snapshot)
 
 
 def destroy(snapshot: Snapshot) -> Task:
     """Create a destroy task."""
 
-    return Task(action="destroy", dataset=snapshot.dataset, snapshot=snapshot)
+    return Task(action="destroy", filesystem=snapshot.filesystem, snapshot=snapshot)

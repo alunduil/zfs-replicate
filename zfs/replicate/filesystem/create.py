@@ -2,13 +2,12 @@
 
 from typing import Optional
 
-from .. import snapshot
-from .. import subprocess
+from .. import snapshot, subprocess
 from ..list import inits
 from .type import FileSystem
 
 
-def create(filesystem: FileSystem, ssh_command: Optional[str()]=None):
+def create(filesystem: FileSystem, ssh_command: Optional[str] = None):
     """Create a FileSystem.
 
     If `ssh_command` is not None, it will be prefixed on the command run.  It is
@@ -35,5 +34,5 @@ def create(filesystem: FileSystem, ssh_command: Optional[str()]=None):
             raise RuntimeError(f"unable to create remote dataset: {filesystem}: {error}")
 
 
-def _create(filesystem: FileSystem) -> str():
+def _create(filesystem: FileSystem) -> str:
     return f"/usr/bin/env zfs create -o readonly=on {filesystem}"

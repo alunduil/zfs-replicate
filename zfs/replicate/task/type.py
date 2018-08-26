@@ -1,8 +1,8 @@
 """Types for Tasks."""
 
 import collections
+from enum import Enum, auto
 
-from enum import auto, Enum
 
 class Action(Enum):
     """Task Action."""

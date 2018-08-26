@@ -2,8 +2,8 @@
 
 from hypothesis import given
 from hypothesis.strategies import integers, lists
+from zfs.replicate.list import *  # pylint: disable=unused-wildcard-import,wildcard-import
 
-from zfs.replicate.list import * # pylint: disable=unused-wildcard-import,wildcard-import
 
 @given(lists(integers()))
 def test_inits_length(elements):

@@ -1,11 +1,10 @@
 """ZFS Snapshot listing."""
 
 import functools
-
 from typing import List, Optional
 
-from ..filesystem import FileSystem
 from .. import subprocess
+from ..filesystem import FileSystem
 from .type import Snapshot
 
 

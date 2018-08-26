@@ -1,7 +1,6 @@
 """Task Reporting Functions."""
 
 import itertools
-
 from typing import Dict, Sequence
 
 from ..filesystem import FileSystem
