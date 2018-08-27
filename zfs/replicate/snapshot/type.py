@@ -1,5 +1,14 @@
 """ZFS Snapshot Type."""
 
-import collections
+import datetime
+from typing import NamedTuple
 
-Snapshot = collections.namedtuple("Snapshot", [])
+from ..filesystem import FileSystem
+
+
+class Snapshot(NamedTuple):
+    """ZFS Snapshot Type."""
+
+    filesystem: FileSystem
+    name: str
+    timestamp: datetime.datetime

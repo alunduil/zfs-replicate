@@ -1,7 +1,7 @@
 """Replication Tasks."""
 
 import collections
-from typing import Dict, List
+from typing import Dict, List, overload
 
 from ..filesystem import FileSystem
 from ..list import venn
@@ -13,21 +13,20 @@ Task = collections.namedtuple("Task", [])
 def generate(
     local_snapshots: Dict[FileSystem, List[Snapshot]],
     remote_snapshots: Dict[FileSystem, List[Snapshot]],
-    follow_delete: bool() = False,
+    follow_delete: bool = False,
 ) -> List[Task]:
     """Generate Tasks for replicating local snapshots to remote snapshots."""
 
     tasks = []
 
-    for local_snapshot in local_snapshots:
-        if local_snapshot not in remote_snapshots:
-            tasks.append(create(TODO))
-            tasks.extend(map(send, local_snapshots[dataset]))
+    for filesystem in local_snapshots:
+        if filesystem not in remote_snapshots:
+            tasks.append(create(filesystem))
+            tasks.extend(map(send, local_snapshots[filesystem]))
             continue
 
-        lefts, middles, rights = venn(local_snapshots[dataset], remote_snapshots[dataset])
+        lefts, middles, rights = venn(local_snapshots[filesystem], remote_snapshots[filesystem])
 
-        # TODO Any better way to write this?
         if not middles:
             tasks.extend(map(destroy, rights))
 
@@ -35,7 +34,6 @@ def generate(
 
         if middles and follow_delete:
             tasks.extend(map(destroy, rights))
-        # TODO ^^^
 
     for dataset in remote_snapshots:
         if dataset not in local_snapshots:
@@ -51,19 +49,21 @@ def create(filesystem: FileSystem) -> Task:
     return Task(action="create", dataset=filesystem, snapshot=None)
 
 
-def remove(filesystem: FileSystem) -> Task:
-    """Create a remove Task."""
-
-    return Task(action="remove", filesystem=filesystem, snapshot=None)
-
-
 def send(snapshot: Snapshot) -> Task:
     """Create a send Task."""
 
     return Task(action="send", filesystem=snapshot.filesystem, snapshot=snapshot)
 
 
+@overload
 def destroy(snapshot: Snapshot) -> Task:
     """Create a destroy task."""
 
     return Task(action="destroy", filesystem=snapshot.filesystem, snapshot=snapshot)
+
+
+@overload
+def destroy(filesystem: FileSystem) -> Task:  # pylint: disable=function-redefined
+    """Create a destroy task."""
+
+    return Task(action="destroy", filesystem=filesystem, snapshot=None)

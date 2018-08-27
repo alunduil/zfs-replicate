@@ -1,14 +1,15 @@
 """Task Execution."""
 
 import itertools
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from .. import filesystem, snapshot
+from ..compress import Compression
 from ..filesystem import FileSystem
 from .type import Action, Task
 
 
-def execute(tasks: Dict[FileSystem, List[Task]], ssh_command: Optional[str()] = None):
+def execute(tasks: Dict[FileSystem, List[Task]], ssh_command: str, follow_delete: bool, compression: Compression):
     """Execute all tasks."""
 
     sorted_items = sorted(tasks.items, key=lambda x: len(x[0].split("/")), reverse=True)
@@ -20,15 +21,15 @@ def execute(tasks: Dict[FileSystem, List[Task]], ssh_command: Optional[str()] = 
             elif action == Action.DESTROY:
                 _destroy(action_tasks, ssh_command=ssh_command)
             elif action == Action.SEND:
-                _send(action_tasks, ssh_command=ssh_command)
+                _send(action_tasks, ssh_command=ssh_command, follow_delete=follow_delete, compression=compression)
 
 
-def _create(tasks: List[Task], ssh_command: Optional[str()] = None):
+def _create(tasks: List[Task], ssh_command: str):
     for task in tasks:
         filesystem.create(task.filesystem, ssh_command=ssh_command)
 
 
-def _destroy(tasks: List[Task], ssh_command: Optional[str()] = None):
+def _destroy(tasks: List[Task], ssh_command: str):
     for task in tasks:
         if task.snapshot is None:
             filesystem.destroy(task.filesystem, ssh_command=ssh_command)
@@ -36,9 +37,15 @@ def _destroy(tasks: List[Task], ssh_command: Optional[str()] = None):
             snapshot.destroy(task.snapshot, ssh_command=ssh_command)
 
 
-def _send(tasks: List[Task], ssh_command: Optional[str()] = None):
+def _send(tasks: List[Task], ssh_command: str, follow_delete: bool, compression: Compression):
     if tasks:
         snapshot.send(tasks[0].snapshot, previous=None, ssh_command=ssh_command)
 
         for task, previous in zip(tasks[1:], tasks):
-            snapshot.send(task.snapshot, previous=previous, ssh_command=ssh_command)
+            snapshot.send(
+                task.snapshot,
+                previous=previous,
+                ssh_command=ssh_command,
+                follow_delete=follow_delete,
+                compression=compression,
+            )

@@ -1,9 +1,14 @@
 """Main function zfs-replicate."""
 
+import itertools
+
 import click
 
-from .. import command, dataset, snapshot, ssh, task
-from ..dataset import DataSet
+from .. import filesystem, snapshot, ssh, task
+from ..compress import Compression
+from ..filesystem import FileSystem
+from ..ssh import Cipher
+from .click import EnumChoice
 
 
 @click.command()
@@ -24,8 +29,8 @@ from ..dataset import DataSet
 )
 @click.option(
     "--cipher",
-    type=option.Cipher,
-    default=option.Cipher.STANDARD,
+    type=EnumChoice(Cipher),
+    default=Cipher.STANDARD,
     help="""\
 disabled = no ciphers
 fast     = only fast ciphers
@@ -34,8 +39,8 @@ standard = default ciphers
 )
 @click.option(
     "--compression",
-    type=option.Compression,
-    default=option.Compression.LZ4,
+    type=EnumChoice(Compression),
+    default=Compression.LZ4,
     help="""\
 off   = no compression
 lz4   = fastest
@@ -46,20 +51,20 @@ plzip = best compression
 @click.argument("host", required=True, help="Replicate snapshots to HOST.")
 @click.argument("remote", required=True, metavar="REMOTE_DATASET", help="Send snapshots to REMOTE_DATASET on HOST.")
 @click.argument("local", required=True, metavar="LOCAL_DATASET", help="Send snapshots of LOCAL_DATASET to HOST.")
-def main(
-    verbose: bool(),
-    dry_run: bool(),
-    follow_delete: bool(),
-    recursive: bool(),
-    port: int(),
-    login: str(),
-    identity_file: str(),
-    cipher: option.Cipher,
-    compression: option.Compression,
-    host: str(),
+def main(  # pylint: disable=too-many-arguments,too-many-locals
+    verbose: bool,
+    dry_run: bool,
+    follow_delete: bool,
+    recursive: bool,
+    port: int,
+    login: str,
+    identity_file: str,
+    cipher: Cipher,
+    compression: Compression,
+    host: str,
     remote: FileSystem,
     local: FileSystem,
-):  # pylint: disable=too-many-arguments,too-many-locals
+):
     """Main entry point into zfs-replicate."""
 
     ssh_command = ssh.command(cipher, login, identity_file, port, host)
@@ -68,25 +73,22 @@ def main(
         click.echo(f"checking filesystem {local}")
 
     l_snaps = snapshot.list(local, recursive=recursive)
-    # TODO Exclusions from snapshots to replicate.
+    # Improvment: exclusions from snapshots to replicate.
 
     if verbose:
         click.echo(f"found {len(l_snaps)} local snapshots")
 
-    r_dataset = dataset.remote_name(remote, local)
-    dataset.create(r_dataset, ssh_command=ssh_command)
-    # TODO integrate into previous
-    # dataset.remote_readonly(remote)
-
-    # TODO figure out truenas stuff
-    # if not readonly_remote_dataset(r_dataset):
-    #   pass
+    r_filesystem = filesystem.remote_name(remote, local)
+    filesystem.create(r_filesystem, ssh_command=ssh_command)
 
     if verbose:
         click.echo(f"checking snapshots on {host}")
 
-    # TODO Localize dataset names.
     r_snaps = snapshot.list(remote, recursive=recursive, ssh_command=ssh_command)
+
+    import pdb
+
+    pdb.set_trace()
 
     if verbose:
         click.echo(f"found {len(r_snaps)} remote snapshots")
@@ -97,4 +99,5 @@ def main(
         click.echo(task.report(tasks))
 
     if not dry_run:
-        task.execute(tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command)
+        filesystem_tasks = dict(itertools.groupby(tasks, key=lambda x: x.filesystem))
+        task.execute(filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command)

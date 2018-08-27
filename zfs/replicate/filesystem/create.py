@@ -1,29 +1,24 @@
 """ZFS FileSystem creation."""
 
-from typing import Optional
+import os.path
 
 from .. import snapshot, subprocess
 from ..list import inits
 from .type import FileSystem
 
 
-def create(filesystem: FileSystem, ssh_command: Optional[str] = None):
-    """Create a FileSystem.
-
-    If `ssh_command` is not None, it will be prefixed on the command run.  It is
-    intended for this to run SSH but that is not enforced.
-
-    """
+def create(filesystem: FileSystem, ssh_command: str) -> None:
+    """Create a Remote FileSystem."""
 
     r_snaps = snapshot.list(filesystem, recursive=True)
 
-    command = _create(filesystem)
-    if ssh_command is not None:
-        command = ssh_command + " " + command
+    for head in inits(filesystem.split("/"))[1:]:
+        path = os.path.join(*head)
 
-    for part in inits(filesystem.split("/"))[1:]:
-        if part in r_snaps:
+        if path in r_snaps:
             continue
+
+        command = ssh_command + " " + _create(path)
 
         proc = subprocess.open(command)
 

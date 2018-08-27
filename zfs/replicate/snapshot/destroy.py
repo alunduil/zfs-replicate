@@ -1,18 +1,13 @@
 """ZFS Snapshot destruction."""
 
-from typing import Optional
-
 from .. import subprocess
 from .type import Snapshot
 
 
-def destroy(snapshot: Snapshot, ssh_command: Optional[str()] = None):
-    """Destroy a snapshot."""
+def destroy(snapshot: Snapshot, ssh_command: str) -> None:
+    """Destroy a remote snapshot."""
 
-    command = _destroy(snapshot)
-
-    if ssh_command is not None:
-        command = ssh_command + " " + command
+    command = ssh_command + " " + _destroy(snapshot)
 
     proc = subprocess.open(command)
 
@@ -21,5 +16,5 @@ def destroy(snapshot: Snapshot, ssh_command: Optional[str()] = None):
         raise RuntimeError(f"unable to destroy snapshot: {snapshot.name}: {error}")
 
 
-def _destroy(snapshot: Snapshot) -> str():
+def _destroy(snapshot: Snapshot) -> str:
     return f"/usr/bin/env zfs destroy '{snapshot.name}'"

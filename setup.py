@@ -22,7 +22,8 @@ setup(
         ],
 
     install_requires=[
-        "click",
+        "click>=6.7,<6.8",
+        "stringcase>=1.2,<1.3",
         ],
 
     tests_require=[
@@ -30,11 +31,7 @@ setup(
         "pytest",
         ],
 
-    console_scripts={
-        "zfs-replicate": "zfs.replicate.cli:main",
-        },
-
-    aliases={
-        "test": "pytest",
+    entry_points = {
+        "console_scripts": ["zfs-replicate=zfs.replicate.cli:main",],
         },
     )
