@@ -48,9 +48,9 @@ pigz  = all rounder
 plzip = best compression
 """,
 )
-@click.argument("host", required=True, help="Replicate snapshots to HOST.")
-@click.argument("remote", required=True, metavar="REMOTE_DATASET", help="Send snapshots to REMOTE_DATASET on HOST.")
-@click.argument("local", required=True, metavar="LOCAL_DATASET", help="Send snapshots of LOCAL_DATASET to HOST.")
+@click.argument("host", required=True)
+@click.argument("remote", required=True, metavar="REMOTE_DATASET")
+@click.argument("local", required=True, metavar="LOCAL_DATASET")
 def main(  # pylint: disable=too-many-arguments,too-many-locals
     verbose: bool,
     dry_run: bool,
@@ -64,7 +64,7 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     host: str,
     remote: FileSystem,
     local: FileSystem,
-):
+) -> None:
     """Main entry point into zfs-replicate."""
 
     ssh_command = ssh.command(cipher, login, identity_file, port, host)
@@ -93,7 +93,9 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     if verbose:
         click.echo(f"found {len(r_snaps)} remote snapshots")
 
-    tasks = task.generate(l_snaps, r_snaps, follow_delete=follow_delete)
+    filesystem_l_snaps = dict(itertools.groupby(l_snaps, key=lambda x: x.filesystem))
+    filesystem_r_snaps = dict(itertools.groupby(r_snaps, key=lambda x: x.filesystem))
+    tasks = task.generate(filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
 
     if verbose:
         click.echo(task.report(tasks))

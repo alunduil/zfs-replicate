@@ -1,9 +1,10 @@
 """Types for Tasks."""
 
 from enum import Enum, auto
-from typing import NamedTuple as namedtuple
+from typing import NamedTuple, Optional
 
 from ..filesystem import FileSystem
+from ..snapshot import Snapshot
 
 
 class Action(Enum):
@@ -14,4 +15,9 @@ class Action(Enum):
     SEND = auto()
 
 
-Task = namedtuple("Task", [("filesystem", FileSystem)])  # pylint: disable=invalid-name
+class Task(NamedTuple):
+    """Task Type."""
+
+    action: Action
+    filesystem: FileSystem
+    snapshot: Optional[Snapshot]

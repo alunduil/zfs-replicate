@@ -28,6 +28,7 @@ lint: clean
 clean:
 	find . -name '*.py[co]' -exec rm -f "{}" +
 	find . -name '*~' -exec rm -f "{}" +
+	find . -name '__pycache__' -exec rmdir "{}" +
 	rm -rf build
 	rm -rf dist
 	rm -rf *.egg-info

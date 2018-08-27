@@ -11,9 +11,9 @@ from .type import Snapshot
 def send(
     current: Snapshot,
     ssh_command: str,
+    compression: Compression,
+    follow_delete: bool,
     previous: Optional[Snapshot] = None,
-    compression: Compression = Compression.LZ4,
-    follow_delete: bool = False,
 ) -> None:
     """Send ZFS Snapshot."""
 
