@@ -10,7 +10,7 @@ check: test
 .PHONY: test
 test: clean
 	find $(PACKAGES) -name '*.py' -exec mypy --strict "{}" +
-	# TODO find $(TEST_PACKAGES) -name '*.py' -exec mypy --strict "{}" \;
+	find $(TEST_PACKAGES) -name '*.py' -exec mypy --strict "{}" +
 
 	pytest
 
