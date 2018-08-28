@@ -10,7 +10,7 @@ def destroy(snapshot: Snapshot, ssh_command: str) -> None:
     """Destroy a remote snapshot."""
 
     command = ssh_command + " " + _destroy(snapshot)
-    click.echo(command)
+    click.secho(command, fg="red")
 
     proc = subprocess.open(command)
 

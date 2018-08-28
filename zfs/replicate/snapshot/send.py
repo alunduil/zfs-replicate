@@ -26,7 +26,7 @@ def send(
     assert compress_command[-1] == "|"
 
     receive_command = " ".join([compress_command, ssh_command, f"'{_receive(current, decompress_command)}'"])
-    click.echo(receive_command)
+    click.secho(receive_command, fg="red")
 
     read_fd = os.fdopen(read, "rb", 0)
 
@@ -43,7 +43,7 @@ def send(
 
 def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False) -> Tuple[int, int]:
     send_command = _send_command(current=current, previous=previous, follow_delete=follow_delete)
-    click.echo(send_command)
+    click.secho(send_command, fg="red")
 
     read, write = os.pipe()
     pid = os.fork()

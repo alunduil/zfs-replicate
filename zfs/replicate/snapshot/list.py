@@ -18,7 +18,7 @@ def list(  # pylint: disable=redefined-builtin
     if ssh_command is not None:
         command = ssh_command + " " + command
 
-    click.echo(command)
+    click.secho(command, fg="red")
 
     proc = subprocess.open(command)
 

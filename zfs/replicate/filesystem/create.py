@@ -21,7 +21,7 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
             continue
 
         command = ssh_command + " " + _create(path)
-        click.echo(command)
+        click.secho(command, fg="red")
 
         proc = subprocess.open(command)
 
