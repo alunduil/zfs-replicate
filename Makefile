@@ -9,19 +9,14 @@ check: test
 
 .PHONY: test
 test: clean
-	find $(PACKAGES) -name '*.py' -exec mypy --strict "{}" +
-	find $(TEST_PACKAGES) -name '*.py' -exec mypy --strict "{}" +
-
-	pytest
+	find $(PACKAGES) $(TEST_PACKAGES) -name '*.py' -exec mypy --strict "{}" +
+	pytest -x
 
 .PHONY: lint
 lint: clean
 	isort -y --atomic -rc $(PACKAGES) $(TEST_PACKAGES)
 	black -l 120 --py36 $(PACKAGES) $(TEST_PACKAGES)
-
-	pylint -j 0 $(PACKAGES)
-	find $(TEST_PACKAGES) -name '*.py' -exec pylint -j 0 "{}" +
-
+	pylint -j 0 $(PACKAGES) $(TEST_PACKAGES)
 	vulture --exclude='zfs/replicate/cli/click.py' --ignore-names=main $(PACKAGES) $(TEST_PACKAGES)
 
 .PHONY: clean

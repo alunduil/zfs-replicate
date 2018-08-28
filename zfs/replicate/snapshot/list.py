@@ -8,7 +8,9 @@ from .. import subprocess
 from ..filesystem import FileSystem
 from .type import Snapshot
 
-DATE_RE = re.compile(r"\w{3} (?P<month>\w{3})  ?(?P<day>\d{1,2})  ?(?P<hour>\d{1,2}):(?P<minute>\d{2}) (?P<year>\d{4})")
+DATE_RE = re.compile(
+    r"\w{3} (?P<month>\w{3})  ?(?P<day>\d{1,2})  ?(?P<hour>\d{1,2}):(?P<minute>\d{2}) (?P<year>\d{1,4})"
+)
 
 
 def list(  # pylint: disable=redefined-builtin
