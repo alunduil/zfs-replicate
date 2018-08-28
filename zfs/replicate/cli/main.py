@@ -15,10 +15,10 @@ from .click import EnumChoice
 @click.option("--verbose", "-v", is_flag=True, help="Print additional output.")
 @click.option("--dry-run", is_flag=True, help="Generate replication tasks but do not execute them.")
 @click.option(
-    "--follow-delete", is_flag=True, help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS"
+    "--follow-delete", is_flag=True, help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS."
 )
 @click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")
-@click.option("--port", "-p", type=click.IntRange(1, 65535), default=22, help="Connect to SSH on PORT.")
+@click.option("--port", "-p", type=click.IntRange(1, 65535), metavar="PORT", default=22, help="Connect to SSH on PORT.")
 @click.option("--login", "-l", "--user", "-u", metavar="USER", help="Connect to SSH as USER.")
 @click.option(
     "-i",
@@ -31,33 +31,24 @@ from .click import EnumChoice
     "--cipher",
     type=EnumChoice(Cipher),
     default=Cipher.STANDARD,
-    help="""\
-disabled = no ciphers
-fast     = only fast ciphers
-standard = default ciphers
-""",
+    help="One of: disable (no ciphers), fast (only fast ciphers), or standard (default ciphers).",
 )
 @click.option(
     "--compression",
     type=EnumChoice(Compression),
     default=Compression.LZ4,
-    help="""\
-off   = no compression
-lz4   = fastest
-pigz  = all rounder
-plzip = best compression
-""",
+    help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
 )
 @click.argument("host", required=True)
-@click.argument("remote", required=True, metavar="REMOTE_DATASET")
-@click.argument("local", required=True, metavar="LOCAL_DATASET")
+@click.argument("remote", required=True, metavar="REMOTE_FS")
+@click.argument("local", required=True, metavar="LOCAL_FS")
 def main(  # pylint: disable=too-many-arguments,too-many-locals
     verbose: bool,
     dry_run: bool,
     follow_delete: bool,
     recursive: bool,
     port: int,
-    login: str,
+    user: str,
     identity_file: str,
     cipher: Cipher,
     compression: Compression,
@@ -65,9 +56,9 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     remote: FileSystem,
     local: FileSystem,
 ) -> None:
-    """Main entry point into zfs-replicate."""
+    """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
-    ssh_command = ssh.command(cipher, login, identity_file, port, host)
+    ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
     if verbose:
         click.echo(f"checking filesystem {local}")

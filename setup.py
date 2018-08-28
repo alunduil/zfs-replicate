@@ -32,6 +32,6 @@ setup(
         ],
 
     entry_points = {
-        "console_scripts": ["zfs-replicate=zfs.replicate.cli:main",],
+        "console_scripts": ["zfs-replicate=zfs.replicate.cli.main:main",],
         },
     )

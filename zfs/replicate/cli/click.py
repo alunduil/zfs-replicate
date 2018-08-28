@@ -17,8 +17,8 @@ class EnumChoice(click.Choice):
         choices = [x.lower() for x in enum._member_names_]  # pylint: disable=protected-access
         super().__init__(list(sorted(set(choices))))
 
-    def convert(self, value: str, param: Any, ctx: Any) -> Any:
-        value = super().convert(value.lower(), param, ctx)
+    def convert(self, value: Any, param: Any, ctx: Any) -> Any:
+        value = super().convert(value.name.lower(), param, ctx)
 
         return next(x for x in self.__enum if x.name.lower() == value.lower())
 

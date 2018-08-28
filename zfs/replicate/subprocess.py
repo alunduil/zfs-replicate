@@ -1,5 +1,6 @@
 """subprocess wrapper."""
 
+import shlex
 import subprocess
 
 STDOUT = subprocess.STDOUT
@@ -11,16 +12,16 @@ def open(  # pylint: disable=redefined-builtin
     # env: Optional[int()] = None,
     shell: bool = False,
     stdin: int = subprocess.PIPE,
-    # stdout: int() = subprocess.PIPE,
+    stdout: int = subprocess.PIPE,
     stderr: int = subprocess.PIPE,
     # start_new_session: bool() = False,
 ) -> subprocess.Popen:
     """Wrapper around subprocess.Popen."""
 
     return subprocess.Popen(
-        command,
+        shlex.split(command),
         stdin=stdin,
-        # stdout=stdout,
+        stdout=stdout,
         stderr=stderr,
         shell=shell,
         # close_fds=close_fds,

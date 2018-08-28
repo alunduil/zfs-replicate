@@ -1,5 +1,7 @@
 """ZFS FileSsytem destruction."""
 
+import click
+
 from .. import subprocess
 from .type import FileSystem
 
@@ -8,6 +10,7 @@ def destroy(filesystem: FileSystem, ssh_command: str) -> None:
     """Destroy a remote fileystem."""
 
     command = ssh_command + " " + _destroy(filesystem)
+    click.echo(command)
 
     proc = subprocess.open(command)
 

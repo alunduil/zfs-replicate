@@ -1,6 +1,5 @@
 """ZFS Snapshot Type."""
 
-import datetime
 from typing import NamedTuple
 
 from ..filesystem import FileSystem
@@ -11,4 +10,4 @@ class Snapshot(NamedTuple):
 
     filesystem: FileSystem
     name: str
-    timestamp: datetime.datetime
+    timestamp: int

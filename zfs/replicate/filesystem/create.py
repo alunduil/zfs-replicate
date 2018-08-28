@@ -2,6 +2,8 @@
 
 import os.path
 
+import click
+
 from .. import snapshot, subprocess
 from ..list import inits
 from .type import FileSystem
@@ -19,6 +21,7 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
             continue
 
         command = ssh_command + " " + _create(path)
+        click.echo(command)
 
         proc = subprocess.open(command)
 

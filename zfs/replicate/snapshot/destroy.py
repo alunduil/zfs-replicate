@@ -1,5 +1,7 @@
 """ZFS Snapshot destruction."""
 
+import click
+
 from .. import subprocess
 from .type import Snapshot
 
@@ -8,6 +10,7 @@ def destroy(snapshot: Snapshot, ssh_command: str) -> None:
     """Destroy a remote snapshot."""
 
     command = ssh_command + " " + _destroy(snapshot)
+    click.echo(command)
 
     proc = subprocess.open(command)
 

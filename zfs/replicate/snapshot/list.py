@@ -1,16 +1,12 @@
 """ZFS Snapshot listing."""
 
-import datetime
-import re
 from typing import List, Optional
+
+import click
 
 from .. import subprocess
 from ..filesystem import FileSystem
 from .type import Snapshot
-
-DATE_RE = re.compile(
-    r"\w{3} (?P<month>\w{3})  ?(?P<day>\d{1,2})  ?(?P<hour>\d{1,2}):(?P<minute>\d{2}) (?P<year>\d{1,4})"
-)
 
 
 def list(  # pylint: disable=redefined-builtin
@@ -22,10 +18,13 @@ def list(  # pylint: disable=redefined-builtin
     if ssh_command is not None:
         command = ssh_command + " " + command
 
+    click.echo(command)
+
     proc = subprocess.open(command)
 
     output, error = proc.communicate()
-    error = error.strip("\n").strip("\r").replace("WARNING: ENABLED NONE CIPHER", "")
+    if error is not None:
+        error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
     if proc.returncode:
         raise RuntimeError(f"error encountered while listing snapshots of {filesystem}: {error}")
@@ -44,43 +43,12 @@ def _list(filesystem: FileSystem, recursive: bool) -> str:
     return f"/usr/bin/env zfs list {' '.join(options)} '{filesystem}'"
 
 
-def _snapshots(zfs_list_output: str) -> List[Snapshot]:
-    return [_snapshot(x) for x in zfs_list_output.split("\n") if x != ""]
+def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:
+    return [_snapshot(x) for x in zfs_list_output.split(b"\n") if x != b""]
 
 
-def _snapshot(zfs_list_line: str) -> Snapshot:
-    name, timestamp = zfs_list_line.split("\t")
-    filesystem, name = name.split("@")
+def _snapshot(zfs_list_line: bytes) -> Snapshot:
+    name, timestamp = zfs_list_line.split(b"\t")
+    filesystem, name = name.split(b"@")
 
-    match = DATE_RE.match(timestamp)
-    if match is None:
-        raise RuntimeError(f"invalid timestamp, {timestamp}, found while parsing '{zfs_list_line}'")
-
-    return Snapshot(
-        filesystem=filesystem,
-        name=name,
-        timestamp=datetime.datetime(
-            int(match.group("year")),
-            _month(match.group("month")),
-            int(match.group("day")),
-            int(match.group("hour")),
-            int(match.group("minute")),
-        ),
-    )
-
-
-def _month(short: str) -> int:
-    return {
-        "jan": 1,
-        "feb": 2,
-        "mar": 3,
-        "apr": 4,
-        "may": 5,
-        "jun": 6,
-        "jul": 7,
-        "aug": 8,
-        "sep": 9,
-        "oct": 10,
-        "nov": 11,
-        "dec": 12,
-    }[short.lower()]
+    return Snapshot(filesystem=filesystem.decode("utf-8"), name=name.decode("utf-8"), timestamp=int(timestamp))

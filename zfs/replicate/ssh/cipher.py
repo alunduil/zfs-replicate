@@ -1,11 +1,11 @@
 """SSH Cipher Type."""
 
-from enum import Enum
+from enum import Enum, auto
 
 
 class Cipher(Enum):
     """SSH Cipher."""
 
-    DISABLED = 0
-    STANDARD = 1
-    FAST = 2
+    DISABLED = auto()
+    STANDARD = auto()
+    FAST = auto()

@@ -3,6 +3,8 @@
 import os
 from typing import Optional, Tuple
 
+import click
+
 from .. import compress, subprocess
 from ..compress import Compression
 from .type import Snapshot
@@ -24,6 +26,7 @@ def send(
     assert compress_command[-1] == "|"
 
     receive_command = " ".join([compress_command, ssh_command, f"'{_receive(current, decompress_command)}'"])
+    click.echo(receive_command)
 
     read_fd = os.fdopen(read, "rb", 0)
 
@@ -40,7 +43,7 @@ def send(
 
 def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False) -> Tuple[int, int]:
     send_command = _send_command(current=current, previous=previous, follow_delete=follow_delete)
-    print(f"send_command: {send_command}")
+    click.echo(send_command)
 
     read, write = os.pipe()
     pid = os.fork()
