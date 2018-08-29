@@ -14,7 +14,7 @@ def execute(
 ) -> None:
     """Execute all tasks."""
 
-    sorted_items = sorted(tasks.items(), key=lambda x: len(x[0].split("/")), reverse=True)
+    sorted_items = sorted(tasks.items(), key=lambda x: len(x[0].name.split("/")), reverse=True)
 
     for _, filesystem_tasks in sorted_items:
         for action, action_tasks in itertools.groupby(filesystem_tasks, key=lambda x: x.action):

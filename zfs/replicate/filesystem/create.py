@@ -4,20 +4,23 @@ import os.path
 
 import click
 
-from .. import snapshot, subprocess
+from .. import subprocess
 from ..list import inits
+from .list import list  # pylint: disable=redefined-builtin
 from .type import FileSystem
 
 
 def create(filesystem: FileSystem, ssh_command: str) -> None:
     """Create a Remote FileSystem."""
 
-    r_snaps = snapshot.list(filesystem, recursive=True)
+    top_level = FileSystem(name=filesystem.name.split("/")[0], readonly=filesystem.readonly)
 
-    for head in inits(filesystem.split("/"))[1:]:
+    filesystems = [x.name for x in list(top_level, ssh_command=ssh_command)]
+
+    for head in inits(filesystem.name.split("/"))[1:]:
         path = os.path.join(*head)
 
-        if path in r_snaps:
+        if path in filesystems:
             continue
 
         command = ssh_command + " " + _create(path)
@@ -32,5 +35,5 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
             raise RuntimeError(f"unable to create remote dataset: {filesystem}: {error}")
 
 
-def _create(filesystem: FileSystem) -> str:
+def _create(filesystem: str) -> str:
     return f"/usr/bin/env zfs create -o readonly=on {filesystem}"

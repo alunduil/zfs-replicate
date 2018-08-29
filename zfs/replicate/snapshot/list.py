@@ -27,7 +27,7 @@ def list(  # pylint: disable=redefined-builtin
         error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
     if proc.returncode:
-        raise RuntimeError(f"error encountered while listing snapshots of {filesystem}: {error}")
+        raise RuntimeError(f"error encountered while listing snapshots of {filesystem.name}: {error}")
 
     return _snapshots(output)
 
@@ -40,7 +40,7 @@ def _list(filesystem: FileSystem, recursive: bool) -> str:
     if not recursive:
         options.append("-d 1")
 
-    return f"/usr/bin/env zfs list {' '.join(options)} '{filesystem}'"
+    return f"/usr/bin/env zfs list {' '.join(options)} '{filesystem.name}'"
 
 
 def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:
@@ -51,4 +51,8 @@ def _snapshot(zfs_list_line: bytes) -> Snapshot:
     name, timestamp = zfs_list_line.split(b"\t")
     filesystem, name = name.split(b"@")
 
-    return Snapshot(filesystem=filesystem.decode("utf-8"), name=name.decode("utf-8"), timestamp=int(timestamp))
+    return Snapshot(
+        filesystem=FileSystem(name=filesystem.decode("utf-8"), readonly=False),
+        name=name.decode("utf-8"),
+        timestamp=int(timestamp),
+    )

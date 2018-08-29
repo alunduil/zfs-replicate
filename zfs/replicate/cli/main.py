@@ -40,8 +40,8 @@ from .click import EnumChoice
     help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
 )
 @click.argument("host", required=True)
-@click.argument("remote", required=True, metavar="REMOTE_FS")
-@click.argument("local", required=True, metavar="LOCAL_FS")
+@click.argument("remote", type=lambda x: FileSystem(name=x, readonly=False), required=True, metavar="REMOTE_FS")
+@click.argument("local", type=lambda x: FileSystem(name=x, readonly=False), required=True, metavar="LOCAL_FS")
 def main(  # pylint: disable=too-many-arguments,too-many-locals
     verbose: bool,
     dry_run: bool,
@@ -59,30 +59,31 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
+    click.secho(ssh_command, fg="red")
 
     if verbose:
-        click.echo(f"checking filesystem {local}")
+        click.echo(f"checking filesystem {local.name}")
 
     l_snaps = snapshot.list(local, recursive=recursive)
     # Improvment: exclusions from snapshots to replicate.
 
     if verbose:
-        click.echo(f"found {len(l_snaps)} local snapshots")
+        click.echo(f"found {len(l_snaps)} snapshots on {local.name}")
 
     r_filesystem = filesystem.remote_name(remote, local)
     filesystem.create(r_filesystem, ssh_command=ssh_command)
 
     if verbose:
-        click.echo(f"checking snapshots on {host}")
+        click.echo(f"checking filesystem {host}/{remote.name}")
 
     r_snaps = snapshot.list(remote, recursive=recursive, ssh_command=ssh_command)
+
+    if verbose:
+        click.echo(f"found {len(r_snaps)} snapshots on {remote.name}")
 
     import pdb
 
     pdb.set_trace()
-
-    if verbose:
-        click.echo(f"found {len(r_snaps)} remote snapshots")
 
     filesystem_l_snaps = dict(itertools.groupby(l_snaps, key=lambda x: x.filesystem))
     filesystem_r_snaps = dict(itertools.groupby(r_snaps, key=lambda x: x.filesystem))
