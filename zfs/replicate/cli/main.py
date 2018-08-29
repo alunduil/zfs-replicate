@@ -81,10 +81,6 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     if verbose:
         click.echo(f"found {len(r_snaps)} snapshots on {remote.name}")
 
-    import pdb
-
-    pdb.set_trace()
-
     filesystem_l_snaps = dict(itertools.groupby(l_snaps, key=lambda x: x.filesystem))
     filesystem_r_snaps = dict(itertools.groupby(r_snaps, key=lambda x: x.filesystem))
     tasks = task.generate(filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)

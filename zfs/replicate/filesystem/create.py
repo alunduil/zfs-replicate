@@ -29,7 +29,7 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
         proc = subprocess.open(command)
 
         _, error = proc.communicate()
-        error = error.strip("\n").strip("\r").replace("WARNING: ENABLED NONE CIPHER", "")
+        error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
         if proc.returncode:
             raise RuntimeError(f"unable to create remote dataset: {filesystem}: {error}")
