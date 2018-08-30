@@ -65,9 +65,9 @@ def _send_command(current: Snapshot, previous: Optional[Snapshot] = None, follow
         options.append("-p")
 
     if previous is not None:
-        options.append(f"-i '{previous.filesystem}@{previous.name}'")
+        options.append(f"-i '{previous.filesystem.name}@{previous.name}'")
 
-    return f"/usr/bin/env zfs send {' '.join(options)} '{current.filesystem}@{current.name}'"
+    return f"/usr/bin/env zfs send {' '.join(options)} '{current.filesystem.name}@{current.name}'"
 
 
 def _receive(current: Snapshot, decompress_command: str) -> str:

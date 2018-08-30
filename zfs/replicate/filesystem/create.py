@@ -31,6 +31,9 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
         _, error = proc.communicate()
         error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
+        if b"cannot mount" in error and b"successfully created, but not mounted" in error:
+            return  # not an error we are concerned with
+
         if proc.returncode:
             raise RuntimeError(f"unable to create remote dataset: {filesystem}: {error}")
 

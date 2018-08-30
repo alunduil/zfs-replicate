@@ -87,7 +87,7 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
         filesystem: list(r_snaps) for filesystem, r_snaps in itertools.groupby(r_snaps, key=lambda x: x.filesystem)
     }
 
-    tasks = task.generate(filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
+    tasks = task.generate(remote, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
 
     if verbose:
         click.echo(task.report(tasks))

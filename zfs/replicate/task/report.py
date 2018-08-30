@@ -7,7 +7,7 @@ from ..filesystem import FileSystem
 from ..snapshot import Snapshot
 from .type import Action, Task
 
-LIMITS = {"filesystem": 3, "action": 4, "snapshot": 12}
+LIMITS = {"filesystem": 3, "action": 4, "snapshot": 100}
 
 AFTERS = {"filesystem": "action", "action": "snapshot"}
 
@@ -58,7 +58,7 @@ def _report_action(actions: Dict[Action, List[Task]], indentation: str = "") -> 
 
 
 def _report_snapshot(snapshots: Dict[Optional[Snapshot], List[Task]], indentation: str = "") -> str:
-    return "\n".join([f"{indentation}snapshot: {s.name}" for s in snapshots if s is not None])
+    return "\n".join([f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s in snapshots if s is not None])
 
 
 def _counts(current: str, tasks: List[Task], indentation: str = "") -> str:
