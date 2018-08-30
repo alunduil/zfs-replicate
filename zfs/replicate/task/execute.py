@@ -1,7 +1,7 @@
 """Task Execution."""
 
 import itertools
-from typing import Dict, Iterator, List
+from typing import Dict, List
 
 from .. import filesystem, optional, snapshot
 from ..compress import Compression
@@ -10,28 +10,33 @@ from .type import Action, Task
 
 
 def execute(
-    tasks: Dict[FileSystem, Iterator[Task]], ssh_command: str, follow_delete: bool, compression: Compression
+    tasks: Dict[FileSystem, List[Task]], ssh_command: str, follow_delete: bool, compression: Compression
 ) -> None:
     """Execute all tasks."""
 
     sorted_items = sorted(tasks.items(), key=lambda x: len(x[0].name.split("/")), reverse=True)
 
     for _, filesystem_tasks in sorted_items:
-        for action, action_tasks in itertools.groupby(filesystem_tasks, key=lambda x: x.action):
+        action_tasks = {
+            action: list(action_tasks)
+            for action, action_tasks in itertools.groupby(filesystem_tasks, key=lambda x: x.action)
+        }
+
+        for action, a_tasks in action_tasks.items():
             if action == Action.CREATE:
-                _create(action_tasks, ssh_command=ssh_command)
+                _create(a_tasks, ssh_command=ssh_command)
             elif action == Action.DESTROY:
-                _destroy(action_tasks, ssh_command=ssh_command)
+                _destroy(a_tasks, ssh_command=ssh_command)
             elif action == Action.SEND:
-                _send(list(action_tasks), ssh_command=ssh_command, follow_delete=follow_delete, compression=compression)
+                _send(a_tasks, ssh_command=ssh_command, follow_delete=follow_delete, compression=compression)
 
 
-def _create(tasks: Iterator[Task], ssh_command: str) -> None:
+def _create(tasks: List[Task], ssh_command: str) -> None:
     for task in tasks:
         filesystem.create(task.filesystem, ssh_command=ssh_command)
 
 
-def _destroy(tasks: Iterator[Task], ssh_command: str) -> None:
+def _destroy(tasks: List[Task], ssh_command: str) -> None:
     for task in tasks:
         if task.snapshot is None:
             filesystem.destroy(task.filesystem, ssh_command=ssh_command)

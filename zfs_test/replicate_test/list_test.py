@@ -36,15 +36,15 @@ def test_inits_monotonic_length(elements: List[int]) -> None:
 def test_venn_subsets(lefts: Set[int], rights: Set[int]) -> None:
     """all combinations of venn with subsets"""
 
-    r_lefts: Iterator[int]
-    r_middles: Iterator[int]
-    r_rights: Iterator[int]
+    r_lefts: List[int]
+    r_middles: List[int]
+    r_rights: List[int]
 
-    r_lefts, r_middles, r_rights = venn(iter(lefts), iter(lefts | rights))
+    r_lefts, r_middles, r_rights = venn(list(lefts), list(lefts | rights))
 
     assert (set(r_lefts), set(r_middles), set(r_rights)) == (set(), lefts, rights - lefts)
 
-    r_lefts, r_middles, r_rights = venn(iter(lefts | rights), iter(rights))
+    r_lefts, r_middles, r_rights = venn(list(lefts | rights), list(rights))
 
     assert (set(r_lefts), set(r_middles), set(r_rights)) == (lefts - rights, rights, set())
 
@@ -56,10 +56,10 @@ def test_venn_disjoint(both: List[int]) -> None:
     e_lefts = list(filter(lambda x: x % 2 == 0, both))
     e_rights = list(filter(lambda x: x % 2 != 0, both))
 
-    r_lefts: Iterator[int]
-    r_middles: Iterator[int]
-    r_rights: Iterator[int]
+    r_lefts: List[int]
+    r_middles: List[int]
+    r_rights: List[int]
 
-    r_lefts, r_middles, r_rights = venn(iter(e_lefts), iter(e_rights))
+    r_lefts, r_middles, r_rights = venn(list(e_lefts), list(e_rights))
 
     assert (list(r_lefts), list(r_middles), list(r_rights)) == (e_lefts, [], e_rights)

@@ -59,7 +59,6 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
-    click.secho(ssh_command, fg="red")
 
     if verbose:
         click.echo(f"checking filesystem {local.name}")
@@ -74,20 +73,27 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     filesystem.create(r_filesystem, ssh_command=ssh_command)
 
     if verbose:
-        click.echo(f"checking filesystem {host}/{remote.name}")
+        click.echo(f"checking filesystem {host}/{r_filesystem.name}")
 
-    r_snaps = snapshot.list(remote, recursive=recursive, ssh_command=ssh_command)
+    r_snaps = snapshot.list(r_filesystem, recursive=recursive, ssh_command=ssh_command)
 
     if verbose:
-        click.echo(f"found {len(r_snaps)} snapshots on {remote.name}")
+        click.echo(f"found {len(r_snaps)} snapshots on {r_filesystem.name}")
 
-    filesystem_l_snaps = dict(itertools.groupby(l_snaps, key=lambda x: x.filesystem))
-    filesystem_r_snaps = dict(itertools.groupby(r_snaps, key=lambda x: x.filesystem))
+    filesystem_l_snaps = {
+        filesystem: list(l_snaps) for filesystem, l_snaps in itertools.groupby(l_snaps, key=lambda x: x.filesystem)
+    }
+    filesystem_r_snaps = {
+        filesystem: list(r_snaps) for filesystem, r_snaps in itertools.groupby(r_snaps, key=lambda x: x.filesystem)
+    }
+
     tasks = task.generate(filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
 
     if verbose:
         click.echo(task.report(tasks))
 
     if not dry_run:
-        filesystem_tasks = dict(itertools.groupby(tasks, key=lambda x: x.filesystem))
+        filesystem_tasks = {
+            filesystem: list(tasks) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
+        }
         task.execute(filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command)

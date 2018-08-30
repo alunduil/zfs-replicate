@@ -1,6 +1,6 @@
 """Common List Functions."""
 
-from typing import Iterator, Sequence, Tuple, TypeVar
+from typing import List, Sequence, Tuple, TypeVar
 
 ElementType = TypeVar("ElementType")
 
@@ -19,8 +19,8 @@ def inits(elements: Sequence[ElementType]) -> Sequence[Sequence[ElementType]]:
 
 
 def venn(
-    lefts: Iterator[ElementType], rights: Iterator[ElementType]
-) -> Tuple[Iterator[ElementType], Iterator[ElementType], Iterator[ElementType]]:
+    lefts: List[ElementType], rights: List[ElementType]
+) -> Tuple[List[ElementType], List[ElementType], List[ElementType]]:
     """A venn diagram of the two sequences.
 
     A venn diagram shows the elements both sets contain individually as well as
@@ -29,11 +29,8 @@ def venn(
 
     """
 
-    lefts_list = list(lefts)
-    rights_list = list(rights)
-
     return (
-        (x for x in lefts_list if x not in rights_list),
-        (x for x in lefts_list if x in rights_list),
-        (x for x in rights_list if x not in lefts_list),
+        [x for x in lefts if x not in rights],
+        [x for x in lefts if x in rights],
+        [x for x in rights if x not in lefts],
     )

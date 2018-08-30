@@ -1,6 +1,6 @@
 """Replication Tasks."""
 
-from typing import Dict, Iterator, List
+from typing import Dict, List
 
 from ..filesystem import FileSystem
 from ..list import venn
@@ -9,8 +9,8 @@ from .type import Action, Task
 
 
 def generate(
-    local_snapshots: Dict[FileSystem, Iterator[Snapshot]],
-    remote_snapshots: Dict[FileSystem, Iterator[Snapshot]],
+    local_snapshots: Dict[FileSystem, List[Snapshot]],
+    remote_snapshots: Dict[FileSystem, List[Snapshot]],
     follow_delete: bool = False,
 ) -> List[Task]:
     """Generate Tasks for replicating local snapshots to remote snapshots."""
@@ -25,9 +25,9 @@ def generate(
             )
             continue
 
-        lefts: Iterator[Snapshot]
-        middles: Iterator[Snapshot]
-        rights: Iterator[Snapshot]
+        lefts: List[Snapshot]
+        middles: List[Snapshot]
+        rights: List[Snapshot]
 
         lefts, middles, rights = venn(local_snapshots[filesystem], remote_snapshots[filesystem])
 
