@@ -2,8 +2,6 @@
 
 from typing import List, Optional
 
-import click
-
 from .. import subprocess
 from ..filesystem import FileSystem
 from .type import Snapshot
@@ -17,8 +15,6 @@ def list(  # pylint: disable=redefined-builtin
     command = _list(filesystem, recursive)
     if ssh_command is not None:
         command = ssh_command + " " + command
-
-    click.secho(command, fg="red")
 
     proc = subprocess.open(command)
 

@@ -3,8 +3,6 @@
 import re
 from typing import List
 
-import click
-
 from .. import subprocess
 from .type import FileSystem
 
@@ -17,8 +15,6 @@ def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:  # pylin
     command = _list(filesystem)
     if ssh_command is not None:
         command = ssh_command + " " + command
-
-    click.secho(command, fg="red")
 
     proc = subprocess.open(command)
 

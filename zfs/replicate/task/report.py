@@ -7,7 +7,7 @@ from ..filesystem import FileSystem
 from ..snapshot import Snapshot
 from .type import Action, Task
 
-LIMITS = {"filesystem": 3, "action": 4, "snapshot": 100}
+LIMITS = {"filesystem": 3, "action": 4, "snapshot": 13}
 
 AFTERS = {"filesystem": "action", "action": "snapshot"}
 
@@ -29,7 +29,7 @@ def _report_dataset(filesystems: Dict[FileSystem, List[Task]]) -> str:
     output = ""
 
     for filesystem, tasks in filesystems.items():
-        output += f"dataset: {filesystem}\n"
+        output += f"dataset: {filesystem.name}\n"
 
         actions = {action: list(tasks) for action, tasks in itertools.groupby(tasks, key=_action)}
 

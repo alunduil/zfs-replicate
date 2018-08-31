@@ -10,7 +10,11 @@ from .type import Action, Task
 
 
 def execute(
-    tasks: Dict[FileSystem, List[Task]], ssh_command: str, follow_delete: bool, compression: Compression
+    remote: FileSystem,
+    tasks: Dict[FileSystem, List[Task]],
+    ssh_command: str,
+    follow_delete: bool,
+    compression: Compression,
 ) -> None:
     """Execute all tasks."""
 
@@ -28,7 +32,7 @@ def execute(
             elif action == Action.DESTROY:
                 _destroy(a_tasks, ssh_command=ssh_command)
             elif action == Action.SEND:
-                _send(a_tasks, ssh_command=ssh_command, follow_delete=follow_delete, compression=compression)
+                _send(remote, a_tasks, ssh_command=ssh_command, follow_delete=follow_delete, compression=compression)
 
 
 def _create(tasks: List[Task], ssh_command: str) -> None:
@@ -44,9 +48,12 @@ def _destroy(tasks: List[Task], ssh_command: str) -> None:
             snapshot.destroy(task.snapshot, ssh_command=ssh_command)
 
 
-def _send(tasks: List[Task], ssh_command: str, follow_delete: bool, compression: Compression) -> None:
+def _send(
+    remote: FileSystem, tasks: List[Task], ssh_command: str, follow_delete: bool, compression: Compression
+) -> None:
     if tasks:
         snapshot.send(
+            remote,
             optional.value(tasks[0].snapshot),
             ssh_command=ssh_command,
             compression=compression,
@@ -56,6 +63,7 @@ def _send(tasks: List[Task], ssh_command: str, follow_delete: bool, compression:
 
         for task, previous in zip(tasks[1:], tasks):
             snapshot.send(
+                remote,
                 optional.value(task.snapshot),
                 ssh_command=ssh_command,
                 compression=compression,

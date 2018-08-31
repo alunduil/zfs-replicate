@@ -2,8 +2,6 @@
 
 import os.path
 
-import click
-
 from .. import subprocess
 from ..list import inits
 from .list import list  # pylint: disable=redefined-builtin
@@ -24,17 +22,16 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
             continue
 
         command = ssh_command + " " + _create(path)
-        click.secho(command, fg="red")
 
         proc = subprocess.open(command)
 
         _, error = proc.communicate()
         error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
-        if b"cannot mount" in error and b"successfully created, but not mounted" in error:
-            return  # not an error we are concerned with
-
         if proc.returncode:
+            if b"successfully created, but not mounted" in error:
+                return  # Ignore this error.
+
             raise RuntimeError(f"unable to create remote dataset: {filesystem}: {error}")
 
 

@@ -1,16 +1,20 @@
 """ZFS Snapshot Send."""
 
 import os
+import shlex
+import tempfile
 from typing import Optional, Tuple
 
 import click
 
 from .. import compress, subprocess
 from ..compress import Compression
+from ..filesystem import FileSystem
 from .type import Snapshot
 
 
-def send(
+def send(  # pylint: disable=too-many-arguments
+    remote: FileSystem,
     current: Snapshot,
     ssh_command: str,
     compression: Compression,
@@ -19,47 +23,59 @@ def send(
 ) -> None:
     """Send ZFS Snapshot."""
 
-    send_pid, read = _send(current, previous, follow_delete=follow_delete)
+    send_pid, read_fd = _send(current, previous, follow_delete=follow_delete)
 
     compress_command, decompress_command = compress.command(compression)
 
-    assert compress_command[-1] == "|"
-
-    receive_command = " ".join([compress_command, ssh_command, f"'{_receive(current, decompress_command)}'"])
+    receive_command = compress_command + ssh_command + " " + f'"{_receive(remote, current, decompress_command)}"'
     click.secho(receive_command, fg="red")
 
-    read_fd = os.fdopen(read, "rb", 0)
+    read = os.fdopen(read_fd, "rb", 0)
 
-    try:
-        proc = subprocess.open(receive_command, shell=True, stdin=read_fd, stderr=subprocess.STDOUT)
-        output, _ = proc.communicate()
+    with tempfile.TemporaryFile("w+") as out:
+        proc = subprocess.open(receive_command, shell=True, stdin=read, stdout=out, stderr=subprocess.STDOUT)
+        proc.wait()
         os.waitpid(send_pid, os.WNOHANG)
-    finally:
-        read_fd.close()
+        read.close()
+        out.seek(0)
+        output = out.read().strip("\n").strip("\r")
 
-    if not ("Succeeded" in output or "failed to create mountpoint" in output):
-        raise RuntimeError(f"failed to create snapshot: {current.name}")
+    output = output.replace(b"WARNING: ENABLED NONE CIPHER", b"")
+
+    click.secho(output.decode("utf-8"), fg="yellow")
+
+    if proc.returncode:
+        if b"Succeeded" in output and b"failed to create mountpoint" in output:
+            return  # Ignore this error.
+
+        raise RuntimeError(f"failed to create snapshot: {current.name}: {output}")
 
 
 def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False) -> Tuple[int, int]:
     send_command = _send_command(current=current, previous=previous, follow_delete=follow_delete)
     click.secho(send_command, fg="red")
 
-    read, write = os.pipe()
+    read_fd, write_fd = os.pipe()
     pid = os.fork()
     if pid == 0:
-        os.close(read)
-        os.dup2(write, 1)
-        os.close(write)
-        os.execv(send_command.split(" ")[0], send_command.split(" ")[1:])
-    else:
-        os.close(write)
+        os.close(read_fd)
+        os.dup2(write_fd, 1)
+        os.close(write_fd)
 
-    return pid, read
+        command = shlex.split(send_command)
+
+        click.secho(command[0], fg="red")
+        click.secho(" ".join(command[1:]), fg="red")
+
+        os.execv(command[0], command[1:])
+    else:
+        os.close(write_fd)
+
+    return pid, read_fd
 
 
 def _send_command(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False) -> str:
-    options = ["-V"]
+    options = []  # ["-V"]
 
     if follow_delete:
         options.append("-p")
@@ -70,5 +86,5 @@ def _send_command(current: Snapshot, previous: Optional[Snapshot] = None, follow
     return f"/usr/bin/env zfs send {' '.join(options)} '{current.filesystem.name}@{current.name}'"
 
 
-def _receive(current: Snapshot, decompress_command: str) -> str:
-    return f"{decompress_command} /usr/bin/env zfs receive -F -d '{current.name}'"
+def _receive(remote: FileSystem, current: Snapshot, decompress_command: str) -> str:
+    return f"{decompress_command}/usr/bin/env zfs receive -F -d '{remote.name}/{current.filesystem.name}'"

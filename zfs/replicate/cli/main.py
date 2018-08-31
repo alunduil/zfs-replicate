@@ -96,4 +96,6 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
         filesystem_tasks = {
             filesystem: list(tasks) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
         }
-        task.execute(filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command)
+        task.execute(
+            remote, filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command
+        )
