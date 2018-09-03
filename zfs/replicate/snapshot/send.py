@@ -7,13 +7,13 @@ from typing import Optional, Tuple
 
 import click
 
-from .. import compress, subprocess
+from .. import compress, filesystem, subprocess
 from ..compress import Compression
 from ..filesystem import FileSystem
 from .type import Snapshot
 
 
-def send(  # pylint: disable=too-many-arguments
+def send(  # pylint: disable=too-many-arguments,too-many-locals
     remote: FileSystem,
     current: Snapshot,
     ssh_command: str,
@@ -40,9 +40,9 @@ def send(  # pylint: disable=too-many-arguments
         out.seek(0)
         output = out.read().strip("\n").strip("\r")
 
-    output = output.replace(b"WARNING: ENABLED NONE CIPHER", b"")
+    output = output.replace("WARNING: ENABLED NONE CIPHER", "")
 
-    click.secho(output.decode("utf-8"), fg="yellow")
+    # click.secho(output, fg="yellow")
 
     if proc.returncode:
         if b"Succeeded" in output and b"failed to create mountpoint" in output:
@@ -58,16 +58,12 @@ def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete:
     read_fd, write_fd = os.pipe()
     pid = os.fork()
     if pid == 0:
+        command = shlex.split(send_command)
         os.close(read_fd)
         os.dup2(write_fd, 1)
         os.close(write_fd)
 
-        command = shlex.split(send_command)
-
-        click.secho(command[0], fg="red")
-        click.secho(" ".join(command[1:]), fg="red")
-
-        os.execv(command[0], command[1:])
+        os.execvp(command[0], command)
     else:
         os.close(write_fd)
 
@@ -83,8 +79,9 @@ def _send_command(current: Snapshot, previous: Optional[Snapshot] = None, follow
     if previous is not None:
         options.append(f"-i '{previous.filesystem.name}@{previous.name}'")
 
-    return f"/usr/bin/env zfs send {' '.join(options)} '{current.filesystem.name}@{current.name}'"
+    return f"/usr/bin/env - zfs send {' '.join(options)} '{current.filesystem.name}@{current.name}'"
 
 
 def _receive(remote: FileSystem, current: Snapshot, decompress_command: str) -> str:
-    return f"{decompress_command}/usr/bin/env zfs receive -F -d '{remote.name}/{current.filesystem.name}'"
+    destination = filesystem.remote_name(remote, current.filesystem)
+    return f"{decompress_command}/usr/bin/env - zfs receive -F -d '{destination.name}'"

@@ -31,7 +31,7 @@ def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:  # pylin
 def _list(filesystem: FileSystem) -> str:
     options = ["-H", "-o name,readonly", "-t filesystem,volume", "-r"]
 
-    return f"/usr/bin/env zfs list {' '.join(options)} '{filesystem.name}'"
+    return f"/usr/bin/env - zfs list {' '.join(options)} '{filesystem.name}'"
 
 
 def _filesystems(zfs_list_output: bytes) -> List[FileSystem]:
