@@ -15,6 +15,12 @@ setup(
 
     packages=[
         "zfs.replicate",
+        "zfs.replicate.cli",
+        "zfs.replicate.compress",
+        "zfs.replicate.filesystem",
+        "zfs.replicate.snapshot",
+        "zfs.replicate.ssh",
+        "zfs.replicate.task",
         ],
 
     setup_requires=[

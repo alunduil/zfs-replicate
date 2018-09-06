@@ -1,0 +1,7 @@
+include LICENSE
+include Makefile
+include mypy.ini
+include pylintrc
+include README.rst
+include zfs/__init__.pyi
+recursive-include zfs_test *.py
