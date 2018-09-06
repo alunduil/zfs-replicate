@@ -1,7 +1,7 @@
 """Task Execution."""
 
 import itertools
-from typing import Dict, List
+from typing import List, Tuple
 
 from .. import filesystem, optional, snapshot
 from ..compress import Compression
@@ -11,14 +11,14 @@ from .type import Action, Task
 
 def execute(  # pylint: disable=too-many-arguments
     remote: FileSystem,
-    tasks: Dict[FileSystem, List[Task]],
+    tasks: List[Tuple[FileSystem, List[Task]]],
     ssh_command: str,
     follow_delete: bool,
     compression: Compression,
 ) -> None:
     """Execute all tasks."""
 
-    sorted_tasks = sorted(tasks.items(), key=lambda x: len(x[0].name.split("/")), reverse=True)
+    sorted_tasks = sorted(tasks, key=lambda x: len(x[0].name.split("/")), reverse=True)
 
     for _, filesystem_tasks in sorted_tasks:
         action_tasks = {

@@ -69,6 +69,7 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
 
     if verbose:
         click.echo(f"found {len(l_snaps)} snapshots on {local_fs.name}")
+        click.echo()
 
     r_filesystem = filesystem.remote_dataset(remote_fs, local_fs)
     filesystem.create(r_filesystem, ssh_command=ssh_command)
@@ -80,6 +81,7 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
 
     if verbose:
         click.echo(f"found {len(r_snaps)} snapshots on {r_filesystem.name}")
+        click.echo()
 
     filesystem_l_snaps = {
         filesystem: list(l_snaps) for filesystem, l_snaps in itertools.groupby(l_snaps, key=lambda x: x.filesystem)
@@ -93,9 +95,9 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
         click.echo(task.report(tasks))
 
     if not dry_run:
-        filesystem_tasks = {
-            filesystem: list(tasks) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
-        }
+        filesystem_tasks = [
+            (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
+        ]
         task.execute(
             remote_fs, filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command
         )

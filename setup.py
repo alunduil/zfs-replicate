@@ -29,6 +29,7 @@ setup(
 
     install_requires=[
         "click>=6.7,<6.8",
+        "multidict>=4.4,<4.5",
         "stringcase>=1.2,<1.3",
         ],
 
