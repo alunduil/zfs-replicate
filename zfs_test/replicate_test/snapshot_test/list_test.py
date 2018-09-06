@@ -5,21 +5,21 @@ from typing import Dict, List
 
 from hypothesis import given
 from hypothesis.searchstrategy import SearchStrategy
-from hypothesis.strategies import fixed_dictionaries, integers, just, lists, text
+from hypothesis.strategies import fixed_dictionaries, integers, lists, none, text
 
-from zfs.replicate.filesystem.type import FileSystem
+from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.list import _snapshot, _snapshots
 from zfs.replicate.snapshot.type import Snapshot
 
 NOT_WHITESPACE = [x for x in string.printable if x not in string.whitespace and x != "@"]
 
-filesystems_dict: Dict[str, SearchStrategy] = {"name": text(NOT_WHITESPACE), "readonly": just(False)}
-filesystems = fixed_dictionaries(filesystems_dict).map(lambda kwargs: FileSystem(**kwargs))
+filesystems = text(NOT_WHITESPACE).map(filesystem)
 
 snapshots_dict: Dict[str, SearchStrategy] = {
     "filesystem": filesystems,
     "name": text(NOT_WHITESPACE),
     "timestamp": integers(),
+    "previous": none(),
 }
 snapshots = fixed_dictionaries(snapshots_dict).map(lambda kwargs: Snapshot(**kwargs))  # pylint: disable=invalid-name
 

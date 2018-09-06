@@ -7,6 +7,7 @@ import click
 from .. import filesystem, snapshot, ssh, task
 from ..compress import Compression
 from ..filesystem import FileSystem
+from ..filesystem import filesystem as filesystem_t
 from ..ssh import Cipher
 from .click import EnumChoice
 
@@ -40,8 +41,8 @@ from .click import EnumChoice
     help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
 )
 @click.argument("host", required=True)
-@click.argument("remote", type=lambda x: FileSystem(name=x, readonly=False), required=True, metavar="REMOTE_FS")
-@click.argument("local", type=lambda x: FileSystem(name=x, readonly=False), required=True, metavar="LOCAL_FS")
+@click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")
+@click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")
 def main(  # pylint: disable=too-many-arguments,too-many-locals
     verbose: bool,
     dry_run: bool,
@@ -53,23 +54,23 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     cipher: Cipher,
     compression: Compression,
     host: str,
-    remote: FileSystem,
-    local: FileSystem,
+    remote_fs: FileSystem,
+    local_fs: FileSystem,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
     if verbose:
-        click.echo(f"checking filesystem {local.name}")
+        click.echo(f"checking filesystem {local_fs.name}")
 
-    l_snaps = snapshot.list(local, recursive=recursive)
+    l_snaps = snapshot.list(local_fs, recursive=recursive)
     # Improvment: exclusions from snapshots to replicate.
 
     if verbose:
-        click.echo(f"found {len(l_snaps)} snapshots on {local.name}")
+        click.echo(f"found {len(l_snaps)} snapshots on {local_fs.name}")
 
-    r_filesystem = filesystem.remote_name(remote, local)
+    r_filesystem = filesystem.remote_dataset(remote_fs, local_fs)
     filesystem.create(r_filesystem, ssh_command=ssh_command)
 
     if verbose:
@@ -86,8 +87,7 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
     filesystem_r_snaps = {
         filesystem: list(r_snaps) for filesystem, r_snaps in itertools.groupby(r_snaps, key=lambda x: x.filesystem)
     }
-
-    tasks = task.generate(remote, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
+    tasks = task.generate(remote_fs, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
 
     if verbose:
         click.echo(task.report(tasks))
@@ -97,5 +97,5 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
             filesystem: list(tasks) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
         }
         task.execute(
-            remote, filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command
+            remote_fs, filesystem_tasks, follow_delete=follow_delete, compression=compression, ssh_command=ssh_command
         )

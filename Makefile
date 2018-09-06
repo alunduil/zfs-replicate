@@ -17,7 +17,7 @@ lint: clean
 	isort -y --atomic -rc $(PACKAGES) $(TEST_PACKAGES)
 	black -l 120 --py36 $(PACKAGES) $(TEST_PACKAGES)
 	pylint -j 0 $(PACKAGES) $(TEST_PACKAGES)
-	vulture --exclude='zfs/replicate/cli/click.py' --ignore-names=main $(PACKAGES) $(TEST_PACKAGES)
+	vulture --min-confidence=61 --exclude='zfs/replicate/cli/click.py' --ignore-names=main $(PACKAGES) $(TEST_PACKAGES)
 
 .PHONY: clean
 clean:

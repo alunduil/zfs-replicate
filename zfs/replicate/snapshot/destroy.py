@@ -13,8 +13,8 @@ def destroy(snapshot: Snapshot, ssh_command: str) -> None:
 
     _, error = proc.communicate()
     if proc.returncode:
-        raise RuntimeError(f"unable to destroy snapshot: {snapshot.name}: {error}")
+        raise RuntimeError(f"unable to destroy snapshot: {snapshot.filesystem.name}@{snapshot.name}: {error}")
 
 
 def _destroy(snapshot: Snapshot) -> str:
-    return f"/usr/bin/env - zfs destroy '{snapshot.name}'"
+    return f"/usr/bin/env - zfs destroy '{snapshot.filesystem.name}@{snapshot.name}'"

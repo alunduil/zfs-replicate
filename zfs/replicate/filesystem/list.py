@@ -3,6 +3,7 @@
 import re
 from typing import List
 
+from . import type  # pylint: disable=redefined-builtin
 from .. import subprocess
 from .type import FileSystem
 
@@ -41,4 +42,4 @@ def _filesystems(zfs_list_output: bytes) -> List[FileSystem]:
 def _filesystem(zfs_list_line: bytes) -> FileSystem:
     name, readonly = RE_WHITESPACE.sub(b" ", zfs_list_line).split(b" ")
 
-    return FileSystem(name=name.decode("utf-8"), readonly=readonly == b"on")
+    return type.filesystem(name=name.decode("utf-8"), readonly=readonly == b"on")

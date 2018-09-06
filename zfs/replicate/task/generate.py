@@ -1,8 +1,10 @@
 """Replication Tasks."""
 
-from typing import Dict, List, Optional
+from typing import Dict, List
 
-from ..filesystem import FileSystem, remote_name
+from ..filesystem import FileSystem
+from ..filesystem import filesystem as filesystem_t
+from ..filesystem import remote_filesystem
 from ..list import venn
 from ..snapshot import Snapshot
 from .type import Action, Task
@@ -19,9 +21,14 @@ def generate(
     tasks = []
 
     for filesystem in local_snapshots:
+        remote_snapshots = {
+            filesystem_t(name=key.name.replace(remote.name + "/", ""), readonly=filesystem.readonly): value
+            for key, value in remote_snapshots.items()
+        }
+
         if filesystem not in remote_snapshots:
-            tasks.append(_task(Action.CREATE, remote_name(remote, filesystem)))
-            tasks.extend([_task(Action.SEND, remote, s) for s in local_snapshots[filesystem]])
+            tasks.append(Task(action=Action.CREATE, filesystem=remote_filesystem(remote, filesystem), snapshot=None))
+            tasks.extend([Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in local_snapshots[filesystem]])
             continue
 
         lefts: List[Snapshot]
@@ -31,23 +38,33 @@ def generate(
         lefts, middles, rights = venn(local_snapshots[filesystem], remote_snapshots[filesystem])
 
         if not middles:
-            tasks.extend([_task(Action.DESTROY, remote, s) for s in rights])
+            tasks.extend(
+                [
+                    Task(action=Action.DESTROY, filesystem=remote_filesystem(remote, filesystem), snapshot=s)
+                    for s in rights
+                ]
+            )
 
-        tasks.extend([_task(Action.SEND, remote, s) for s in lefts])
+        tasks.extend([Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in lefts])
 
         if middles and follow_delete:
-            tasks.extend([_task(Action.DESTROY, remote, s) for s in rights])
+            tasks.extend(
+                [
+                    Task(action=Action.DESTROY, filesystem=remote_filesystem(remote, filesystem), snapshot=s)
+                    for s in rights
+                ]
+            )
 
     for filesystem in remote_snapshots:
+        filesystem = filesystem_t(name=filesystem.name.replace(remote.name + "/", ""), readonly=filesystem.readonly)
+
         if filesystem not in local_snapshots:
-            tasks.extend([_task(Action.DESTROY, remote, s) for s in remote_snapshots[filesystem]])
-            tasks.append(_task(Action.DESTROY, remote_name(remote, filesystem)))
+            tasks.extend(
+                [
+                    Task(action=Action.DESTROY, filesystem=remote_filesystem(remote, filesystem), snapshot=s)
+                    for s in remote_snapshots[filesystem]
+                ]
+            )
+            tasks.append(Task(action=Action.DESTROY, filesystem=remote_filesystem(remote, filesystem), snapshot=None))
 
     return tasks
-
-
-def _task(action: Action, destination: FileSystem, snapshot: Optional[Snapshot] = None) -> Task:
-    if snapshot is not None:
-        destination = remote_name(destination, snapshot.filesystem)
-
-    return Task(action=action, filesystem=destination, snapshot=snapshot)

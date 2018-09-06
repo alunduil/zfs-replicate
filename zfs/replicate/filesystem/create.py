@@ -2,6 +2,7 @@
 
 import os.path
 
+from . import type  # pylint: disable=redefined-builtin
 from .. import subprocess
 from ..list import inits
 from .list import list  # pylint: disable=redefined-builtin
@@ -11,7 +12,10 @@ from .type import FileSystem
 def create(filesystem: FileSystem, ssh_command: str) -> None:
     """Create a Remote FileSystem."""
 
-    top_level = FileSystem(name=filesystem.name.split("/")[0], readonly=filesystem.readonly)
+    if filesystem.name is None:
+        raise RuntimeError(f"refusing to create data pool: {filesystem.dataset}")
+
+    top_level = type.filesystem(name=filesystem.dataset, readonly=filesystem.readonly)
 
     filesystems = [x.name for x in list(top_level, ssh_command=ssh_command)]
 

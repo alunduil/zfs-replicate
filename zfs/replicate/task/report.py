@@ -22,14 +22,14 @@ def report(tasks: List[Task]) -> str:
     if len(filesystems) > LIMITS["filesystem"]:
         return _counts("filesystem", tasks)
 
-    return _report_dataset(filesystems)
+    return _report_filesystem(filesystems)
 
 
-def _report_dataset(filesystems: Dict[FileSystem, List[Task]]) -> str:
+def _report_filesystem(filesystems: Dict[FileSystem, List[Task]]) -> str:
     output = ""
 
     for filesystem, tasks in filesystems.items():
-        output += f"dataset: {filesystem.name}\n"
+        output += f"filesystem: {filesystem.name}\n"
 
         actions = {action: list(tasks) for action, tasks in itertools.groupby(tasks, key=_action)}
 
@@ -58,7 +58,9 @@ def _report_action(actions: Dict[Action, List[Task]], indentation: str = "") -> 
 
 
 def _report_snapshot(snapshots: Dict[Optional[Snapshot], List[Task]], indentation: str = "") -> str:
-    return "\n".join([f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s in snapshots if s is not None])
+    return (
+        "\n".join([f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s in snapshots if s is not None]) + "\n"
+    )
 
 
 def _counts(current: str, tasks: List[Task], indentation: str = "") -> str:

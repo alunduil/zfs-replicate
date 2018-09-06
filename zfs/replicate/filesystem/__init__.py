@@ -2,12 +2,16 @@
 
 from .create import create
 from .destroy import destroy
-from .type import FileSystem
+from .type import FileSystem, filesystem
 
 
-def remote_name(remote: FileSystem, local: FileSystem) -> FileSystem:
-    """Remote dataset name for the remote and local pair."""
+def remote_dataset(remote: FileSystem, local: FileSystem) -> FileSystem:
+    """Remote dataset for the remote and local pair."""
 
-    volume, _, _ = local.name.partition("/")
+    return type.filesystem(name=remote.name + "/" + local.dataset)
 
-    return FileSystem(name=remote.name + "/" + volume, readonly=False)
+
+def remote_filesystem(remote: FileSystem, local: FileSystem) -> FileSystem:
+    """Remote filesystem for the remote and local pair."""
+
+    return type.filesystem(name=remote.name + "/" + local.name)
