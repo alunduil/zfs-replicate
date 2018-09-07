@@ -8,11 +8,12 @@ matrix:
   allow_failures:
     - python: "nightly"
   fast_finish: true
+
 install:
   - "pip install -qU --compile pip"
-  - "make dependencies"
-  - "make test-dependencies"
+  - "pip install -r requirements.txt"
+
 script:
-  - "make sdist"
-  - "make install"
-  - "make"
+  - "python setup.py sdist"
+  - "pip install ."
+  - "make check"
