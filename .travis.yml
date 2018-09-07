@@ -1,0 +1,18 @@
+language: python
+python:
+  - "3.6"
+  - "3.6-dev"
+  - "3.7-dev"
+  - "nightly"
+matrix:
+  allow_failures:
+    - python: "nightly"
+  fast_finish: true
+install:
+  - "pip install -qU --compile pip"
+  - "make dependencies"
+  - "make test-dependencies"
+script:
+  - "make sdist"
+  - "make install"
+  - "make"
