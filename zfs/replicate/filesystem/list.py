@@ -24,7 +24,7 @@ def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:  # pylin
         error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
     if proc.returncode:
-        raise RuntimeError(f"error encountered while listing filsystems of {filesystem.name}: {error}")
+        raise RuntimeError(f"error encountered while listing filesystems of {filesystem.name}: {error}")
 
     return _filesystems(output)
 
