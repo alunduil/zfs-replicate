@@ -10,7 +10,7 @@ check: test
 .PHONY: test
 test: clean
 	find $(PACKAGES) $(TEST_PACKAGES) -name '*.py' -exec mypy --strict "{}" +
-	pytest -x
+	pytest -x --doctest-modules $(PACKAGES:%=--cov=%) --cov-report term-missing
 
 .PHONY: lint
 lint: clean

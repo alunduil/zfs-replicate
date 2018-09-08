@@ -17,3 +17,6 @@ script:
   - "python setup.py sdist"
   - "pip install ."
   - "make check"
+
+after_success:
+  - coveralls
