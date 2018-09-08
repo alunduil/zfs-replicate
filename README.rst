@@ -27,15 +27,13 @@ has ZFS_ permissions configured correctly.
 
 Allow user to mount (FreeBSD_):
 
-```
-sysctl -w vfs.usermount=1
-```
+::
+    sysctl -w vfs.usermount=1
 
 ZFS_ Permissions:
 
-```
-zfs allow backup create,destroy,snapshot,rollback,clone,promote,rename,mount,send,receive,quota,reservation,hold storage
-```
+::
+    zfs allow backup create,destroy,snapshot,rollback,clone,promote,rename,mount,send,receive,quota,reservation,hold storage
 
 More information about this configuration can be found at the following sources:
 
@@ -80,6 +78,7 @@ request.  This project follows `git flow`_ and utilizes travis_ to automatically
 check pull requests before a manual review.
 
 .. _autorepl.py: https://github.com/freenas/freenas/blob/master/gui/tools/autorepl.py
+.. _FreeBSD: https://www.freebsd.org/
 .. _FreeNAS: http://www.freenas.org/
 .. _git flow: http://nvie.com/posts/a-successful-git-branching-model/
 .. _Github: https://github.com/alunduil/zfs-replicate
