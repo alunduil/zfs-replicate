@@ -52,7 +52,7 @@ any special tools (other than the standard shell scripts) on the remote host.
 Other tools fill other niches:
 
 `sanoid <https://github.com/jimsalterjrs/sanoid>`
-  A full snapshot management system.  It's companion application, syncoid,
+  A full snapshot management system.  Its companion application, syncoid,
   handles replication with many available options.
 
 `zfs-replicate (BASH) <https://github.com/leprechau/zfs-replicate>`
