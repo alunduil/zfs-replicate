@@ -71,7 +71,7 @@ More information has been captured in `this survey <https://www.reddit.com/r/zfs
 Reporting Issues
 ----------------
 
-Any isseus discovered should be recorded on
+Any issues discovered should be recorded on
 `Github <https://github.com/alunduil/zfs-replicate>`_.  If you believe you've
 found an error or have a suggestion for a new feature, please ensure that it is
 reported.
