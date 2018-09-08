@@ -25,14 +25,12 @@ Otherwise, you'll not only need to ensure the user you're using has SSH_ access
 to the remote host, but also can mount filesystems (if this is desirable) and
 has ZFS_ permissions configured correctly.
 
-Allow user to mount (FreeBSD_):
+Allow user to mount (FreeBSD_)::
 
-::
     sysctl -w vfs.usermount=1
 
-ZFS_ Permissions:
+ZFS_ Permissions::
 
-::
     zfs allow backup create,destroy,snapshot,rollback,clone,promote,rename,mount,send,receive,quota,reservation,hold storage
 
 More information about this configuration can be found at the following sources:
