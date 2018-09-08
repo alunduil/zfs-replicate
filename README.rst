@@ -52,7 +52,7 @@ any special tools (other than the standard shell scripts) on the remote host.
 Other tools fill other niches:
 
 `sanoid`_
-  A full snapshot management system.  It's companion application, syncoid,
+  A full snapshot management system.  Its companion application, syncoid,
   handles replication with many available options.
 
 `zfs-replicate (BASH)`_
@@ -71,7 +71,7 @@ More information has been captured in `this survey`_.
 Reporting Issues
 ----------------
 
-Any isseus discovered should be recorded on Github_.  If you believe you've
+Any issues discovered should be recorded on Github_.  If you believe you've
 found an error or have a suggestion for a new feature, please ensure that it is
 reported.
 
