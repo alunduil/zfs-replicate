@@ -20,3 +20,11 @@ script:
 
 after_success:
   - coveralls
+
+deploy:
+  provider: pypi
+  user: "alunduil"
+  password:
+    secure: Kcsqc4VJM2uzhwd2xw3uByM0zLibN03Aq/lRMvcNSJbdwfL7Mfz9RaO6hMzfQYrcndO4MH8iYZxVbnh+xQSo52PBCIBeitbcwmdco6BWRF0Y9APo+t1koJ8fw+Zms4Tb+B4lMeYXoil5+hySv5sVlbAUaZyMgm+cm5ccennyTsxcrV3rU8JG0jND9WonXcvVWuV2LnLM8+FAdb5Habbfbus98KQTQjj4Acsq2xuoWq5i8DYAVteMe7j/Oazpb4/BXoyK7/bNLnzZ3wM/E9gzb6ZZy6gkd36T7s691BVDCMmLnIJpwRxBq4H+4DeM0SigzqpItk0Sunnw2wI/C44/q9LA6h3VOKEQAGkLALV5c6pq61TxvO7Sw2e7hoLSZk5F3abHYh6Ka6NivMfoQldCOIo46HdUOetEQEeHvrzRHsi6sVRtiKddgBZQMB0ULmSy9AFNa4HVU9JSPa5+Z0e+smrykQmpwj0GzWPW2s4Y4uc/qnNCCoO1ZS+8+Qfjvy2R1H/y0lRnmusnalbvZc8hShRSWKhpXe7WWMOJMaQ0a0xebM+RmmKdFrhtDUf8iDwoXfbBh+FDhKhoBsEolB9C+CXZZ4JPhR12Rww1t2qOS3EfM28kNGPidHrMLEEmcC0B7XD4Kz6ZlO83MXumTxvyHJ9i6D9VoCIwgZNSamkZi68=
+  on:
+    tags: true
