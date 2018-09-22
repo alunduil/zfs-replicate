@@ -3,6 +3,7 @@
 from typing import List, Optional
 
 from .. import subprocess
+from ..error import ZFSReplicateError
 from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
 
@@ -23,7 +24,9 @@ def list(  # pylint: disable=redefined-builtin
         error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
     if proc.returncode:
-        raise RuntimeError(f"error encountered while listing snapshots of {filesystem.name}: {error}")
+        raise ZFSReplicateError(
+            f"error encountered while listing snapshots of '{filesystem.name}': {error}", filesystem, error
+        )
 
     return _snapshots(output)
 

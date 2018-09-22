@@ -11,4 +11,4 @@ def command(compression: Compression) -> Tuple[str, str]:
     if compression == Compression.LZ4:
         return (f"/usr/bin/env - lz4c | ", f"/usr/bin/env - lz4c -d | ")
 
-    raise RuntimeError(f"unknown Compression: {compression}")
+    raise ValueError(f"invalid compression: '{compression}'", compression)
