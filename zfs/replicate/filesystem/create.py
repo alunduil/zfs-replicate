@@ -4,6 +4,7 @@ import os.path
 
 from . import type  # pylint: disable=redefined-builtin
 from .. import subprocess
+from ..error import ZFSReplicateError
 from ..list import inits
 from .list import list  # pylint: disable=redefined-builtin
 from .type import FileSystem
@@ -13,7 +14,7 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
     """Create a Remote FileSystem."""
 
     if filesystem.name is None:
-        raise RuntimeError(f"refusing to create data pool: {filesystem.dataset}")
+        raise ZFSReplicateError(f"refusing to create dataset: '{filesystem.dataset}'", filesystem)
 
     top_level = type.filesystem(name=filesystem.dataset, readonly=filesystem.readonly)
 
@@ -36,7 +37,9 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
             if b"successfully created, but not mounted" in error:
                 return  # Ignore this error.
 
-            raise RuntimeError(f"unable to create remote dataset: {filesystem}: {error}")
+            raise ZFSReplicateError(
+                f"unable to create remote dataset: '{filesystem.dataset}': {error}", filesystem, error
+            )
 
 
 def _create(filesystem: str) -> str:
