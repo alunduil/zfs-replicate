@@ -5,6 +5,7 @@ from typing import Optional
 
 from .. import compress, filesystem
 from ..compress import Compression
+from ..error import ZFSReplicateError
 from ..filesystem import FileSystem
 from .type import Snapshot
 
@@ -35,7 +36,9 @@ def send(  # pylint: disable=too-many-arguments,too-many-locals
         if b"failed to create mountpoint" in error:
             return  # Ignore this error.
 
-        raise RuntimeError(f"failed to create snapshot: {current.filesystem.name}@{current.name}: {error}")
+        raise ZFSReplicateError(
+            f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error}", current, error
+        )
 
 
 def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False) -> str:

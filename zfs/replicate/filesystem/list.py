@@ -5,6 +5,7 @@ from typing import List
 
 from . import type  # pylint: disable=redefined-builtin
 from .. import subprocess
+from ..error import ZFSReplicateError
 from .type import FileSystem
 
 RE_WHITESPACE = re.compile(b"[ \t]+")
@@ -24,7 +25,9 @@ def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:  # pylin
         error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
     if proc.returncode:
-        raise RuntimeError(f"error encountered while listing filesystems of {filesystem.name}: {error}")
+        raise ZFSReplicateError(
+            f"error encountered while listing filesystems of '{filesystem.name}': {error}", filesystem, error
+        )
 
     return _filesystems(output)
 
