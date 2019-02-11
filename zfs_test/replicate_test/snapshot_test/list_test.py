@@ -1,7 +1,7 @@
 """zfs.replicate.snapshot tests"""
 
 import string
-from typing import Dict, List
+from typing import Dict, List, Any
 
 from hypothesis import given
 from hypothesis.searchstrategy import SearchStrategy
@@ -13,9 +13,9 @@ from zfs.replicate.snapshot.type import Snapshot
 
 NOT_WHITESPACE = [x for x in string.printable if x not in string.whitespace and x != "@"]
 
-filesystems = text(NOT_WHITESPACE).map(filesystem)
+filesystems = text(NOT_WHITESPACE).map(filesystem)  # pylint: disable=invalid-name
 
-snapshots_dict: Dict[str, SearchStrategy] = {
+snapshots_dict: Dict[str, SearchStrategy[Any]] = {
     "filesystem": filesystems,
     "name": text(NOT_WHITESPACE),
     "timestamp": integers(),
