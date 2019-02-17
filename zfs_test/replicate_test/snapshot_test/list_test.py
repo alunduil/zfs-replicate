@@ -1,7 +1,7 @@
 """zfs.replicate.snapshot tests"""
 
 import string
-from typing import Dict, List, Any
+from typing import Any, Dict, List
 
 from hypothesis import given
 from hypothesis.searchstrategy import SearchStrategy
