@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name="zfs-replicate",
-    version="1.1.0",
+    version="1.1.1",
     description="ZFS Snapshot Replicator",
     url="https://github.com/alunduil/zfs-replicate",
 
