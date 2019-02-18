@@ -10,9 +10,9 @@ STDOUT = subprocess.STDOUT
 def open(  # pylint: disable=redefined-builtin
     command: str,
     shell: bool = False,
-    stdin: Union[IO, int] = subprocess.PIPE,
-    stdout: Union[IO, int] = subprocess.PIPE,
-    stderr: Union[IO, int] = subprocess.PIPE,
+    stdin: Union[IO[str], int] = subprocess.PIPE,
+    stdout: Union[IO[str], int] = subprocess.PIPE,
+    stderr: Union[IO[str], int] = subprocess.PIPE,
 ) -> subprocess.Popen:
     """Wrapper around subprocess.Popen."""
 
