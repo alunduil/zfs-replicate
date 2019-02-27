@@ -2,10 +2,14 @@
 
 from setuptools import setup
 
+with open("README.rst") as fh:
+    README = fh.read()
+
 setup(
     name="zfs-replicate",
-    version="1.1.1",
+    version="1.1.2",
     description="ZFS Snapshot Replicator",
+    long_description=README,
     url="https://github.com/alunduil/zfs-replicate",
 
     author="Alex Brandt",
