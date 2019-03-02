@@ -1,8 +1,8 @@
 """ZFS FileSsytem destruction."""
 
+from .type import FileSystem
 from .. import subprocess
 from ..error import ZFSReplicateError
-from .type import FileSystem
 
 
 def destroy(filesystem: FileSystem, ssh_command: str) -> None:
