@@ -2,12 +2,12 @@
 
 import os.path
 
-from . import type  # pylint: disable=redefined-builtin
-from .list import list  # pylint: disable=redefined-builtin
-from .type import FileSystem
 from .. import subprocess
 from ..error import ZFSReplicateError
 from ..list import inits
+from . import type  # pylint: disable=redefined-builtin
+from .list import list  # pylint: disable=redefined-builtin
+from .type import FileSystem
 
 
 def create(filesystem: FileSystem, ssh_command: str) -> None:
