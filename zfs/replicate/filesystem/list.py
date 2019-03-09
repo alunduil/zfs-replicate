@@ -11,7 +11,9 @@ from .type import FileSystem
 RE_WHITESPACE = re.compile(b"[ \t]+")
 
 
-def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:  # pylint: disable=redefined-builtin
+def list(
+    filesystem: FileSystem, ssh_command: str
+) -> List[FileSystem]:  # pylint: disable=redefined-builtin
     """List ZFS FileSystem."""
 
     command = _list(filesystem)
@@ -22,11 +24,17 @@ def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:  # pylin
 
     output, error = proc.communicate()
     if error is not None:
-        error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
+        error = (
+            error.strip(b"\n")
+            .strip(b"\r")
+            .replace(b"WARNING: ENABLED NONE CIPHER", b"")
+        )
 
     if proc.returncode:
         raise ZFSReplicateError(
-            f"error encountered while listing filesystems of '{filesystem.name}': {error}", filesystem, error
+            f"error encountered while listing filesystems of '{filesystem.name}': {error}",
+            filesystem,
+            error,
         )
 
     return _filesystems(output)
