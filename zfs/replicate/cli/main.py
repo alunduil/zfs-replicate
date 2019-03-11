@@ -4,12 +4,12 @@ import itertools
 
 import click
 
+from .click import EnumChoice
 from .. import filesystem, snapshot, ssh, task
 from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
 from ..ssh import Cipher
-from .click import EnumChoice
 
 
 @click.command()
