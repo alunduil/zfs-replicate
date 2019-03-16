@@ -2,12 +2,12 @@
 
 from typing import Dict, List
 
-from .type import Action, Task
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
 from ..filesystem import remote_filesystem
 from ..list import venn
 from ..snapshot import Snapshot
+from .type import Action, Task
 
 
 def generate(

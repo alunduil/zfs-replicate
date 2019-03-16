@@ -1,4 +1,4 @@
-black==18.6b4
+black==19.3b0
 click==6.7
 coveralls==1.6.0
 hypothesis==3.69.2
