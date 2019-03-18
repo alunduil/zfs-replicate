@@ -3,10 +3,10 @@
 import itertools
 from typing import List, Tuple
 
-from .type import Action, Task
 from .. import filesystem, optional, snapshot
 from ..compress import Compression
 from ..filesystem import FileSystem
+from .type import Action, Task
 
 
 def execute(  # pylint: disable=too-many-arguments

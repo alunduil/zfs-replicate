@@ -3,9 +3,9 @@
 import itertools
 from typing import List, Tuple
 
-from .type import Action, Task
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
+from .type import Action, Task
 
 LIMITS = {"filesystem": 6, "action": 4, "snapshot": 13}
 

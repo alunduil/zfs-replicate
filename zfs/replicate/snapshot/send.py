@@ -3,11 +3,11 @@
 import subprocess
 from typing import Optional
 
-from .type import Snapshot
 from .. import compress, filesystem
 from ..compress import Compression
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem
+from .type import Snapshot
 
 
 def send(  # pylint: disable=too-many-arguments,too-many-locals

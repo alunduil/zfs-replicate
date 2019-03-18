@@ -1,8 +1,8 @@
 """ZFS Snapshot destruction."""
 
-from .type import Snapshot
 from .. import subprocess
 from ..error import ZFSReplicateError
+from .type import Snapshot
 
 
 def destroy(snapshot: Snapshot, ssh_command: str) -> None:

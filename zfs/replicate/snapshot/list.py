@@ -2,10 +2,10 @@
 
 from typing import List, Optional
 
-from .type import Snapshot
 from .. import subprocess
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem, filesystem
+from .type import Snapshot
 
 
 def list(  # pylint: disable=redefined-builtin
