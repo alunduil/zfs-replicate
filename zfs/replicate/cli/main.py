@@ -20,7 +20,7 @@ from .click import EnumChoice
 )
 @click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")
 @click.option("--port", "-p", type=click.IntRange(1, 65535), metavar="PORT", default=22, help="Connect to SSH on PORT.")
-@click.option("--login", "-l", "--user", "-u", metavar="USER", help="Connect to SSH as USER.")
+@click.option("--login", "-l", "--user", "-u", "user", metavar="USER", help="Connect to SSH as USER.")
 @click.option(
     "-i",
     "--identity-file",
