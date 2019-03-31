@@ -8,4 +8,6 @@ def test_invokes_without_stacktrace() -> None:
 
     runner = CliRunner()
     result = runner.invoke(main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
-    assert isinstance(result.exception, SystemExit), "Expected normal exit."
+    assert isinstance(result.exception, SystemExit) or result.exception == FileNotFoundError(
+        2, "No such file or directory: '/usr/bin/env'"
+    ), "Expected SystemExit or FileNotFoundError."
