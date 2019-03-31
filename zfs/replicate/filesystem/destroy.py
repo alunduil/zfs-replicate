@@ -18,4 +18,4 @@ def destroy(filesystem: FileSystem, ssh_command: str) -> None:
 
 
 def _destroy(filesystem: FileSystem) -> str:
-    return f"/usr/bin/env - zfs destroy -r '{filesystem}'"
+    return f"zfs destroy -r '{filesystem}'"

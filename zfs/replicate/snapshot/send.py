@@ -50,9 +50,9 @@ def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete:
     if previous is not None:
         options.append(f"-i '{previous.filesystem.name}@{previous.name}'")
 
-    return f"/usr/bin/env - zfs send {' '.join(options)} '{current.filesystem.name}@{current.name}'"
+    return f"zfs send {' '.join(options)} '{current.filesystem.name}@{current.name}'"
 
 
 def _receive(remote: FileSystem, current: Snapshot, decompress_command: str) -> str:
     destination = filesystem.remote_dataset(remote, current.filesystem)
-    return f"{decompress_command}/usr/bin/env - zfs receive -F -d '{destination.name}'"
+    return f"{decompress_command}zfs receive -F -d '{destination.name}'"

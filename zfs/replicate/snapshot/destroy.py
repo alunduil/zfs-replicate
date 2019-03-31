@@ -20,4 +20,4 @@ def destroy(snapshot: Snapshot, ssh_command: str) -> None:
 
 
 def _destroy(snapshot: Snapshot) -> str:
-    return f"/usr/bin/env - zfs destroy '{snapshot.filesystem.name}@{snapshot.name}'"
+    return f"zfs destroy '{snapshot.filesystem.name}@{snapshot.name}'"

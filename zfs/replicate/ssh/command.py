@@ -6,8 +6,6 @@ from .cipher import Cipher
 def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> str:
     """Generated ssh commandline invocation."""
 
-    ssh = "/usr/bin/env - ssh"
-
     options = []
 
     if cipher == Cipher.FAST:
@@ -22,4 +20,4 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> s
 
     options.extend([f"-p {port}", host])
 
-    return ssh + " " + " ".join(options)
+    return "ssh " + " ".join(options)

@@ -9,6 +9,6 @@ def command(compression: Compression) -> Tuple[str, str]:
     """Compress and decompress command strings for compression."""
 
     if compression == Compression.LZ4:
-        return (f"/usr/bin/env - lz4c | ", f"/usr/bin/env - lz4c -d | ")
+        return (f"lz4c | ", f"lz4c -d | ")
 
     raise ValueError(f"invalid compression: '{compression}'", compression)

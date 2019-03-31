@@ -39,7 +39,7 @@ def _list(filesystem: FileSystem, recursive: bool) -> str:  # pylint: disable=re
     if not recursive:
         options.append("-d 1")
 
-    return f"/usr/bin/env - zfs list {' '.join(options)} '{filesystem.name}'"
+    return f"zfs list {' '.join(options)} '{filesystem.name}'"
 
 
 def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:

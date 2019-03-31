@@ -43,4 +43,4 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
 
 
 def _create(filesystem: str) -> str:
-    return f"/usr/bin/env - zfs create -o readonly=on {filesystem}"
+    return f"zfs create -o readonly=on {filesystem}"
