@@ -7,6 +7,6 @@ mypy==0.700
 pylint==2.3.1
 pytest==4.5.0
 pytest-cov==2.6.1
-pytest-runner==4.4
+pytest-runner==5.0
 stringcase==1.2.0
 vulture==0.29
