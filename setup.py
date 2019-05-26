@@ -7,7 +7,7 @@ with open("README.rst") as fh:
 
 setup(
     name="zfs-replicate",
-    version="1.1.8",
+    version="1.1.9",
     description="ZFS Snapshot Replicator",
     long_description=README,
     url="https://github.com/alunduil/zfs-replicate",
