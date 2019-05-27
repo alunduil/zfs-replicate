@@ -1,4 +1,4 @@
-from click.testing import CliRunner, Result
+from click.testing import CliRunner
 
 from zfs.replicate.cli.main import main
 
@@ -8,8 +8,8 @@ def test_invokes_without_stacktrace() -> None:
 
     runner = CliRunner()
     result = runner.invoke(main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
-    assert isinstance(result.exception, SystemExit) or file_not_found_error(
-        result
+    assert isinstance(result.exception, SystemExit) or (
+        isinstance(result.exception, FileNotFoundError) and result.exception.filename == "/usr/bin/env"
     ), "Expected SystemExit or FileNotFoundError."
 
 
@@ -18,10 +18,6 @@ def test_invokes_without_stacktrace_verbose() -> None:
 
     runner = CliRunner()
     result = runner.invoke(main, ["--verbose", "-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
-    assert isinstance(result.exception, SystemExit) or file_not_found_error(
-        result
+    assert isinstance(result.exception, SystemExit) or (
+        isinstance(result.exception, FileNotFoundError) and result.exception.filename == "/usr/bin/env"
     ), "Expected SystemExit or FileNotFoundError."
-
-
-def file_not_found_error(result: Result) -> bool:
-    return bool(FileNotFoundError(2, "No such file or directory: '/usr/bin/env'") == result.exception)
