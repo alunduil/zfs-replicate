@@ -10,10 +10,10 @@ class Snapshot(NamedTuple):
 
     filesystem: FileSystem
     name: str
-    previous: Optional[Any]  # mypy doesn't support nested types yet
+    previous: Optional["Snapshot"]
     timestamp: int
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: "Snapshot") -> bool:
         if not isinstance(other, Snapshot):
             raise NotImplementedError
 
