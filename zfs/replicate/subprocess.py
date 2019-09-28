@@ -13,7 +13,7 @@ def open(  # pylint: disable=redefined-builtin
     stdin: Union[IO[str], int] = subprocess.PIPE,
     stdout: Union[IO[str], int] = subprocess.PIPE,
     stderr: Union[IO[str], int] = subprocess.PIPE,
-) -> subprocess.Popen:
+) -> subprocess.Popen[bytes]:  # pylint: disable=unsubscriptable-object
     """Wrapper around subprocess.Popen."""
 
     return subprocess.Popen(shlex.split(command), stdin=stdin, stdout=stdout, stderr=stderr, shell=shell)
