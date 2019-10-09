@@ -126,3 +126,11 @@ pip-selfcheck.json
 
 
 # End of https://www.gitignore.io/api/python
+
+
+#Added by cargo
+#
+#already existing elements are commented out
+
+/target
+**/*.rs.bk
