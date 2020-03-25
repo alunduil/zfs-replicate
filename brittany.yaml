@@ -1,0 +1,4 @@
+conf_errorHandling:
+  econf_Werror: true
+conf_layout:
+  lconfig_cols: 120
