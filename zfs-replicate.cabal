@@ -45,6 +45,7 @@ executable zfs-replicate
       base >= 4.12 && < 4.13
 
   other-modules:
+      SSH
 
   hs-source-dirs:
       src
