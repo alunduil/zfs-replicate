@@ -73,11 +73,13 @@ options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS 
             <> value Nothing
             <> metavar "USER"
             )
-      <*> strOption (long "identity-file" <> short 'i' <> help "SSH identity file to use.")
+      <*> strOption (long "identity-file" <> short 'i' <> help "SSH identity file to use." <> metavar "PATH")
       <*> option
             auto
-            (long "cipher" <> value SSH.Standard <> help
-              "One of: disable (no ciphers), fast (only fast ciphers), or standard (default ciphers)."
+            (  long "cipher"
+            <> value SSH.Standard
+            <> help "One of: disable (no ciphers), fast (only fast ciphers), or standard (default ciphers)."
+            <> metavar "CIPHER"
             )
       <*> strArgument (metavar "HOSTNAME")
       <*> (FS.fromName <$> strArgument (metavar "REMOTE_FS"))
