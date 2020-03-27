@@ -13,7 +13,6 @@ from .click import EnumChoice
 
 
 @click.command()
-@click.option("--verbose", "-v", is_flag=True, help="Print additional output.")
 @click.option("--dry-run", is_flag=True, help="Generate replication tasks but do not execute them.")
 @click.option(
     "--follow-delete", is_flag=True, help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS."
@@ -25,21 +24,13 @@ from .click import EnumChoice
     default=Compression.LZ4,
     help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
 )
-@click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")
-@click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")
 def main(  # pylint: disable=too-many-arguments,too-many-locals
-    verbose: bool,
     dry_run: bool,
     follow_delete: bool,
     recursive: bool,
     compression: Compression,
-    remote_fs: FileSystem,
-    local_fs: FileSystem,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
-
-    if verbose:
-        click.echo(f"checking filesystem {local_fs.name}")
 
     l_snaps = snapshot.list(local_fs, recursive=recursive)
     # Improvment: exclusions from snapshots to replicate.

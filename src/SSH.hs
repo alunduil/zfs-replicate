@@ -21,7 +21,9 @@ import           Prelude                        ( (++)
                                                 , unwords
                                                 )
 
-data Cipher = Disabled | Fast | Standard
+data Cipher = Disabled
+            | Fast
+            | Standard
             deriving (Eq, Read, Show)
 
 type HostName = String

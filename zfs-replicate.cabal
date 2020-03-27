@@ -48,7 +48,8 @@ executable zfs-replicate
     , optparse-applicative == 0.14.3.0
 
   other-modules:
-      SSH
+      FileSystem
+    , SSH
 
   hs-source-dirs:
       src

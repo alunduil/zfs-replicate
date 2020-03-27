@@ -5,9 +5,14 @@ module Main
   )
 where
 
+import           Control.Monad                  ( when )
 import           Control.Monad.Extra            ( (<=<)
                                                 , unlessM
                                                 , whenM
+                                                )
+import qualified FileSystem                    as FS
+                                                ( FileSystem(name)
+                                                , fromName
                                                 )
 import           Options.Applicative
 import           Prelude
@@ -22,12 +27,16 @@ import           System.Directory               ( doesDirectoryExist
                                                 )
 import           System.Exit                    ( exitFailure )
 
-data Options = Options { port :: SSH.Port
-                       , userName :: Maybe SSH.UserName
-                       , identityFile :: FilePath
-                       , cipher :: SSH.Cipher
-                       , hostName :: SSH.HostName
-                       }
+data Options = Options
+             { verbose :: Bool
+             , port :: SSH.Port
+             , userName :: Maybe SSH.UserName
+             , identityFile :: FilePath
+             , cipher :: SSH.Cipher
+             , hostName :: SSH.HostName
+             , remote :: FS.FileSystem
+             , local :: FS.FileSystem
+             }
 
 main :: IO ()
 main = do
@@ -37,6 +46,8 @@ main = do
   whenM (doesDirectoryExist identityFile) (die ("'" <> identityFile <> "' is a directory."))
 
   let sshCommand = SSH.command cipher userName identityFile port hostName
+
+  when verbose $ putStrLn $ "checking filesystem " ++ FS.name local
 
   putStrLn sshCommand
 
@@ -48,7 +59,8 @@ options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS 
  where
   options' =
     Options
-      <$> option
+      <$> switch (long "verbose" <> short 'v' <> help "Print additional output.")
+      <*> option
             auto
             (long "port" <> short 'p' <> help "Connect to SSH on PORT." <> showDefault <> value 22 <> metavar "PORT")
       <*> option
@@ -67,7 +79,9 @@ options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS 
             (long "cipher" <> value SSH.Standard <> help
               "One of: disable (no ciphers), fast (only fast ciphers), or standard (default ciphers)."
             )
-      <*> strArgument idm
+      <*> strArgument (metavar "HOSTNAME")
+      <*> (FS.fromName <$> strArgument (metavar "REMOTE_FS"))
+      <*> (FS.fromName <$> strArgument (metavar "LOCAL_FS"))
 
 die :: String -> IO a
 die = const exitFailure <=< putStrLn
