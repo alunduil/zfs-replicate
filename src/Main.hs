@@ -5,9 +5,9 @@ module Main
   )
 where
 
+import           Control                        ( die )
 import           Control.Monad                  ( when )
-import           Control.Monad.Extra            ( (<=<)
-                                                , unlessM
+import           Control.Monad.Extra            ( unlessM
                                                 , whenM
                                                 )
 import qualified FileSystem                    as FS
@@ -16,6 +16,7 @@ import qualified FileSystem                    as FS
                                                 )
 import           Options.Applicative
 import           Prelude
+import qualified Snapshot                       ( listRecursive )
 import qualified SSH                            ( Cipher(Standard)
                                                 , HostName
                                                 , Port
@@ -25,7 +26,6 @@ import qualified SSH                            ( Cipher(Standard)
 import           System.Directory               ( doesDirectoryExist
                                                 , doesPathExist
                                                 )
-import           System.Exit                    ( exitFailure )
 
 data Options = Options
              { verbose :: Bool
@@ -34,8 +34,8 @@ data Options = Options
              , identityFile :: FilePath
              , cipher :: SSH.Cipher
              , hostName :: SSH.HostName
-             , remote :: FS.FileSystem
-             , local :: FS.FileSystem
+             , remoteFS :: FS.FileSystem
+             , localFS :: FS.FileSystem
              }
 
 main :: IO ()
@@ -47,9 +47,16 @@ main = do
 
   let sshCommand = SSH.command cipher userName identityFile port hostName
 
-  when verbose $ putStrLn $ "checking filesystem " ++ FS.name local
+  when verbose $ putStrLn $ "checking filesystem " ++ FS.name localFS
 
-  putStrLn sshCommand
+  localSnapshots <- Snapshot.listRecursive localFS
+  -- TODO exclusions from snapshots to replicate.
+
+  when verbose $ do
+    putStrLn $ "found " ++ show (length localSnapshots) ++ " snapshots on " ++ FS.name localFS
+    putStrLn ""
+
+  print sshCommand
 
   return ()
 
@@ -84,6 +91,3 @@ options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS 
       <*> strArgument (metavar "HOSTNAME")
       <*> (FS.fromName <$> strArgument (metavar "REMOTE_FS"))
       <*> (FS.fromName <$> strArgument (metavar "LOCAL_FS"))
-
-die :: String -> IO a
-die = const exitFailure <=< putStrLn

@@ -1,5 +1,5 @@
 { mkDerivation, base, directory, extra, hspec, hspec-discover
-, optparse-applicative, stdenv
+, optparse-applicative, process, QuickCheck, stdenv, text
 }:
 mkDerivation {
   pname = "zfs-replicate";
@@ -8,9 +8,9 @@ mkDerivation {
   isLibrary = false;
   isExecutable = true;
   executableHaskellDepends = [
-    base directory extra optparse-applicative
+    base directory extra optparse-applicative process text
   ];
-  testHaskellDepends = [ base hspec ];
+  testHaskellDepends = [ base extra hspec process QuickCheck text ];
   testToolDepends = [ hspec-discover ];
   homepage = "https://github.com/alunduil/zfs-replicate";
   description = "ZFS Snapshot Replicator";

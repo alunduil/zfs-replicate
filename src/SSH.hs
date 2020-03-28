@@ -35,7 +35,7 @@ type UserName = String
 command :: Cipher -> Maybe UserName -> FilePath -> Port -> HostName -> String
 command cipher user keyFile port hostName = ssh ++ " " ++ unwords (catMaybes options)
  where
-  ssh = "usr/bin/env - ssh"
+  ssh = "/usr/bin/env - ssh"
   options =
     toOptions cipher
       ++ [ Just $ "-i " ++ keyFile

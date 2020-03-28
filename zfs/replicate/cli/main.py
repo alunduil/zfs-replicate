@@ -32,13 +32,6 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
-    l_snaps = snapshot.list(local_fs, recursive=recursive)
-    # Improvment: exclusions from snapshots to replicate.
-
-    if verbose:
-        click.echo(f"found {len(l_snaps)} snapshots on {local_fs.name}")
-        click.echo()
-
     r_filesystem = filesystem.remote_dataset(remote_fs, local_fs)
     filesystem.create(r_filesystem, ssh_command=ssh_command)
 
