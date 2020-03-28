@@ -32,7 +32,6 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
-    r_filesystem = filesystem.remote_dataset(remote_fs, local_fs)
     filesystem.create(r_filesystem, ssh_command=ssh_command)
 
     if verbose:

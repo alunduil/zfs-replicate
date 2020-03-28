@@ -13,6 +13,7 @@ import           Control.Monad.Extra            ( unlessM
 import qualified FileSystem                    as FS
                                                 ( FileSystem(name)
                                                 , fromName
+                                                , remoteDataset
                                                 )
 import           Options.Applicative
 import           Prelude
@@ -56,7 +57,10 @@ main = do
     putStrLn $ "found " ++ show (length localSnapshots) ++ " snapshots on " ++ FS.name localFS
     putStrLn ""
 
+  let remoteFileSystem = FS.remoteDataset remoteFS localFS
+
   print sshCommand
+  print remoteFileSystem
 
   return ()
 
