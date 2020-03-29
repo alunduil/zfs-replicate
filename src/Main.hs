@@ -18,7 +18,10 @@ import qualified FileSystem                    as FS
                                                 )
 import           Options.Applicative
 import           Prelude
-import qualified Snapshot                       ( listRecursive )
+import qualified Snapshot                       ( list
+                                                , ListOptions(..)
+                                                , listOptions
+                                                )
 import qualified SSH                            ( Cipher(Standard)
                                                 , HostName
                                                 , Port
@@ -31,6 +34,7 @@ import           System.Directory               ( doesDirectoryExist
 
 data Options = Options
              { verbose :: Bool
+             , recursive :: Bool
              , port :: SSH.Port
              , userName :: Maybe SSH.UserName
              , identityFile :: FilePath
@@ -51,7 +55,7 @@ main = do
 
   when verbose $ putStrLn $ "checking filesystem " ++ FS.name localFS
 
-  localSnapshots <- Snapshot.listRecursive localFS
+  localSnapshots <- Snapshot.list $ Snapshot.listOptions localFS
   -- TODO exclusions from snapshots to replicate.
 
   when verbose $ do
@@ -63,6 +67,12 @@ main = do
 
   when verbose $ putStrLn $ "checking filesystem " ++ hostName ++ "/" ++ FS.name remoteFileSystem
 
+  remoteSnapshots <- Snapshot.list
+    $ (Snapshot.listOptions remoteFS) { Snapshot.recursive = recursive, Snapshot.sshCommand = Just sshCommand }
+
+  when verbose $ do
+    putStrLn $ "found " ++ show (length remoteSnapshots) ++ " snapshots on " ++ FS.name remoteFileSystem
+    putStrLn ""
 
 options :: ParserInfo Options
 options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS to REMOTE_FS on HOST.")
@@ -70,6 +80,7 @@ options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS 
   options' =
     Options
       <$> switch (long "verbose" <> short 'v' <> help "Print additional output.")
+      <*> switch (long "recursive" <> help "Recursively replicate snapshots.")
       <*> option
             auto
             (long "port" <> short 'p' <> help "Connect to SSH on PORT." <> showDefault <> value 22 <> metavar "PORT")

@@ -17,7 +17,6 @@ from .click import EnumChoice
 @click.option(
     "--follow-delete", is_flag=True, help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS."
 )
-@click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")
 @click.option(
     "--compression",
     type=EnumChoice(Compression),
@@ -27,16 +26,9 @@ from .click import EnumChoice
 def main(  # pylint: disable=too-many-arguments,too-many-locals
     dry_run: bool,
     follow_delete: bool,
-    recursive: bool,
     compression: Compression,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
-
-    r_snaps = snapshot.list(r_filesystem, recursive=recursive, ssh_command=ssh_command)
-
-    if verbose:
-        click.echo(f"found {len(r_snaps)} snapshots on {r_filesystem.name}")
-        click.echo()
 
     filesystem_l_snaps = {
         filesystem: list(l_snaps) for filesystem, l_snaps in itertools.groupby(l_snaps, key=lambda x: x.filesystem)

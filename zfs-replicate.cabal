@@ -58,6 +58,7 @@ executable zfs-replicate
     , Shell
     , Snapshot
     , Snapshot.Internal
+    , Snapshot.List
     , Snapshot.Types
     , SSH
 
@@ -96,6 +97,7 @@ test-suite zfs-replicate-tests
     , Snapshot.Arbitrary
     , Snapshot.Internal
     , Snapshot.InternalSpec
+    , Snapshot.List
     , Snapshot.Types
     , Snapshot.TypesSpec
 
