@@ -21,6 +21,7 @@ import           Prelude
 import qualified Snapshot                       ( list
                                                 , ListOptions(..)
                                                 , listOptions
+                                                , group
                                                 )
 import qualified SSH                            ( Cipher(Standard)
                                                 , HostName
@@ -73,6 +74,9 @@ main = do
   when verbose $ do
     putStrLn $ "found " ++ show (length remoteSnapshots) ++ " snapshots on " ++ FS.name remoteFileSystem
     putStrLn ""
+
+  print $ Snapshot.group localSnapshots
+  print $ Snapshot.group remoteSnapshots
 
 options :: ParserInfo Options
 options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS to REMOTE_FS on HOST.")

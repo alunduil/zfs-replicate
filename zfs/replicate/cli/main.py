@@ -30,12 +30,6 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
-    filesystem_l_snaps = {
-        filesystem: list(l_snaps) for filesystem, l_snaps in itertools.groupby(l_snaps, key=lambda x: x.filesystem)
-    }
-    filesystem_r_snaps = {
-        filesystem: list(r_snaps) for filesystem, r_snaps in itertools.groupby(r_snaps, key=lambda x: x.filesystem)
-    }
     tasks = task.generate(remote_fs, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
 
     if verbose:
