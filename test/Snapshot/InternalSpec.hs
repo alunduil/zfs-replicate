@@ -11,21 +11,6 @@ import qualified FileSystem                    as FS
                                                 ( FileSystem(name)
                                                 , fromName
                                                 )
-import           Prelude                        ( (==)
-                                                , (+)
-                                                , (++)
-                                                , (<=)
-                                                , (<$>)
-                                                , ($)
-                                                , Int
-                                                , IO
-                                                , Maybe(..)
-                                                , String
-                                                , length
-                                                , maximum
-                                                , show
-                                                , unlines
-                                                )
 import           Snapshot.Arbitrary             ( )
 import           Snapshot.Types                 ( Snapshot(..) )
 import           Test.Hspec                     ( Spec

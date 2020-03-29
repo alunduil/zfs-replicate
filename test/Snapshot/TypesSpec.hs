@@ -6,10 +6,6 @@ where
 
 import qualified FileSystem                    as FS
                                                 ( fromName )
-import           Prelude                        ( ($)
-                                                , IO
-                                                , Maybe(..)
-                                                )
 import           Test.Hspec                     ( Spec
                                                 , describe
                                                 , hspec

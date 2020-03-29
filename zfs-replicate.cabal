@@ -45,6 +45,7 @@ executable zfs-replicate
       base >= 4.12 && < 4.13
     , directory >= 1.3 && < 1.4
     , extra >= 1.7 && < 1.8
+    , filepath >= 1.4 && < 1.5
     , optparse-applicative == 0.14.3.0
     , process >= 1.6 && < 1.7
     , text >= 1.2 && < 1.3
@@ -52,6 +53,9 @@ executable zfs-replicate
   other-modules:
       Control
     , FileSystem
+    , FileSystem.Create
+    , FileSystem.Types
+    , Shell
     , Snapshot
     , Snapshot.Internal
     , Snapshot.Types
@@ -73,14 +77,21 @@ test-suite zfs-replicate-tests
   build-depends:
       base >= 4.12 && < 4.13
     , extra >= 1.7 && < 1.8
+    , filepath >= 1.4 && < 1.5
     , hspec >= 2.7 && < 2.8
     , process >= 1.6 && < 1.7
     , QuickCheck >= 2.13 && < 2.14
     , text >= 1.2 && < 1.3
 
   other-modules:
-      Control
+      Arbitrary.Name
+    , Control
     , FileSystem
+    , FileSystem.Arbitrary
+    , FileSystem.Create
+    , FileSystem.CreateSpec
+    , FileSystem.Types
+    , Shell
     , Snapshot
     , Snapshot.Arbitrary
     , Snapshot.Internal

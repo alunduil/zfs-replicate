@@ -6,24 +6,13 @@ module Snapshot.Arbitrary
   ()
 where
 
-import           Data.Char                      ( isSpace )
+import           Arbitrary.Name                 ( arbitraryName )
 import qualified FileSystem                    as FS
-                                                ( FileSystem(name)
-                                                , fromName
-                                                )
-import           Prelude                        ( (.)
-                                                , (/=)
-                                                , (<$>)
-                                                , ($)
-                                                , Maybe(Nothing)
-                                                , not
-                                                , return
-                                                )
+                                                ( fromName )
+import           FileSystem.Arbitrary           ( )
 import           Snapshot.Types                 ( Snapshot(..) )
 import           Test.QuickCheck                ( Arbitrary(arbitrary, shrink)
-                                                , arbitraryPrintableChar
-                                                , listOf
-                                                , suchThat
+                                                , genericShrink
                                                 )
 
 instance Arbitrary Snapshot where
@@ -33,9 +22,5 @@ instance Arbitrary Snapshot where
     let previous = Nothing
     timestamp <- arbitrary
     return Snapshot { .. }
-    where arbitraryName = listOf $ arbitraryPrintableChar `suchThat` (not . isSpace) `suchThat` (/= '@')
 
-  shrink Snapshot {..} =
-    [ Snapshot (FS.fromName fileSystem') name' previous' timestamp'
-    | (fileSystem', name', previous', timestamp') <- shrink (FS.name fileSystem, name, previous, timestamp)
-    ]
+  shrink = genericShrink

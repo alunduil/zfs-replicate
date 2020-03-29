@@ -12,6 +12,7 @@ import           Control.Monad.Extra            ( unlessM
                                                 )
 import qualified FileSystem                    as FS
                                                 ( FileSystem(name)
+                                                , create
                                                 , fromName
                                                 , remoteDataset
                                                 )
@@ -58,11 +59,9 @@ main = do
     putStrLn ""
 
   let remoteFileSystem = FS.remoteDataset remoteFS localFS
+  FS.create remoteFileSystem sshCommand
 
-  print sshCommand
-  print remoteFileSystem
-
-  return ()
+  when verbose $ putStrLn $ "checking filesystem " ++ hostName ++ "/" ++ FS.name remoteFileSystem
 
 
 options :: ParserInfo Options

@@ -32,11 +32,6 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
-    filesystem.create(r_filesystem, ssh_command=ssh_command)
-
-    if verbose:
-        click.echo(f"checking filesystem {host}/{r_filesystem.name}")
-
     r_snaps = snapshot.list(r_filesystem, recursive=recursive, ssh_command=ssh_command)
 
     if verbose:
