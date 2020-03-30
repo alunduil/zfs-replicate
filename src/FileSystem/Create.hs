@@ -8,27 +8,7 @@ import           Data.List                      ( inits
                                                 , isSubsequenceOf
                                                 )
 import           FileSystem.Types
-import           Prelude                        ( (.)
-                                                , (++)
-                                                , (==)
-                                                , (/=)
-                                                , ($)
-                                                , (&&)
-                                                , (<$>)
-                                                , FilePath
-                                                , IO
-                                                , String
-                                                , filter
-                                                , fmap
-                                                , lines
-                                                , not
-                                                , notElem
-                                                , null
-                                                , return
-                                                , span
-                                                , tail
-                                                , unwords
-                                                )
+import           Prelude                 hiding ( error )
 import qualified Shell                          ( process
                                                 , sanitize
                                                 )

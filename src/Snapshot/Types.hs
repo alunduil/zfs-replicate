@@ -6,15 +6,6 @@ import           Data.List                      ( isSuffixOf )
 import qualified FileSystem                    as FS
                                                 ( FileSystem(name) )
 import           GHC.Generics                   ( Generic )
-import           Prelude                        ( (||)
-                                                , (&&)
-                                                , ($)
-                                                , Eq((==))
-                                                , Int
-                                                , Maybe
-                                                , Show
-                                                , String
-                                                )
 
 data Snapshot = Snapshot
               { fileSystem :: FS.FileSystem

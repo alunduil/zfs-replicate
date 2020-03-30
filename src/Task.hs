@@ -13,15 +13,6 @@ import qualified FileSystem                    as FS
                                                 ( FileSystem
                                                 , remoteFileSystem
                                                 )
-import           Prelude                        ( (&&)
-                                                , ($)
-                                                , (++)
-                                                , Bool
-                                                , Maybe(..)
-                                                , concat
-                                                , not
-                                                , null
-                                                )
 import           Snapshot                       ( Snapshot )
 import           Task.Internal
 import           Task.Types

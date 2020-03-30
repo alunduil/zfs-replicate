@@ -5,17 +5,7 @@ import           Control.Monad                  ( when )
 import           Data.Maybe                     ( catMaybes )
 import qualified FileSystem                    as FS
                                                 ( FileSystem(name) )
-import           Prelude                        ( (++)
-                                                , ($)
-                                                , (/=)
-                                                , Bool(False)
-                                                , IO
-                                                , Maybe(..)
-                                                , String
-                                                , maybe
-                                                , return
-                                                , unwords
-                                                )
+import           Prelude                 hiding ( error )
 import           Snapshot.Internal              ( snapshots )
 import           Snapshot.Types                 ( Snapshot )
 import qualified Shell                          ( process

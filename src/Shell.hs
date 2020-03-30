@@ -11,10 +11,6 @@ import           Data.Text                      ( pack
                                                 , strip
                                                 , unpack
                                                 )
-import           Prelude                        ( (.)
-                                                , Bool(True)
-                                                , String
-                                                )
 import           System.Process                 ( CreateProcess(delegate_ctlc)
                                                 , shell
                                                 )

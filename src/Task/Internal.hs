@@ -10,12 +10,6 @@ import qualified FileSystem                    as FS
                                                 ( FileSystem(name, readonly)
                                                 , fromName
                                                 )
-import           Prelude                        ( ($)
-                                                , (++)
-                                                , Eq
-                                                , filter
-                                                , notElem
-                                                )
 
 dropFromName :: FS.FileSystem -> FS.FileSystem -> FS.FileSystem
 dropFromName remote fs = (FS.fromName name') { FS.readonly = FS.readonly fs }

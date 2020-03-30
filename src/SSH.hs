@@ -9,17 +9,6 @@ where
 
 import           Data.Maybe                     ( catMaybes )
 import           Data.Word                      ( Word16 )
-import           Prelude                        ( (++)
-                                                , ($)
-                                                , (<$>)
-                                                , Eq
-                                                , FilePath
-                                                , Maybe(..)
-                                                , Read
-                                                , Show(show)
-                                                , String
-                                                , unwords
-                                                )
 
 data Cipher = Disabled
             | Fast

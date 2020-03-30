@@ -2,10 +2,6 @@ module Task.Types where
 
 import qualified FileSystem                    as FS
                                                 ( FileSystem )
-import           Prelude                        ( Eq
-                                                , Maybe
-                                                , Show
-                                                )
 import           Snapshot                       ( Snapshot )
 
 data Task = Task

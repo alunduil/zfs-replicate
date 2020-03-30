@@ -7,21 +7,6 @@ import           Control.Arrow                  ( first
                                                 )
 import qualified FileSystem                    as FS
                                                 ( fromName )
-import           Prelude                        ( (/=)
-                                                , (==)
-                                                , ($)
-                                                , Maybe(..)
-                                                , String
-                                                , head
-                                                , lines
-                                                , not
-                                                , null
-                                                , otherwise
-                                                , read
-                                                , span
-                                                , tail
-                                                , zipWith
-                                                )
 import           Snapshot.Types
 
 snapshots :: String -> [Snapshot]

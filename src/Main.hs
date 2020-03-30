@@ -17,7 +17,6 @@ import qualified FileSystem                    as FS
                                                 , remoteDataset
                                                 )
 import           Options.Applicative
-import           Prelude
 import qualified Snapshot                       ( list
                                                 , ListOptions(..)
                                                 , listOptions
