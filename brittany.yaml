@@ -1,3 +1,6 @@
+conf_forward:
+  options_ghc:
+    - -XTypeApplications
 conf_errorHandling:
   econf_Werror: true
 conf_layout:

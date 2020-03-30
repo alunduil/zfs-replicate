@@ -1,20 +1,28 @@
+{-# LANGUAGE RecordWildCards #-}
+
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module FileSystem.Arbitrary
   ()
 where
 
-import           Arbitrary.Name                 ( arbitraryName )
+import           Arbitrary.Name                 ( NameString(NameString)
+                                                , arbitraryName
+                                                )
+import           Data.List                      ( isPrefixOf )
 import           FileSystem.Types
 import           Test.QuickCheck                ( Arbitrary(arbitrary, shrink)
-                                                , genericShrink
                                                 , suchThat
                                                 )
 
 instance Arbitrary FileSystem where
   arbitrary = do
     ro <- arbitrary
-    fs <- fromName <$> (arbitraryName `suchThat` (not . null))
+    fs <- fromName <$> arbitraryName `suchThat` (not . ("/" `isPrefixOf`))
     return $ fs { readonly = ro }
 
-  shrink = genericShrink
+  shrink FileSystem {..} =
+    [ (fromName name') { readonly = readonly' }
+    | (NameString name', readonly') <- shrink (NameString name, readonly)
+    , not $ null name'
+    ]

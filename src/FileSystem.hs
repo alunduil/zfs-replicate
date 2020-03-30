@@ -1,7 +1,8 @@
 module FileSystem
-  ( FileSystem(name)
+  ( FileSystem(name, readonly)
   , fromName
   , remoteDataset
+  , remoteFileSystem
   , create
   )
 where
@@ -14,3 +15,6 @@ import           Prelude                        ( ($)
 
 remoteDataset :: FileSystem -> FileSystem -> FileSystem
 remoteDataset remote local = fromName $ name remote ++ "/" ++ dataset local
+
+remoteFileSystem :: FileSystem -> FileSystem -> FileSystem
+remoteFileSystem remote local = fromName $ name remote ++ "/" ++ name local

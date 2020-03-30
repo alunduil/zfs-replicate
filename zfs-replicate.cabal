@@ -62,6 +62,9 @@ executable zfs-replicate
     , Snapshot.List
     , Snapshot.Types
     , SSH
+    , Task
+    , Task.Internal
+    , Task.Types
 
   hs-source-dirs:
       src
@@ -102,6 +105,11 @@ test-suite zfs-replicate-tests
     , Snapshot.List
     , Snapshot.Types
     , Snapshot.TypesSpec
+    , Task
+    , Task.Internal
+    , Task.InternalSpec
+    , TaskSpec
+    , Task.Types
 
   hs-source-dirs:
       src

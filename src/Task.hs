@@ -1,0 +1,62 @@
+module Task
+  ( fromSnapshots
+  )
+where
+
+import           Data.Map.Strict                ( (!)
+                                                , Map
+                                                , keys
+                                                , mapKeys
+                                                , notMember
+                                                )
+import qualified FileSystem                    as FS
+                                                ( FileSystem
+                                                , remoteFileSystem
+                                                )
+import           Prelude                        ( (&&)
+                                                , ($)
+                                                , (++)
+                                                , Bool
+                                                , Maybe(..)
+                                                , concat
+                                                , not
+                                                , null
+                                                )
+import           Snapshot                       ( Snapshot )
+import           Task.Internal
+import           Task.Types
+
+fromSnapshots :: FS.FileSystem -> Map FS.FileSystem [Snapshot] -> Map FS.FileSystem [Snapshot] -> Bool -> [Task]
+fromSnapshots remote localSnapshots remoteSnapshots followDelete = concat $ creates ++ destroys
+ where
+  remoteSnapshots' = mapKeys (dropFromName remote) remoteSnapshots
+  creates =
+    [ if fs `notMember` remoteSnapshots'
+        then
+          Task { action = Create, fileSystem = FS.remoteFileSystem remote fs, snapshot = Nothing }
+            : [ Task { action = Send, fileSystem = remote, snapshot = Just s } | s <- localSnapshots ! fs ]
+        else vennTasks fs
+    | fs <- keys localSnapshots
+    ]
+  destroys =
+    [ if fs `notMember` localSnapshots
+        then
+          [ Task { action = Destroy, fileSystem = FS.remoteFileSystem remote fs, snapshot = Just s }
+            | s <- remoteSnapshots ! fs
+            ]
+            ++ [Task { action = Destroy, fileSystem = FS.remoteFileSystem remote fs, snapshot = Nothing }]
+        else []
+    | fs <- keys remoteSnapshots'
+    ]
+  vennTasks fs =
+    (if null middles
+        then [ Task { action = Destroy, fileSystem = FS.remoteFileSystem remote fs, snapshot = Just s } | s <- rights ]
+        else []
+      )
+      ++ [ Task { action = Send, fileSystem = remote, snapshot = Just s } | s <- lefts ]
+      ++ (if not (null middles) && followDelete
+           then
+             [ Task { action = Destroy, fileSystem = FS.remoteFileSystem remote fs, snapshot = Just s } | s <- rights ]
+           else []
+         )
+    where (lefts, middles, rights) = venn (localSnapshots ! fs) (remoteSnapshots' ! fs)

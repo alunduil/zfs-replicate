@@ -2,8 +2,11 @@
 
 module FileSystem.Types where
 
+import           Data.List                      ( stripPrefix )
+import           Data.Maybe                     ( fromMaybe )
 import           GHC.Generics                   ( Generic )
 import           Prelude                        ( (/=)
+                                                , ($)
                                                 , Bool(False)
                                                 , Eq
                                                 , Ord
@@ -19,4 +22,5 @@ data FileSystem = FileSystem
                 } deriving (Eq, Generic, Ord, Show)
 
 fromName :: String -> FileSystem
-fromName n = FileSystem { dataset = takeWhile (/= '/') n, name = n, readonly = False }
+fromName n = FileSystem { dataset = takeWhile (/= '/') n', name = n', readonly = False }
+  where n' = fromMaybe n $ stripPrefix "/" n

@@ -25,9 +25,9 @@ import           Prelude                        ( (.)
                                                 , notElem
                                                 , null
                                                 , return
+                                                , span
                                                 , tail
                                                 , unwords
-                                                , words
                                                 )
 import qualified Shell                          ( process
                                                 , sanitize
@@ -72,4 +72,4 @@ filesystems :: String -> [FileSystem]
 filesystems = fmap filesystem . filter (not . null) . lines
 
 filesystem :: String -> FileSystem
-filesystem input = (fromName n) { readonly = ro == "on" } where [n, ro] = words input
+filesystem input = (fromName n) { readonly = ro == "on" } where (n, '\t' : ro) = span (/= '\t') input

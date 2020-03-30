@@ -15,9 +15,6 @@ from .click import EnumChoice
 @click.command()
 @click.option("--dry-run", is_flag=True, help="Generate replication tasks but do not execute them.")
 @click.option(
-    "--follow-delete", is_flag=True, help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS."
-)
-@click.option(
     "--compression",
     type=EnumChoice(Compression),
     default=Compression.LZ4,
@@ -25,12 +22,9 @@ from .click import EnumChoice
 )
 def main(  # pylint: disable=too-many-arguments,too-many-locals
     dry_run: bool,
-    follow_delete: bool,
     compression: Compression,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
-
-    tasks = task.generate(remote_fs, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
 
     if verbose:
         click.echo(task.report(tasks))

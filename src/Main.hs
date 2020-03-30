@@ -32,9 +32,11 @@ import qualified SSH                            ( Cipher(Standard)
 import           System.Directory               ( doesDirectoryExist
                                                 , doesPathExist
                                                 )
+import qualified Task                           ( fromSnapshots )
 
 data Options = Options
              { verbose :: Bool
+             , followDelete :: Bool
              , recursive :: Bool
              , port :: SSH.Port
              , userName :: Maybe SSH.UserName
@@ -75,8 +77,12 @@ main = do
     putStrLn $ "found " ++ show (length remoteSnapshots) ++ " snapshots on " ++ FS.name remoteFileSystem
     putStrLn ""
 
-  print $ Snapshot.group localSnapshots
-  print $ Snapshot.group remoteSnapshots
+  let tasks = Task.fromSnapshots remoteFileSystem
+                                 (Snapshot.group localSnapshots)
+                                 (Snapshot.group remoteSnapshots)
+                                 followDelete
+
+  print tasks
 
 options :: ParserInfo Options
 options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS to REMOTE_FS on HOST.")
@@ -84,6 +90,7 @@ options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS 
   options' =
     Options
       <$> switch (long "verbose" <> short 'v' <> help "Print additional output.")
+      <*> switch (long "follow-delete" <> help "Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS.")
       <*> switch (long "recursive" <> help "Recursively replicate snapshots.")
       <*> option
             auto

@@ -1,12 +1,13 @@
 module Snapshot
-  ( list
+  ( Snapshot
+  , list
   , ListOptions(..)
   , listOptions
   , group
   )
 where
 
-import           Data.Map.Lazy                  ( Map
+import           Data.Map.Strict                ( Map
                                                 , fromListWith
                                                 )
 import qualified FileSystem                    as FS
