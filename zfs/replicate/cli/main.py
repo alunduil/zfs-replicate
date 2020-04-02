@@ -26,9 +26,6 @@ def main(  # pylint: disable=too-many-arguments,too-many-locals
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
 
-    if verbose:
-        click.echo(task.report(tasks))
-
     if not dry_run:
         filesystem_tasks = [
             (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)

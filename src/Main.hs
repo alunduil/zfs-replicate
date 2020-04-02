@@ -31,7 +31,9 @@ import qualified SSH                            ( Cipher(Standard)
 import           System.Directory               ( doesDirectoryExist
                                                 , doesPathExist
                                                 )
-import qualified Task                           ( fromSnapshots )
+import qualified Task                           ( fromSnapshots
+                                                , report
+                                                )
 
 data Options = Options
              { verbose :: Bool
@@ -81,7 +83,7 @@ main = do
                                  (Snapshot.group remoteSnapshots)
                                  followDelete
 
-  print tasks
+  when verbose $ putStrLn $ Task.report tasks
 
 options :: ParserInfo Options
 options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS to REMOTE_FS on HOST.")

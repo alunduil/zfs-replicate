@@ -1,7 +1,7 @@
 module Snapshot
-  ( Snapshot
+  ( Snapshot(..)
   , list
-  , ListOptions(..)
+  , ListOptions(recursive, sshCommand)
   , listOptions
   , group
   )

@@ -1,5 +1,8 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module Task
   ( fromSnapshots
+  , report
   )
 where
 
@@ -10,10 +13,10 @@ import           Data.Map.Strict                ( (!)
                                                 , notMember
                                                 )
 import qualified FileSystem                    as FS
-                                                ( FileSystem
+                                                ( FileSystem(name)
                                                 , remoteFileSystem
                                                 )
-import           Snapshot                       ( Snapshot )
+import           Snapshot                       ( Snapshot(name) )
 import           Task.Internal
 import           Task.Types
 
@@ -51,3 +54,7 @@ fromSnapshots remote localSnapshots remoteSnapshots followDelete = concat $ crea
            else []
          )
     where (lefts, middles, rights) = venn (localSnapshots ! fs) (remoteSnapshots' ! fs)
+
+report :: [Task] -> String
+report = unlines . fmap report'
+  where report' Task {..} = show action ++ " " ++ FS.name fileSystem ++ maybe "" (('@' :) . Snapshot.name) snapshot
