@@ -35,7 +35,7 @@ Allow user to mount (FreeBSD_)::
 
 ZFS_ Permissions::
 
-    zfs allow <user> create,destroy,snapshot,rollback,clone,promote,rename,mount,send,receive,readonly,quota,reservation,hold <backup_dataset>
+    zfs allow ${USER} create,destroy,snapshot,rollback,clone,promote,rename,mount,send,receive,readonly,quota,reservation,hold ${BACKUP_DATASET}
 
 More information about this configuration can be found at the following sources:
 
