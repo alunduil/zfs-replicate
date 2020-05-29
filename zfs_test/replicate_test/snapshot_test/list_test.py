@@ -4,8 +4,7 @@ import string
 from typing import Any, Dict, List
 
 from hypothesis import given
-from hypothesis.searchstrategy import SearchStrategy
-from hypothesis.strategies import fixed_dictionaries, integers, lists, none, text
+from hypothesis.strategies import SearchStrategy, fixed_dictionaries, integers, lists, none, text
 
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.list import _snapshot, _snapshots
