@@ -1,11 +1,14 @@
 {-# LANGUAGE RecordWildCards #-}
 
 module Task
-  ( fromSnapshots
+  ( Task(..)
+  , fromSnapshots
   , report
+  , execute
   )
 where
 
+import           Compression                    ( Compression )
 import           Data.Map.Strict                ( (!)
                                                 , Map
                                                 , keys
@@ -14,9 +17,14 @@ import           Data.Map.Strict                ( (!)
                                                 )
 import qualified FileSystem                    as FS
                                                 ( FileSystem(name)
+                                                , create
+                                                , destroy
                                                 , remoteFileSystem
                                                 )
-import           Snapshot                       ( Snapshot(name) )
+import           Snapshot                       ( Snapshot(name)
+                                                , destroy
+                                                , send
+                                                )
 import           Task.Internal
 import           Task.Types
 
@@ -58,3 +66,13 @@ fromSnapshots remote localSnapshots remoteSnapshots followDelete = concat $ crea
 report :: [Task] -> String
 report = unlines . fmap report'
   where report' Task {..} = show action ++ " " ++ FS.name fileSystem ++ maybe "" (('@' :) . Snapshot.name) snapshot
+
+execute :: FS.FileSystem -> Map FS.FileSystem [Task] -> String -> Bool -> Compression -> IO ()
+execute remote tasks sshCommand followDelete compression = mapM_ (execute' . snd) tasks'
+ where
+  tasks' = sortOn (length . filter (== '/') . FS.name . fst) $ assocs tasks
+  execute' Task { action = Create, fileSystem = fileSystem, snapshot = Nothing }  = FS.create fileSystem sshCommand
+  execute' Task { action = Destroy, fileSystem = fileSystem, snapshot = Nothing } = FS.destroy fileSystem sshCommand
+  execute' Task { action = Destroy, snapshot = Just snapshot }                    = Snapshot.destroy snapshot sshCommand
+  execute' Task { action = Send, snapshot = Just snapshot } =
+    Snapshot.send remote snapshot sshCommand compression followDelete

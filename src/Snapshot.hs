@@ -3,17 +3,12 @@ module Snapshot
   , list
   , ListOptions(recursive, sshCommand)
   , listOptions
-  , group
+  , destroy
+  , send
   )
 where
 
-import           Data.Map.Strict                ( Map
-                                                , fromListWith
-                                                )
-import qualified FileSystem                    as FS
-                                                ( FileSystem )
+import           Snapshot.Destroy
 import           Snapshot.List
 import           Snapshot.Types
-
-group :: [Snapshot] -> Map FS.FileSystem [Snapshot]
-group ss = fromListWith (++) [ (Snapshot.Types.fileSystem s, [s]) | s <- ss ]
+import           Snapshot.Send

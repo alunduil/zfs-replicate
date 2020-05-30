@@ -17,10 +17,10 @@ import qualified FileSystem                    as FS
                                                 , remoteDataset
                                                 )
 import           Options.Applicative
-import qualified Snapshot                       ( list
+import qualified Snapshot                       ( Snapshot(fileSystem)
+                                                , list
                                                 , ListOptions(..)
                                                 , listOptions
-                                                , group
                                                 )
 import qualified SSH                            ( Cipher(Standard)
                                                 , HostName
@@ -79,11 +79,14 @@ main = do
     putStrLn ""
 
   let tasks = Task.fromSnapshots remoteFileSystem
-                                 (Snapshot.group localSnapshots)
-                                 (Snapshot.group remoteSnapshots)
+                                 (toMapBy Snapshot.fileSystem localSnapshots)
+                                 (toMapBy Snapshot.fileSystem remoteSnapshots)
                                  followDelete
 
   when verbose $ putStrLn $ Task.report tasks
+
+  unless dryRun $ Task.execute remoteFileSystem (toMapBy Task.fileSystem tasks) followDelete compression sshCommand
+  where toMapBy p = fromListWith (++) . p &&& (: [])
 
 options :: ParserInfo Options
 options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS to REMOTE_FS on HOST.")
@@ -91,6 +94,7 @@ options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS 
   options' =
     Options
       <$> switch (long "verbose" <> short 'v' <> help "Print additional output.")
+      <*> switch (long "dry-run" <> help "Generate replication tasks but do not execute them.")
       <*> switch (long "follow-delete" <> help "Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS.")
       <*> switch (long "recursive" <> help "Recursively replicate snapshots.")
       <*> option
@@ -113,6 +117,11 @@ options = info (options' <**> helper) (fullDesc <> progDesc "Replicate LOCAL_FS 
             <> value SSH.Standard
             <> help "One of: disable (no ciphers), fast (only fast ciphers), or standard (default ciphers)."
             <> metavar "CIPHER"
+            )
+      <*> option
+            auto
+            (long "compression" <> value Compression.LZ4 <> help
+              "One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compressino)."
             )
       <*> strArgument (metavar "HOSTNAME")
       <*> (FS.fromName <$> strArgument (metavar "REMOTE_FS"))
