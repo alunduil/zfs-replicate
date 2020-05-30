@@ -1,5 +1,5 @@
 black==19.10b0
-click==7.0
+click==7.1.2
 coveralls==1.8.2
 hypothesis==4.25.1
 isort==4.3.21
