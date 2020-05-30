@@ -1,6 +1,6 @@
 black==19.10b0
 click==7.1.2
-coveralls==1.8.2
+coveralls==2.0.0
 hypothesis==4.25.1
 isort==4.3.21
 mypy==0.700
