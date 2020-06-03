@@ -5,7 +5,7 @@ hypothesis==4.25.1
 isort==4.3.21
 mypy==0.700
 pylint==2.4.1
-pytest==5.2.1
+pytest==5.4.3
 pytest-cov==2.8.0
 pytest-runner==5.1
 stringcase==1.2.0
