@@ -1,6 +1,6 @@
 """ZFS Snapshot Type."""
 
-from typing import Any, NamedTuple, Optional
+from typing import NamedTuple, Optional
 
 from ..filesystem import FileSystem
 
@@ -13,9 +13,9 @@ class Snapshot(NamedTuple):
     previous: Optional["Snapshot"]
     timestamp: int
 
-    def __eq__(self, other: "Snapshot") -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Snapshot):
-            raise NotImplementedError
+            return NotImplemented
 
         is_suffix = self.filesystem.name.endswith(other.filesystem.name) or other.filesystem.name.endswith(
             self.filesystem.name
