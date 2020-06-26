@@ -1,12 +1,12 @@
 black==19.3b0
 click==7.0
 coveralls==1.8.2
-hypothesis==4.25.1
+hypothesis==5.18.2
 isort==4.3.21
 mypy==0.700
 pylint==2.5.3
 pytest==5.4.3
-pytest-cov==2.8.0
+pytest-cov==2.10.0
 pytest-runner==5.1
 stringcase==1.2.0
 vulture==1.1
