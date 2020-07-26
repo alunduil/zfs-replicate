@@ -1,6 +1,6 @@
 """ZFS Snapshot Type."""
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Optional
 
 from ..filesystem import FileSystem
 
@@ -11,10 +11,10 @@ class Snapshot:
 
     filesystem: FileSystem
     name: str
-    previous: "Optional[Snapshot]"
+    previous: Optional["Snapshot"]
     timestamp: int
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Equality of Snapshots."""
         if other is None:
             return False

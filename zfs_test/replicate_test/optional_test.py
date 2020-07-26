@@ -16,7 +16,7 @@ def test_value_none() -> None:
         assert False, "Expected RuntimeError"
 
 
-@given(integers())
+@given(integers())  # type: ignore
 def test_value_not_none(value: int) -> None:
     """optional.value(value) == value."""
     assert optional.value(value) == value

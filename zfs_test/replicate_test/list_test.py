@@ -7,20 +7,20 @@ from hypothesis.strategies import integers, lists, sets
 from zfs.replicate import list as sut
 
 
-@given(lists(integers()))
+@given(lists(integers()))  # type: ignore
 def test_inits_length(elements: List[int]) -> None:
     """len(inits(elements)) == len(elements) + 1."""
     assert len(sut.inits(elements)) == len(elements) + 1
 
 
-@given(lists(integers(), min_size=2))
+@given(lists(integers(), min_size=2))  # type: ignore
 def test_inits_heads(elements: List[int]) -> None:
     """inits(elements)[:1] == [[], [elements[0]]."""
     assert sut.inits(elements)[0] == []
     assert sut.inits(elements)[1] == [elements[0]]
 
 
-@given(lists(integers()))
+@given(lists(integers()))  # type: ignore
 def test_inits_monotonic_length(elements: List[int]) -> None:
     """[len(x) for xs in inits(elements)] == range(len(elements) + 1)."""
     lengths = [len(xs) for xs in sut.inits(elements)]
@@ -28,7 +28,7 @@ def test_inits_monotonic_length(elements: List[int]) -> None:
     assert lengths == list(range(len(elements) + 1))
 
 
-@given(sets(integers()), sets(integers()))
+@given(sets(integers()), sets(integers()))  # type: ignore
 def test_venn_subsets(lefts: Set[int], rights: Set[int]) -> None:
     """All combinations of venn with subsets."""
     r_lefts: List[int]
@@ -44,7 +44,7 @@ def test_venn_subsets(lefts: Set[int], rights: Set[int]) -> None:
     assert (set(r_lefts), set(r_middles), set(r_rights)) == (lefts - rights, rights, set())
 
 
-@given(lists(integers()))
+@given(lists(integers()))  # type: ignore
 def test_venn_disjoint(both: List[int]) -> None:
     """Venn with disjoint."""
     e_lefts = list(filter(lambda x: x % 2 == 0, both))
