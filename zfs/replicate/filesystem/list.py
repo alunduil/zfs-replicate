@@ -26,7 +26,7 @@ def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:  # pylin
 
     if proc.returncode:
         raise ZFSReplicateError(
-            f"error encountered while listing filesystems of '{filesystem.name}': {error}", filesystem, error
+            f"error encountered while listing filesystems of '{filesystem.name}': {error!r}", filesystem, error
         )
 
     return _filesystems(output)
