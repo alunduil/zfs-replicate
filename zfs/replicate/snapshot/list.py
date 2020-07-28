@@ -25,7 +25,7 @@ def list(  # pylint: disable=redefined-builtin
 
     if proc.returncode:
         raise ZFSReplicateError(
-            f"error encountered while listing snapshots of '{filesystem.name}': {error}", filesystem, error
+            f"error encountered while listing snapshots of '{filesystem.name}': {error!r}", filesystem, error
         )
 
     return _snapshots(output)
