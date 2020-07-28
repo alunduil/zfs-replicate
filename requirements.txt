@@ -1,7 +1,7 @@
 black==19.10b0
 click==7.1.2
 coveralls==2.1.1
-hypothesis==4.25.1
+hypothesis==4.38.1
 isort==4.3.21
 mypy==0.782
 pylint==2.5.3
