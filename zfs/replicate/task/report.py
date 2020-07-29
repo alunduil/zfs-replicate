@@ -16,7 +16,8 @@ def report(tasks: List[Task]) -> str:
     """Pretty printed report on given Tasks."""
 
     filesystems = [
-        (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
+        (filesystem, list(tasks))
+        for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
     ]
 
     if len(filesystems) > LIMITS["filesystem"]:
@@ -31,7 +32,10 @@ def _report_filesystem(filesystems: List[Tuple[FileSystem, List[Task]]]) -> str:
     for filesystem, tasks in filesystems:
         output += f"\nfilesystem: {filesystem.name}\n"
 
-        actions = [(action, list(tasks)) for action, tasks in itertools.groupby(tasks, key=_action)]
+        actions = [
+            (action, list(tasks))
+            for action, tasks in itertools.groupby(tasks, key=_action)
+        ]
 
         if len(actions) > LIMITS["action"]:
             output += _counts("action", tasks, indentation="    ")
@@ -41,7 +45,9 @@ def _report_filesystem(filesystems: List[Tuple[FileSystem, List[Task]]]) -> str:
     return output
 
 
-def _report_action(actions: List[Tuple[Action, List[Task]]], indentation: str = "") -> str:
+def _report_action(
+    actions: List[Tuple[Action, List[Task]]], indentation: str = ""
+) -> str:
     output = ""
 
     for action, tasks in actions:
@@ -61,8 +67,12 @@ def _report_action(actions: List[Tuple[Action, List[Task]]], indentation: str = 
     return output
 
 
-def _report_snapshot(snapshots: List[Tuple[Snapshot, List[Task]]], indentation: str = "") -> str:
-    output = "\n".join([f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s, _ in snapshots])
+def _report_snapshot(
+    snapshots: List[Tuple[Snapshot, List[Task]]], indentation: str = ""
+) -> str:
+    output = "\n".join(
+        [f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s, _ in snapshots]
+    )
 
     if output:
         output += "\n"

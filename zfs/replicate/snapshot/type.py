@@ -17,8 +17,10 @@ class Snapshot(NamedTuple):
         if not isinstance(other, Snapshot):
             raise NotImplementedError
 
-        is_suffix = self.filesystem.name.endswith(other.filesystem.name) or other.filesystem.name.endswith(
-            self.filesystem.name
-        )
+        is_suffix = self.filesystem.name.endswith(
+            other.filesystem.name
+        ) or other.filesystem.name.endswith(self.filesystem.name)
 
-        return is_suffix and self.name == other.name and self.timestamp == other.timestamp
+        return (
+            is_suffix and self.name == other.name and self.timestamp == other.timestamp
+        )

@@ -1,9 +1,9 @@
 """ZFS FileSystem Operations."""
 
-from .create import create as create  # pylint: disable=useless-import-alias
-from .destroy import destroy as destroy  # pylint: disable=useless-import-alias
-from .type import FileSystem as FileSystem  # pylint: disable=useless-import-alias
-from .type import filesystem as filesystem  # pylint: disable=useless-import-alias
+from .create import create as create  # noqa: F401
+from .destroy import destroy as destroy  # noqa: F401
+from .type import FileSystem as FileSystem
+from .type import filesystem as filesystem
 
 
 def remote_dataset(remote: FileSystem, local: FileSystem) -> FileSystem:
