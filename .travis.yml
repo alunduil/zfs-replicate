@@ -22,6 +22,7 @@ install:
 script:
     - python setup.py sdist
     - pip install .
+    - pip install .[dev]
     - pre-commit run --all-files
 
 after_success:
