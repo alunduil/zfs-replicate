@@ -8,8 +8,8 @@ from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
 
 
-def list(  # pylint: disable=redefined-builtin
-    filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = None  # pylint: disable=redefined-outer-name
+def list(
+    filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = None
 ) -> List[Snapshot]:
     """List ZFS snapshots."""
 
@@ -21,17 +21,23 @@ def list(  # pylint: disable=redefined-builtin
 
     output, error = proc.communicate()
     if error is not None:
-        error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
+        error = (
+            error.strip(b"\n")
+            .strip(b"\r")
+            .replace(b"WARNING: ENABLED NONE CIPHER", b"")
+        )
 
     if proc.returncode:
         raise ZFSReplicateError(
-            f"error encountered while listing snapshots of '{filesystem.name}': {error!r}", filesystem, error
+            f"error encountered while listing snapshots of '{filesystem.name}': {error!r}",
+            filesystem,
+            error,
         )
 
     return _snapshots(output)
 
 
-def _list(filesystem: FileSystem, recursive: bool) -> str:  # pylint: disable=redefined-outer-name
+def _list(filesystem: FileSystem, recursive: bool) -> str:
     """ZFS List Snapshot command."""
 
     options = ["-H", "-t snapshot", "-p", "-o name,creation", "-r"]
@@ -50,7 +56,9 @@ def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:
 
     snapshots[0] = _add_previous(snapshots[0], None)
 
-    return [snapshots[0]] + [_add_previous(s, p) for s, p in zip(snapshots[1:], snapshots)]
+    return [snapshots[0]] + [
+        _add_previous(s, p) for s, p in zip(snapshots[1:], snapshots)
+    ]
 
 
 def _snapshot(zfs_list_line: bytes) -> Snapshot:
@@ -69,4 +77,9 @@ def _add_previous(snapshot: Snapshot, previous: Optional[Snapshot] = None) -> Sn
     if previous is not None and snapshot.filesystem != previous.filesystem:
         previous = None
 
-    return Snapshot(filesystem=snapshot.filesystem, name=snapshot.name, previous=previous, timestamp=snapshot.timestamp)
+    return Snapshot(
+        filesystem=snapshot.filesystem,
+        name=snapshot.name,
+        previous=previous,
+        timestamp=snapshot.timestamp,
+    )

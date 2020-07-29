@@ -11,7 +11,7 @@ from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 
 @given(lists(SNAPSHOTS))
-def test_snapshots(snapshots: List[Snapshot]) -> None:  # pylint: disable=redefined-outer-name
+def test_snapshots(snapshots: List[Snapshot]) -> None:
     """_snapshots"""
 
     output = "\n".join([_output(s) for s in snapshots])

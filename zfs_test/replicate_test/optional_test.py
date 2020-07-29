@@ -14,7 +14,7 @@ def test_value_none() -> None:
         optional.value(None)
     except RuntimeError:
         pass
-    except:  # pylint: disable=bare-except
+    except:  # noqa: E722
         assert False, "Expected RuntimeError"
 
 
