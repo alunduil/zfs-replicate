@@ -16,6 +16,4 @@ def open(
 ):  # type: (...) -> subprocess.Popen[bytes]
     """Wrapper around subprocess.Popen."""
 
-    return subprocess.Popen(
-        shlex.split(command), stdin=stdin, stdout=stdout, stderr=stderr, shell=shell
-    )
+    return subprocess.Popen(shlex.split(command), stdin=stdin, stdout=stdout, stderr=stderr, shell=shell)
