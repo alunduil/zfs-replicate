@@ -15,6 +15,7 @@ class EnumChoice(click.Choice):
         self.__enum = enum
 
         choices = [x.lower() for x in enum._member_names_]
+
         super().__init__(list(sorted(set(choices))))
 
     def convert(self, value: Any, param: Any, ctx: Any) -> Any:

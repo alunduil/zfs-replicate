@@ -2,10 +2,9 @@
 
 from typing import List, Set
 
+import zfs.replicate.list as sut
 from hypothesis import given
 from hypothesis.strategies import integers, lists, sets
-
-import zfs.replicate.list as sut
 
 
 @given(lists(integers()))
@@ -42,19 +41,11 @@ def test_venn_subsets(lefts: Set[int], rights: Set[int]) -> None:
 
     r_lefts, r_middles, r_rights = sut.venn(list(lefts), list(lefts | rights))
 
-    assert (set(r_lefts), set(r_middles), set(r_rights)) == (
-        set(),
-        lefts,
-        rights - lefts,
-    )
+    assert (set(r_lefts), set(r_middles), set(r_rights)) == (set(), lefts, rights - lefts,)
 
     r_lefts, r_middles, r_rights = sut.venn(list(lefts | rights), list(rights))
 
-    assert (set(r_lefts), set(r_middles), set(r_rights)) == (
-        lefts - rights,
-        rights,
-        set(),
-    )
+    assert (set(r_lefts), set(r_middles), set(r_rights)) == (lefts - rights, rights, set(),)
 
 
 @given(lists(integers()))
