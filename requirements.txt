@@ -5,5 +5,6 @@ pre-commit==2.6.0
 pytest==6.0.0
 pytest-cov==2.10.0
 pytest-runner==5.2
+setuptools_scm[toml]>=3.4
 stringcase==1.2.0
 vulture==1.6

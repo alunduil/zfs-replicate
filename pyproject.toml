@@ -5,3 +5,8 @@ line-length = 120
 line_length = 120
 multi_line = 3
 trailing_comma = true
+
+[tool.setuptools_scm]
+
+[build-system]
+requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
