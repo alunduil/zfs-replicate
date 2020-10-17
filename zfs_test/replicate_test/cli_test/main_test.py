@@ -1,5 +1,6 @@
-from click.testing import CliRunner
+"""zfs.replicate.cli.main tests"""
 
+from click.testing import CliRunner
 from zfs.replicate.cli.main import main
 
 

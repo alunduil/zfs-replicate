@@ -9,7 +9,7 @@ from ..filesystem import FileSystem
 from .type import Action, Task
 
 
-def execute(  # pylint: disable=too-many-arguments
+def execute(
     remote: FileSystem,
     tasks: List[Tuple[FileSystem, List[Task]]],
     ssh_command: str,
@@ -32,7 +32,9 @@ def execute(  # pylint: disable=too-many-arguments
             elif action == Action.DESTROY:
                 _destroy(a_tasks, ssh_command=ssh_command)
             elif action == Action.SEND:
-                _send(remote, a_tasks, ssh_command=ssh_command, follow_delete=follow_delete, compression=compression)
+                _send(
+                    remote, a_tasks, ssh_command=ssh_command, follow_delete=follow_delete, compression=compression,
+                )
 
 
 def _create(tasks: List[Task], ssh_command: str) -> None:
@@ -49,7 +51,7 @@ def _destroy(tasks: List[Task], ssh_command: str) -> None:
 
 
 def _send(
-    remote: FileSystem, tasks: List[Task], ssh_command: str, follow_delete: bool, compression: Compression
+    remote: FileSystem, tasks: List[Task], ssh_command: str, follow_delete: bool, compression: Compression,
 ) -> None:
     for task in tasks:
         snapshot.send(

@@ -10,7 +10,7 @@ from ..filesystem import FileSystem
 from .type import Snapshot
 
 
-def send(  # pylint: disable=too-many-arguments,too-many-locals
+def send(
     remote: FileSystem,
     current: Snapshot,
     ssh_command: str,
@@ -37,7 +37,7 @@ def send(  # pylint: disable=too-many-arguments,too-many-locals
             return  # Ignore this error.
 
         raise ZFSReplicateError(
-            f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error}", current, error
+            f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error!r}", current, error,
         )
 
 

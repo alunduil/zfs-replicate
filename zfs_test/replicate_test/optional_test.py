@@ -2,7 +2,6 @@
 
 from hypothesis import given
 from hypothesis.strategies import integers
-
 from zfs.replicate import optional
 
 
@@ -14,7 +13,7 @@ def test_value_none() -> None:
         optional.value(None)
     except RuntimeError:
         pass
-    except:  # pylint: disable=bare-except
+    except:  # noqa: E722
         assert False, "Expected RuntimeError"
 
 

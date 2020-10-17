@@ -8,9 +8,7 @@ from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
 
 
-def list(  # pylint: disable=redefined-builtin
-    filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = None  # pylint: disable=redefined-outer-name
-) -> List[Snapshot]:
+def list(filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = None) -> List[Snapshot]:
     """List ZFS snapshots."""
 
     command = _list(filesystem, recursive)
@@ -25,13 +23,13 @@ def list(  # pylint: disable=redefined-builtin
 
     if proc.returncode:
         raise ZFSReplicateError(
-            f"error encountered while listing snapshots of '{filesystem.name}': {error}", filesystem, error
+            f"error encountered while listing snapshots of '{filesystem.name}': {error!r}", filesystem, error,
         )
 
     return _snapshots(output)
 
 
-def _list(filesystem: FileSystem, recursive: bool) -> str:  # pylint: disable=redefined-outer-name
+def _list(filesystem: FileSystem, recursive: bool) -> str:
     """ZFS List Snapshot command."""
 
     options = ["-H", "-t snapshot", "-p", "-o name,creation", "-r"]
@@ -69,4 +67,6 @@ def _add_previous(snapshot: Snapshot, previous: Optional[Snapshot] = None) -> Sn
     if previous is not None and snapshot.filesystem != previous.filesystem:
         previous = None
 
-    return Snapshot(filesystem=snapshot.filesystem, name=snapshot.name, previous=previous, timestamp=snapshot.timestamp)
+    return Snapshot(
+        filesystem=snapshot.filesystem, name=snapshot.name, previous=previous, timestamp=snapshot.timestamp,
+    )

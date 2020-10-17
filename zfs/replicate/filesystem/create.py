@@ -2,11 +2,11 @@
 
 import os.path
 
+from . import type
 from .. import subprocess
 from ..error import ZFSReplicateError
 from ..list import inits
-from . import type  # pylint: disable=redefined-builtin
-from .list import list  # pylint: disable=redefined-builtin
+from .list import list
 from .type import FileSystem
 
 
@@ -38,7 +38,7 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
                 return  # Ignore this error.
 
             raise ZFSReplicateError(
-                f"unable to create remote dataset: '{filesystem.dataset}': {error}", filesystem, error
+                f"unable to create remote dataset: '{filesystem.dataset}': {error!r}", filesystem, error,
             )
 
 
