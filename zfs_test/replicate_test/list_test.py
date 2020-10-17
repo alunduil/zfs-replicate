@@ -9,23 +9,20 @@ from hypothesis.strategies import integers, lists, sets
 
 @given(lists(integers()))
 def test_inits_length(elements: List[int]) -> None:
-    """len(inits(elements)) == len(elements) + 1"""
-
+    """len(inits(elements)) == len(elements) + 1."""
     assert len(sut.inits(elements)) == len(elements) + 1
 
 
 @given(lists(integers(), min_size=2))
 def test_inits_heads(elements: List[int]) -> None:
-    """inits(elements)[:1] == [[], [elements[0]]"""
-
+    """inits(elements)[:1] == [[], [elements[0]]."""
     assert sut.inits(elements)[0] == []
     assert sut.inits(elements)[1] == [elements[0]]
 
 
 @given(lists(integers()))
 def test_inits_monotonic_length(elements: List[int]) -> None:
-    """[len(x) for xs in inits(elements)] == range(len(elements) + 1)"""
-
+    """[len(x) for xs in inits(elements)] == range(len(elements) + 1)."""
     lengths = [len(xs) for xs in sut.inits(elements)]
 
     assert lengths == list(range(len(elements) + 1))
@@ -33,8 +30,7 @@ def test_inits_monotonic_length(elements: List[int]) -> None:
 
 @given(sets(integers()), sets(integers()))
 def test_venn_subsets(lefts: Set[int], rights: Set[int]) -> None:
-    """all combinations of venn with subsets"""
-
+    """All combinations of venn with subsets."""
     r_lefts: List[int]
     r_middles: List[int]
     r_rights: List[int]
@@ -50,8 +46,7 @@ def test_venn_subsets(lefts: Set[int], rights: Set[int]) -> None:
 
 @given(lists(integers()))
 def test_venn_disjoint(both: List[int]) -> None:
-    """venn with disjoint"""
-
+    """Venn with disjoint."""
     e_lefts = list(filter(lambda x: x % 2 == 0, both))
     e_rights = list(filter(lambda x: x % 2 != 0, both))
 

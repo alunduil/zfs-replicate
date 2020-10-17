@@ -17,7 +17,6 @@ def generate(
     follow_delete: bool = False,
 ) -> List[Task]:
     """Generate Tasks for replicating local snapshots to remote snapshots."""
-
     tasks = []
 
     for filesystem in local_snapshots:

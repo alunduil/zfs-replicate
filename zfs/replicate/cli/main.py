@@ -64,7 +64,6 @@ def main(
     local_fs: FileSystem,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
-
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
     if verbose:

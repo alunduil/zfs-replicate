@@ -1,4 +1,4 @@
-"""zfs.replicate.task.generate tests"""
+"""zfs.replicate.task.generate tests."""
 
 import itertools
 import operator
@@ -14,15 +14,13 @@ from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 
 def test_no_tasks() -> None:
-    """generate(Any, {}, {}) == []"""
-
+    """generate(Any, {}, {}) == []."""
     assert [] == generate(filesystem("pool/filesystem"), {}, {})
 
 
 @given(lists(SNAPSHOTS))
 def test_empty_remotes(snapshots: List[Snapshot]) -> None:
-    """generate with empty remotes"""
-
+    """Generate with empty remotes."""
     snapshots_by_fs = {
         k: list(v)
         for (k, v) in itertools.groupby(
@@ -40,8 +38,7 @@ def test_empty_remotes(snapshots: List[Snapshot]) -> None:
 
 @given(lists(SNAPSHOTS))
 def test_empty_locals(snapshots: List[Snapshot]) -> None:
-    """generate with empty locals"""
-
+    """Generate with empty locals."""
     snapshots_by_fs = {
         k: list(v)
         for (k, v) in itertools.groupby(

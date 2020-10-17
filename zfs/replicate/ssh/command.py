@@ -4,8 +4,7 @@ from .cipher import Cipher
 
 
 def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> str:
-    """Generated ssh commandline invocation."""
-
+    """Generate ssh commandline invocation."""
     ssh = "/usr/bin/env - ssh"
 
     options = []

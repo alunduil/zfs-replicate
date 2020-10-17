@@ -12,7 +12,6 @@ from .type import FileSystem
 
 def create(filesystem: FileSystem, ssh_command: str) -> None:
     """Create a Remote FileSystem."""
-
     if filesystem.name is None:
         raise ZFSReplicateError(f"refusing to create dataset: '{filesystem.dataset}'", filesystem)
 

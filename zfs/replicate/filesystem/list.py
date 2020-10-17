@@ -13,7 +13,6 @@ RE_WHITESPACE = re.compile(b"[ \t]+")
 
 def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:
     """List ZFS FileSystem."""
-
     command = _list(filesystem)
     if ssh_command is not None:
         command = ssh_command + " " + command

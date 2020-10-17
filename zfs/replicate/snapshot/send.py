@@ -19,7 +19,6 @@ def send(
     previous: Optional[Snapshot] = None,
 ) -> None:
     """Send ZFS Snapshot."""
-
     send_command = _send(current, previous, follow_delete=follow_delete)
 
     compress_command, decompress_command = compress.command(compression)

@@ -6,8 +6,7 @@ from zfs.replicate import optional
 
 
 def test_value_none() -> None:
-    """optional.value(None) → RuntimeError"""
-
+    """optional.value(None) → RuntimeError."""
     # Use try except due to lack of typing on pytest module.
     try:
         optional.value(None)
@@ -19,6 +18,5 @@ def test_value_none() -> None:
 
 @given(integers())
 def test_value_not_none(value: int) -> None:
-    """optional.value(value) == value"""
-
+    """optional.value(value) == value."""
     assert optional.value(value) == value

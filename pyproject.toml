@@ -1,7 +1,65 @@
+[tool.poetry]
+name = "zfs-replicate"
+version = "1.2.0"
+description = "ZFS Snapshot Replicator"
+authors = ["Alex Brandt <alunduil@gmail.com>"]
+license = "BSD-2-Clause"
+readme = "README.rst"
+repository = "https://github.com/alunduil/zfs-replicate"
+keywords = [
+  "zfs",
+  "replication",
+  "backup",
+  "remote",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: System Administrators",
+  "License :: OSI Approved :: BSD License",
+  "Natural Language :: English",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Topic :: System",
+  "Topic :: System :: Archiving",
+  "Topic :: System :: Filesystems",
+]
+packages = [
+  { include = "zfs" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.6.1"
+click = "^7.1.2"
+stringcase = "^1.2.0"
+pre-commit = "^2.7.1"
+
+[tool.poetry.dev-dependencies]
+coveralls = "^2.1.1"
+hypothesis = "^4.38.1"
+pytest = "^6.1.1"
+pytest-cov = "^2.10.0"
+vulture = "^2.0"
+
+[tool.poetry.scripts]
+zfs-replicate = "zfs.replicate.cli.main:main"
+
 [tool.black]
 line-length = 120
 
-[tool.isort]
-line_length = 120
-multi_line = 3
-trailing_comma = true
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --cov=zfs --cov-report=term-missing"
+testpaths = [
+  "zfs_test",
+]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

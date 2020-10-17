@@ -14,6 +14,7 @@ class Snapshot(NamedTuple):
     timestamp: int
 
     def __eq__(self, other: Any) -> bool:
+        """Equality of Snapshots."""
         if not isinstance(other, Snapshot):
             raise NotImplementedError
 

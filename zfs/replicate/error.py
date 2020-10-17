@@ -9,4 +9,5 @@ class ZFSReplicateError(ClickException):
     """Base ZFS Replication Error."""
 
     def __init__(self, message: str, *_args: Any) -> None:
+        """Construct ZFSReplicateError."""
         super().__init__(message)
