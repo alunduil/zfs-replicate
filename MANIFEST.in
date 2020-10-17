@@ -1,5 +1,4 @@
 include LICENSE
-include Makefile
 include mypy.ini
 include README.rst
 include setup.cfg
