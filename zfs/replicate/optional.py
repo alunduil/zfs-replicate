@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 """Optional Functions."""
+from typing import Optional
+from typing import TypeVar
 
-from typing import Optional, TypeVar
 
 Value = TypeVar("Value")
 

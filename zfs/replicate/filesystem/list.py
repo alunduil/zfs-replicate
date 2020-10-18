@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """ZFs FileSystem List."""
-
 import re
 from typing import List
 
@@ -7,6 +7,7 @@ from . import type
 from .. import subprocess
 from ..error import ZFSReplicateError
 from .type import FileSystem
+
 
 RE_WHITESPACE = re.compile(b"[ \t]+")
 

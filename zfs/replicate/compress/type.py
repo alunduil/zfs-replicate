@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 """ZFS Replication Stream Compression."""
-
-from enum import Enum, auto
+from enum import auto
+from enum import Enum
 
 
 class Compression(Enum):

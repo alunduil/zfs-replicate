@@ -1,9 +1,10 @@
+# -*- coding: utf-8 -*-
 """ZFS Snapshot Send."""
-
 import subprocess
 from typing import Optional
 
-from .. import compress, filesystem
+from .. import compress
+from .. import filesystem
 from ..compress import Compression
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem

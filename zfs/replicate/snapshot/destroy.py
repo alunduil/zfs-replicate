@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """ZFS Snapshot destruction."""
-
 from .. import subprocess
 from ..error import ZFSReplicateError
 from .type import Snapshot

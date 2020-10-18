@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """ZFS Replication Errors."""
-
 from typing import Any
 
 from click import ClickException

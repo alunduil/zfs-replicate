@@ -1,12 +1,16 @@
+# -*- coding: utf-8 -*-
 """Task Execution."""
-
 import itertools
-from typing import List, Tuple
+from typing import List
+from typing import Tuple
 
-from .. import filesystem, optional, snapshot
+from .. import filesystem
+from .. import optional
+from .. import snapshot
 from ..compress import Compression
 from ..filesystem import FileSystem
-from .type import Action, Task
+from .type import Action
+from .type import Task
 
 
 def execute(

@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """zfs.replicate.task.generate tests."""
-
 import itertools
 import operator
 from typing import List
@@ -10,6 +10,7 @@ from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot import Snapshot
 from zfs.replicate.task.generate import generate
 from zfs.replicate.task.type import Action
+
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 
@@ -32,7 +33,7 @@ def test_empty_remotes(snapshots: List[Snapshot]) -> None:
 
     assert len([t for t in result if t.action == Action.CREATE and t.snapshot is None]) == len(snapshots_by_fs)
     assert len([t for t in result if t.action == Action.SEND and t.snapshot is not None]) == sum(
-        map(len, snapshots_by_fs.values())
+        map(len, snapshots_by_fs.values()),
     )
 
 
@@ -49,6 +50,6 @@ def test_empty_locals(snapshots: List[Snapshot]) -> None:
     result = generate(filesystem(""), {}, snapshots_by_fs)
 
     assert len([t for t in result if t.action == Action.DESTROY]) == len(snapshots_by_fs) + sum(
-        map(len, snapshots_by_fs.values())
+        map(len, snapshots_by_fs.values()),
     )
     assert all(t.action == Action.DESTROY for t in result)

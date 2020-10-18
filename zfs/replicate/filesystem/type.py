@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """ZFS FileySystem Type."""
-
 from typing import NamedTuple
 
 

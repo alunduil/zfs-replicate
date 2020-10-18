@@ -1,8 +1,17 @@
+[build-system]
+requires = [ "poetry>=0.12",]
+build-backend = "poetry.masonry.api"
+
+[tool.black]
+line-length = 120
+
 [tool.poetry]
 name = "zfs-replicate"
 version = "1.2.0"
 description = "ZFS Snapshot Replicator"
-authors = ["Alex Brandt <alunduil@gmail.com>"]
+authors = [
+  "Alex Brandt <alunduil@gmail.com>",
+]
 license = "BSD-2-Clause"
 readme = "README.rst"
 repository = "https://github.com/alunduil/zfs-replicate"
@@ -36,10 +45,10 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6.1"
 click = "^7.1.2"
-stringcase = "^1.2.0"
 pre-commit = "^2.7.1"
+python = "^3.6.1"
+stringcase = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 coveralls = "^2.1.1"
@@ -51,15 +60,14 @@ vulture = "^2.0"
 [tool.poetry.scripts]
 zfs-replicate = "zfs.replicate.cli.main:main"
 
-[tool.black]
-line-length = 120
-
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --cov=zfs --cov-report=term-missing"
 testpaths = [
   "zfs_test",
 ]
 
-[build-system]
-requires = ["poetry>=0.12"]
-build-backend = "poetry.masonry.api"
+[tool.skjold]
+sources = [
+  "pyup",
+  "gemnasium",
+]

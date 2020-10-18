@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 """SSH Cipher Type."""
-
-from enum import Enum, auto
+from enum import auto
+from enum import Enum
 
 
 class Cipher(Enum):

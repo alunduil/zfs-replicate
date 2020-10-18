@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """Tests for zfs.replicate.optional."""
-
 from hypothesis import given
 from hypothesis.strategies import integers
 from zfs.replicate import optional

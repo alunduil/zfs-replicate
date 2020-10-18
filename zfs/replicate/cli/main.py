@@ -1,10 +1,13 @@
+# -*- coding: utf-8 -*-
 """Main function zfs-replicate."""
-
 import itertools
 
 import click
 
-from .. import filesystem, snapshot, ssh, task
+from .. import filesystem
+from .. import snapshot
+from .. import ssh
+from .. import task
 from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
@@ -70,7 +73,7 @@ def main(
         click.echo(f"checking filesystem {local_fs.name}")
 
     l_snaps = snapshot.list(local_fs, recursive=recursive)
-    # Improvment: exclusions from snapshots to replicate.
+    # Improvement: exclusions from snapshots to replicate.
 
     if verbose:
         click.echo(f"found {len(l_snaps)} snapshots on {local_fs.name}")

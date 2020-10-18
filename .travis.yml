@@ -1,9 +1,9 @@
 ---
 language: python
 python:
-    - '3.6' # EOL 2021-12-23
-    - '3.7' # EOL 2023-06-27
-    - '3.8' # EOL 2024-10
+    - '3.6'  # EOL 2021-12-23
+    - '3.7'  # EOL 2023-06-27
+    - '3.8'  # EOL 2024-10
     - 3.9-dev   # EOL 2025-10
     - nightly
 matrix:
@@ -26,7 +26,7 @@ install:
 
 script:
     - pre-commit run --all-files
-    - vulture --min-confidence=61 --exclude=zfs/replicate/cli/click.py --ignore-names=main zfs
+    - vulture --min-confidence=61 --exclude=zfs/replicate/cli/click.py --ignore-names=main zfs  # yamllint disable-line
     - zfs-replicate --help
     - pytest
     - poetry build
@@ -36,8 +36,8 @@ after_success:
     - coveralls
 
 before_deploy:
-  # User and password environment variables are set as hidden variables through
-  # the web interface in the project settings.
+    # User and password environment variables are set as hidden variables
+    # through the web interface in the project settings.
     - pip install --upgrade pip
     - pip install poetry
     - poetry config http-basic.pypi $PYPI_USER $PYPI_PASS
@@ -47,8 +47,8 @@ deploy:
     provider: script
     script: poetry publish
     skip_cleanup: true
-    on:
-        all_branches: true # Travis recognizes tag names as "branches"
+    on:  # yamllint disable-line
+        all_branches: true  # Travis recognizes tag names as "branches"
         condition: $TRAVIS_BUILD_STAGE_NAME = Deploy
         repo: alunduil/zfs-replicate
         tags: true

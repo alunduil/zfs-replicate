@@ -1,9 +1,8 @@
+# -*- coding: utf-8 -*-
 """ZFS Replication Options."""
-
 from typing import Any
 
 import click
-
 import stringcase
 
 
@@ -28,7 +27,7 @@ class EnumChoice(click.Choice):
 
     def get_metavar(self, param: Any) -> str:
         """Use Enum name as metavar."""
-        metavar = stringcase.snakecase(self.__enum.__name__)  # type: str
+        metavar: str = stringcase.snakecase(self.__enum.__name__)
 
         if metavar.endswith("_enum"):
             metavar = metavar[:-5]

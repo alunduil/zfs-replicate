@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """ZFS Replication Compression Command Mapping."""
-
 from typing import Tuple
 
 from .type import Compression
