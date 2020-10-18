@@ -15,6 +15,6 @@ def open(
     stdin: Union[IO[str], int] = subprocess.PIPE,
     stdout: Union[IO[str], int] = subprocess.PIPE,
     stderr: Union[IO[str], int] = subprocess.PIPE,
-) -> subprocess.Popen[bytes]:
+):  # type: (...) -> subprocess.Popen[bytes]
     """Wrap subprocess.Popen for convenience."""
     return subprocess.Popen(shlex.split(command), stdin=stdin, stdout=stdout, stderr=stderr, shell=shell)
