@@ -2,10 +2,10 @@
 """ZFS FileSystem creation."""
 import os.path
 
-from . import type
 from .. import subprocess
 from ..error import ZFSReplicateError
 from ..list import inits
+from . import type
 from .list import list
 from .type import FileSystem
 

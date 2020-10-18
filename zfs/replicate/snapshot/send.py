@@ -3,8 +3,7 @@
 import subprocess
 from typing import Optional
 
-from .. import compress
-from .. import filesystem
+from .. import compress, filesystem
 from ..compress import Compression
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem

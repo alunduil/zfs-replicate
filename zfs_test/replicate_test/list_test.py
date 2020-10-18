@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """Tests for zfs.replicate.list."""
-from typing import List
-from typing import Set
+from typing import List, Set
 
 from hypothesis import given
-from hypothesis.strategies import integers
-from hypothesis.strategies import lists
-from hypothesis.strategies import sets
+from hypothesis.strategies import integers, lists, sets
+
 from zfs.replicate import list as sut
 
 

@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """ZFS Snapshot listing."""
-from typing import List
-from typing import Optional
+from typing import List, Optional
 
 from .. import subprocess
 from ..error import ZFSReplicateError
-from ..filesystem import FileSystem
-from ..filesystem import filesystem
+from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
 
 

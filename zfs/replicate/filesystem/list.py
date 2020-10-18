@@ -3,11 +3,10 @@
 import re
 from typing import List
 
-from . import type
 from .. import subprocess
 from ..error import ZFSReplicateError
+from . import type
 from .type import FileSystem
-
 
 RE_WHITESPACE = re.compile(b"[ \t]+")
 

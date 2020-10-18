@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """Replication Tasks."""
-from typing import Dict
-from typing import List
+from typing import Dict, List
 
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
 from ..filesystem import remote_filesystem
 from ..list import venn
 from ..snapshot import Snapshot
-from .type import Action
-from .type import Task
+from .type import Action, Task
 
 
 def generate(

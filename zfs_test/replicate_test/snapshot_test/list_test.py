@@ -4,10 +4,9 @@ from typing import List
 
 from hypothesis import given
 from hypothesis.strategies import lists
-from zfs.replicate.snapshot.list import _snapshot
-from zfs.replicate.snapshot.list import _snapshots
-from zfs.replicate.snapshot.type import Snapshot
 
+from zfs.replicate.snapshot.list import _snapshot, _snapshots
+from zfs.replicate.snapshot.type import Snapshot
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 

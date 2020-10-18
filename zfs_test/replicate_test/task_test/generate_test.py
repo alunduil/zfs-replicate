@@ -6,11 +6,11 @@ from typing import List
 
 from hypothesis import given
 from hypothesis.strategies import lists
+
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot import Snapshot
 from zfs.replicate.task.generate import generate
 from zfs.replicate.task.type import Action
-
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 

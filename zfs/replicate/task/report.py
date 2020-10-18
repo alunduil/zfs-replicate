@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """Task Reporting Functions."""
 import itertools
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
 
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
-from .type import Action
-from .type import Task
-
+from .type import Action, Task
 
 LIMITS = {"filesystem": 6, "action": 4, "snapshot": 13}
 

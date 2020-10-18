@@ -4,10 +4,7 @@ import itertools
 
 import click
 
-from .. import filesystem
-from .. import snapshot
-from .. import ssh
-from .. import task
+from .. import filesystem, snapshot, ssh, task
 from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t

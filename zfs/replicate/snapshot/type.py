@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """ZFS Snapshot Type."""
-from typing import Any
-from typing import NamedTuple
-from typing import Optional
+from typing import Any, NamedTuple, Optional
 
 from ..filesystem import FileSystem
 

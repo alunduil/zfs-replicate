@@ -2,9 +2,7 @@
 """subprocess wrapper."""
 import shlex
 import subprocess
-from typing import IO
-from typing import Union
-
+from typing import IO, Union
 
 STDOUT = subprocess.STDOUT
 

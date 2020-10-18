@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """Common List Functions."""
-from typing import List
-from typing import Sequence
-from typing import Tuple
-from typing import TypeVar
-
+from typing import List, Sequence, Tuple, TypeVar
 
 __all__ = ("inits", "venn")
 

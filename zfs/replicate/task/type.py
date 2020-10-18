@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """Types for Tasks."""
-from enum import auto
-from enum import Enum
-from typing import NamedTuple
-from typing import Optional
+from enum import Enum, auto
+from typing import NamedTuple, Optional
 
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
