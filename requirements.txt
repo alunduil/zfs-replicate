@@ -1,6 +1,6 @@
 click==7.1.2
 coveralls==2.1.1
-hypothesis==4.38.1
+hypothesis==5.30.0
 pre-commit==2.6.0
 pytest==6.0.0
 pytest-cov==2.10.0
