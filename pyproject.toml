@@ -46,16 +46,18 @@ packages = [
 
 [tool.poetry.dependencies]
 click = "^7.1.2"
-pre-commit = "^2.7.1"
 python = "^3.6.1"
 stringcase = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 coveralls = "^2.1.1"
 hypothesis = "^5.37.3"
+pip = "^20.2.4"
+pre-commit = "^2.7.1"
 pytest = "^6.1.1"
 pytest-cov = "^2.10.0"
 vulture = "^2.0"
+virtualenv = "^20.1.0"
 
 [tool.poetry.scripts]
 zfs-replicate = "zfs.replicate.cli.main:main"
