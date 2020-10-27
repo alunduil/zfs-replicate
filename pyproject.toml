@@ -57,7 +57,6 @@ pre-commit = "^2.7.1"
 pytest = "^6.1.1"
 pytest-cov = "^2.10.0"
 vulture = "^2.0"
-virtualenv = "^20.1.0"
 
 [tool.poetry.scripts]
 zfs-replicate = "zfs.replicate.cli.main:main"
