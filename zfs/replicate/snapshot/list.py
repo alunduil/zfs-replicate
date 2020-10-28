@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """ZFS Snapshot listing."""
-
 from typing import List, Optional
 
 from .. import subprocess
@@ -10,7 +10,6 @@ from .type import Snapshot
 
 def list(filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = None) -> List[Snapshot]:
     """List ZFS snapshots."""
-
     command = _list(filesystem, recursive)
     if ssh_command is not None:
         command = ssh_command + " " + command
@@ -31,7 +30,6 @@ def list(filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = N
 
 def _list(filesystem: FileSystem, recursive: bool) -> str:
     """ZFS List Snapshot command."""
-
     options = ["-H", "-t snapshot", "-p", "-o name,creation", "-r"]
 
     if not recursive:

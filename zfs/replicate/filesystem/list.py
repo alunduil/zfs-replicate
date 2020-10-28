@@ -1,11 +1,11 @@
+# -*- coding: utf-8 -*-
 """ZFs FileSystem List."""
-
 import re
 from typing import List
 
-from . import type
 from .. import subprocess
 from ..error import ZFSReplicateError
+from . import type
 from .type import FileSystem
 
 RE_WHITESPACE = re.compile(b"[ \t]+")
@@ -13,7 +13,6 @@ RE_WHITESPACE = re.compile(b"[ \t]+")
 
 def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:
     """List ZFS FileSystem."""
-
     command = _list(filesystem)
     if ssh_command is not None:
         command = ssh_command + " " + command

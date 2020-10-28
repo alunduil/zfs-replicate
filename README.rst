@@ -37,7 +37,8 @@ ZFS_ Permissions::
 
     zfs allow ${USER} create,destroy,snapshot,rollback,clone,promote,rename,mount,send,receive,readonly,quota,reservation,hold ${BACKUP_DATASET}
 
-More information about this configuration can be found at the following sources:
+More information about this configuration can be found at the following
+sources:
 
 * `ZFS REMOTE REPLICATION SCRIPT WITH REPORTING`_
 * `ZFS replication without using Root user`_
@@ -76,8 +77,8 @@ found an error or have a suggestion for a new feature, please ensure that it is
 reported.
 
 If you would like to contribute a fix or new feature, please submit a pull
-request.  This project follows `git flow`_ and utilizes travis_ to automatically
-check pull requests before a manual review.
+request.  This project follows `git flow`_ and utilizes travis_ to
+automatically check pull requests before a manual review.
 
 .. _autorepl.py: https://github.com/freenas/freenas/blob/master/gui/tools/autorepl.py
 .. _FreeBSD: https://www.freebsd.org/

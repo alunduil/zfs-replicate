@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """subprocess wrapper."""
-
 import shlex
 import subprocess
 from typing import IO, Union
@@ -14,6 +14,5 @@ def open(
     stdout: Union[IO[str], int] = subprocess.PIPE,
     stderr: Union[IO[str], int] = subprocess.PIPE,
 ):  # type: (...) -> subprocess.Popen[bytes]
-    """Wrapper around subprocess.Popen."""
-
+    """Wrap subprocess.Popen for convenience."""
     return subprocess.Popen(shlex.split(command), stdin=stdin, stdout=stdout, stderr=stderr, shell=shell)

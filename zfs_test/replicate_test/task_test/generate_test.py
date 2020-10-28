@@ -1,11 +1,12 @@
-"""zfs.replicate.task.generate tests"""
-
+# -*- coding: utf-8 -*-
+"""zfs.replicate.task.generate tests."""
 import itertools
 import operator
 from typing import List
 
 from hypothesis import given
 from hypothesis.strategies import lists
+
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot import Snapshot
 from zfs.replicate.task.generate import generate
@@ -14,15 +15,13 @@ from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 
 def test_no_tasks() -> None:
-    """generate(Any, {}, {}) == []"""
-
+    """generate(Any, {}, {}) == []."""
     assert [] == generate(filesystem("pool/filesystem"), {}, {})
 
 
 @given(lists(SNAPSHOTS))
 def test_empty_remotes(snapshots: List[Snapshot]) -> None:
-    """generate with empty remotes"""
-
+    """Generate with empty remotes."""
     snapshots_by_fs = {
         k: list(v)
         for (k, v) in itertools.groupby(
@@ -34,14 +33,13 @@ def test_empty_remotes(snapshots: List[Snapshot]) -> None:
 
     assert len([t for t in result if t.action == Action.CREATE and t.snapshot is None]) == len(snapshots_by_fs)
     assert len([t for t in result if t.action == Action.SEND and t.snapshot is not None]) == sum(
-        map(len, snapshots_by_fs.values())
+        map(len, snapshots_by_fs.values()),
     )
 
 
 @given(lists(SNAPSHOTS))
 def test_empty_locals(snapshots: List[Snapshot]) -> None:
-    """generate with empty locals"""
-
+    """Generate with empty locals."""
     snapshots_by_fs = {
         k: list(v)
         for (k, v) in itertools.groupby(
@@ -52,6 +50,6 @@ def test_empty_locals(snapshots: List[Snapshot]) -> None:
     result = generate(filesystem(""), {}, snapshots_by_fs)
 
     assert len([t for t in result if t.action == Action.DESTROY]) == len(snapshots_by_fs) + sum(
-        map(len, snapshots_by_fs.values())
+        map(len, snapshots_by_fs.values()),
     )
     assert all(t.action == Action.DESTROY for t in result)

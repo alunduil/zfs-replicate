@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """Types for Tasks."""
-
 from enum import Enum, auto
 from typing import NamedTuple, Optional
 

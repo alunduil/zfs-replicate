@@ -1,13 +1,12 @@
-"""ZFS FileSsytem destruction."""
-
+# -*- coding: utf-8 -*-
+"""ZFS FileSystem destruction."""
 from .. import subprocess
 from ..error import ZFSReplicateError
 from .type import FileSystem
 
 
 def destroy(filesystem: FileSystem, ssh_command: str) -> None:
-    """Destroy a remote fileystem."""
-
+    """Destroy a remote filesystem."""
     command = ssh_command + " " + _destroy(filesystem)
 
     proc = subprocess.open(command)

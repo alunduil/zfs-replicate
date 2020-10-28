@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """ZFS FileySystem Type."""
-
 from typing import NamedTuple
 
 
@@ -13,7 +13,6 @@ class FileSystem(NamedTuple):
 
 def filesystem(name: str, readonly: bool = False) -> FileSystem:
     """Create a FileSystem from a name."""
-
     dataset = name.split("/", 1)[0]
 
     return FileSystem(dataset=dataset, name=name, readonly=readonly)
