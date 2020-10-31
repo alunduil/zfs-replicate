@@ -18,7 +18,7 @@ def test_no_tasks() -> None:
     assert [] == generate(filesystem("pool/filesystem"), {}, {})
 
 
-@given(lists(SNAPSHOTS))  # type: ignore
+@given(lists(SNAPSHOTS))
 def test_empty_remotes(snapshots: List[Snapshot]) -> None:
     """Generate with empty remotes."""
     snapshots_by_fs = {
@@ -37,7 +37,7 @@ def test_empty_remotes(snapshots: List[Snapshot]) -> None:
     )
 
 
-@given(lists(SNAPSHOTS))  # type: ignore
+@given(lists(SNAPSHOTS))
 def test_empty_locals(snapshots: List[Snapshot]) -> None:
     """Generate with empty locals."""
     snapshots_by_fs = {
