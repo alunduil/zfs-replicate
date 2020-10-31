@@ -46,7 +46,7 @@ packages = [
 
 [tool.poetry.dependencies]
 click = "^7.1.2"
-python = "^3.7.0"
+python = "^3.7"
 stringcase = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
