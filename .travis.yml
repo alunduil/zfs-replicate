@@ -49,6 +49,6 @@ deploy:
     skip_cleanup: true
     on:  # yamllint disable-line
         all_branches: true  # Travis recognizes tag names as "branches"
-        condition: $TRAVIS_BUILD_STAGE_NAME = Deploy
         repo: alunduil/zfs-replicate
         tags: true
+        python: 3.8
