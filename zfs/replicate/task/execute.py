@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """Task Execution."""
-
 import itertools
 from typing import List, Tuple
 
@@ -17,7 +17,6 @@ def execute(
     compression: Compression,
 ) -> None:
     """Execute all tasks."""
-
     sorted_tasks = sorted(tasks, key=lambda x: len(x[0].name.split("/")), reverse=True)
 
     for _, filesystem_tasks in sorted_tasks:

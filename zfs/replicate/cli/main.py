@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """Main function zfs-replicate."""
-
 import itertools
 
 import click
@@ -64,14 +64,13 @@ def main(
     local_fs: FileSystem,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
-
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
     if verbose:
         click.echo(f"checking filesystem {local_fs.name}")
 
     l_snaps = snapshot.list(local_fs, recursive=recursive)
-    # Improvment: exclusions from snapshots to replicate.
+    # Improvement: exclusions from snapshots to replicate.
 
     if verbose:
         click.echo(f"found {len(l_snaps)} snapshots on {local_fs.name}")

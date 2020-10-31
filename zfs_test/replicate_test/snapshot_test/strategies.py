@@ -1,9 +1,10 @@
-"""Snapshot Hypothesis Strategies"""
-
+# -*- coding: utf-8 -*-
+"""Snapshot Hypothesis Strategies."""
 import string
 from typing import Any, Dict
 
 from hypothesis.strategies import SearchStrategy, fixed_dictionaries, integers, none, text
+
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 

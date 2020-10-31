@@ -1,6 +1,0 @@
-include LICENSE
-include mypy.ini
-include README.rst
-include setup.cfg
-include zfs/__init__.pyi
-recursive-include zfs_test *.py

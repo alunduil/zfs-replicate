@@ -1,12 +1,17 @@
-"""zfs.replicate.cli.main tests"""
-
+# -*- coding: utf-8 -*-
+"""zfs.replicate.cli.main tests."""
 from click.testing import CliRunner
+
 from zfs.replicate.cli.main import main
 
 
 def test_invokes_without_stacktrace() -> None:
-    """zfs-replicate -l alunduil -i mypy.ini example.com bogus bogus => No stacktrace"""
+    """Invoke without stacktrace.
 
+    .. code:: bash
+
+        zfs-replicate -l alunduil -i mypy.ini example.com bogus bogus
+    """
     runner = CliRunner()
     result = runner.invoke(main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
     assert isinstance(result.exception, SystemExit) or (
@@ -15,8 +20,12 @@ def test_invokes_without_stacktrace() -> None:
 
 
 def test_invokes_without_stacktrace_verbose() -> None:
-    """zfs-replicate --verbose -l alunduil -i mypy.ini example.com bogus bogus => No stacktrace"""
+    """Invoke without stacktrace.
 
+    .. code:: bash
+
+        zfs-replicate --verbose -l alunduil -i mypy.ini example.com bogus bogus.
+    """
     runner = CliRunner()
     result = runner.invoke(main, ["--verbose", "-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
     assert isinstance(result.exception, SystemExit) or (

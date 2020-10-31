@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 """Task Reporting Functions."""
-
 import itertools
 from typing import List, Tuple
 
@@ -14,7 +14,6 @@ AFTERS = {"filesystem": "action", "action": "snapshot"}
 
 def report(tasks: List[Task]) -> str:
     """Pretty printed report on given Tasks."""
-
     filesystems = [
         (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
     ]
