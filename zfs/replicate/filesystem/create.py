@@ -35,6 +35,8 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
         if proc.returncode:
             if b"successfully created, but not mounted" in error:
                 return  # Ignore this error.
+            if b"filesystem successfully created, but it may only be mounted by root" in error:
+                return  # Ignore this error.
 
             raise ZFSReplicateError(
                 f"unable to create remote dataset: '{filesystem.dataset}': {error!r}", filesystem, error,
