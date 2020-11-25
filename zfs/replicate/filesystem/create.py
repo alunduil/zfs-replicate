@@ -33,10 +33,9 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
         error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
         if proc.returncode:
-            if b"successfully created, but not mounted" in error:
-                return  # Ignore this error.
-            if b"filesystem successfully created, but it may only be mounted by root" in error:
-                return  # Ignore this error.
+            if b"filesystem successfully created, but " in error:
+                return  # Ignore mount and share errors 
+                        # https://github.com/openzfs/zfs/blob/master/cmd/zfs/zfs_main.c#L760-L777
 
             raise ZFSReplicateError(
                 f"unable to create remote dataset: '{filesystem.dataset}': {error!r}", filesystem, error,
