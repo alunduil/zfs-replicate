@@ -25,7 +25,8 @@ def test_empty_remotes(snapshots: List[Snapshot]) -> None:
     snapshots_by_fs = {
         k: list(v)
         for (k, v) in itertools.groupby(
-            sorted(snapshots, key=operator.attrgetter("filesystem")), key=operator.attrgetter("filesystem"),
+            sorted(snapshots, key=operator.attrgetter("filesystem")),
+            key=operator.attrgetter("filesystem"),
         )
     }
 
@@ -43,7 +44,8 @@ def test_empty_locals(snapshots: List[Snapshot]) -> None:
     snapshots_by_fs = {
         k: list(v)
         for (k, v) in itertools.groupby(
-            sorted(snapshots, key=operator.attrgetter("filesystem")), key=operator.attrgetter("filesystem"),
+            sorted(snapshots, key=operator.attrgetter("filesystem")),
+            key=operator.attrgetter("filesystem"),
         )
     }
 
