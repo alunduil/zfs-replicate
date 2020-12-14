@@ -22,7 +22,9 @@ def list(filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = N
 
     if proc.returncode:
         raise ZFSReplicateError(
-            f"error encountered while listing snapshots of '{filesystem.name}': {error!r}", filesystem, error,
+            f"error encountered while listing snapshots of '{filesystem.name}': {error!r}",
+            filesystem,
+            error,
         )
 
     return _snapshots(output)
@@ -66,5 +68,8 @@ def _add_previous(snapshot: Snapshot, previous: Optional[Snapshot] = None) -> Sn
         previous = None
 
     return Snapshot(
-        filesystem=snapshot.filesystem, name=snapshot.name, previous=previous, timestamp=snapshot.timestamp,
+        filesystem=snapshot.filesystem,
+        name=snapshot.name,
+        previous=previous,
+        timestamp=snapshot.timestamp,
     )
