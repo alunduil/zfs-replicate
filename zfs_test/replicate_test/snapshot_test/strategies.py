@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Snapshot Hypothesis Strategies."""
 import string
 from typing import Any, Dict

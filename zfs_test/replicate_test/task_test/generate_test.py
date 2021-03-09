@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """zfs.replicate.task.generate tests."""
 import itertools
 import operator

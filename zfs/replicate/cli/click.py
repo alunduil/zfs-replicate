@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFS Replication Options."""
 from typing import Any
 
