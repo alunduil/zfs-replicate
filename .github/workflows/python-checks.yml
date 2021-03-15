@@ -40,13 +40,15 @@ jobs:
             - name: pre-commit
               run: pre-commit run --all-files
             - name: vulture
-              run: vulture --min-confidence=61 --exclude=zfs/replicate/cli/click.py --ignore-names=main zfs  # yamllint disable-line
+              run: poetry run vulture --min-confidence=61 --exclude=zfs/replicate/cli/click.py --ignore-names=main zfs  # yamllint disable-line
             - name: zfs-replicate --help
-              run: zfs-replicate --help
+              run: poetry run zfs-replicate --help
             - name: pytest
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
-                  pytest
-                  coveralls
+                  poetry run pytest
+                  poetry run coveralls
             - name: poetry build
               run: |
                   poetry build
