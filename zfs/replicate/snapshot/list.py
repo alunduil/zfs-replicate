@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFS Snapshot listing."""
 from typing import List, Optional
 

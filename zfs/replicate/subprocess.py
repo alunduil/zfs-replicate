@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """subprocess wrapper."""
 import shlex
 import subprocess

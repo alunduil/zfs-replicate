@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """SSH Command Generator."""
 from .cipher import Cipher
 

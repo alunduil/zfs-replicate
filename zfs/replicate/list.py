@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Common List Functions."""
 from typing import List, Sequence, Tuple, TypeVar
 

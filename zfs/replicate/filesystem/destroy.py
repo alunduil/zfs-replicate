@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFS FileSystem destruction."""
 from .. import subprocess
 from ..error import ZFSReplicateError

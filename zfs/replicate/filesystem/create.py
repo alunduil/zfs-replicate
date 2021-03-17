@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFS FileSystem creation."""
 import os.path
 

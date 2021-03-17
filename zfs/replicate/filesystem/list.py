@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFs FileSystem List."""
 import re
 from typing import List

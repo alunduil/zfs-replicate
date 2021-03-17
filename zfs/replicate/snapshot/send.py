@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFS Snapshot Send."""
 import subprocess
 from typing import Optional
