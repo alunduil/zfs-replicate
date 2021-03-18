@@ -139,7 +139,7 @@ repos:
           - id: toml-sort
             args: [--in-place]
     - repo: https://github.com/executablebooks/mdformat
-      rev: 0.6.1  # Use the ref you want to point at
+      rev: 0.5.3
       hooks:
           - id: mdformat
             additional_dependencies:
