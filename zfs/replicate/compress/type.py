@@ -6,3 +6,4 @@ class Compression(Enum):
     """Stream Compression Choices."""
 
     LZ4 = auto()
+    OFF = auto()
