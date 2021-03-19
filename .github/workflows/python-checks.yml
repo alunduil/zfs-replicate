@@ -26,7 +26,13 @@ jobs:
                   key: ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}  # yamllint disable-line
                   restore-keys: |
                       ${{ runner.os }}-pre-commit-
-                      ${{ runner.os }}-
+            - name: cache poetry
+              uses: actions/cache@v2
+              with:
+                  path: ~/.cache/poetry
+                  key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}  # yamllint disable-line
+                  restore-keys: |
+                      ${{ runner.os }}-poetry-
 
             - name: install dependencies
               run: |
