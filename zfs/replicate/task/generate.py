@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Replication Tasks."""
 from typing import Dict, List
 

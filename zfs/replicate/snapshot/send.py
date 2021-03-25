@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFS Snapshot Send."""
 import subprocess
 from typing import Optional
@@ -36,7 +35,9 @@ def send(
             return  # Ignore this error.
 
         raise ZFSReplicateError(
-            f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error!r}", current, error,
+            f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error!r}",
+            current,
+            error,
         )
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFS FileSystem Operations."""
 from .create import create as create  # noqa: F401
 from .destroy import destroy as destroy  # noqa: F401

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFs FileSystem List."""
 import re
 from typing import List
@@ -25,7 +24,9 @@ def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:
 
     if proc.returncode:
         raise ZFSReplicateError(
-            f"error encountered while listing filesystems of '{filesystem.name}': {error!r}", filesystem, error,
+            f"error encountered while listing filesystems of '{filesystem.name}': {error!r}",
+            filesystem,
+            error,
         )
 
     return _filesystems(output)

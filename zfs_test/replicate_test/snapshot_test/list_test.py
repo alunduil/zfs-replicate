@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """zfs.replicate.snapshot tests."""
 from typing import List
 

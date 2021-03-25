@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Task Reporting Functions."""
 import itertools
 from typing import List, Tuple

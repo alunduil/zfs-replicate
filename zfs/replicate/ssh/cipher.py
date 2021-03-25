@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """SSH Cipher Type."""
 from enum import Enum, auto
 
