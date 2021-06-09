@@ -87,7 +87,7 @@ automatically check pull requests before a manual review.
 .. _Github: https://github.com/alunduil/zfs-replicate
 .. _sanoid: https://github.com/jimsalterjrs/sanoid
 .. _SSH: https://www.openssh.com/
-.. _this survey: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
+.. _this survey: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 .. _travis: https://travis-ci.org/aunduil/zfs-replicate
 .. _Working With Oracle Solaris ZFS Snapshots and Clones: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc
 .. _ZFS: http://open-zfs.org/wiki/System_Administration
