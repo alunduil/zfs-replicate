@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """zfs.replicate.snapshot.type tests."""
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot

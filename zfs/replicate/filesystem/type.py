@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 """ZFS FileySystem Type."""
-from typing import NamedTuple
+from dataclasses import dataclass
 
 
-class FileSystem(NamedTuple):
+@dataclass(order=True, frozen=True)
+class FileSystem:
     """FileSystem Type."""
 
     dataset: str

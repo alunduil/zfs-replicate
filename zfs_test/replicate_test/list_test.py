@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests for zfs.replicate.list."""
 from typing import List, Set
 

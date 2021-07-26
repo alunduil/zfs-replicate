@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 """ZFS Replication Options."""
+from enum import Enum
 from typing import Any
 
 import click
@@ -21,7 +21,10 @@ class EnumChoice(click.Choice):
 
     def convert(self, value: Any, param: Any, ctx: Any) -> Any:
         """Convert string value to Enum value."""
-        value = super().convert(value.name.lower(), param, ctx)
+        if isinstance(value, Enum):
+            value = super().convert(value.name.lower(), param, ctx)
+        else:
+            value = super().convert(value.lower(), param, ctx)
 
         return next(x for x in self.__enum if x.name.lower() == value.lower())
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Common List Functions."""
 from typing import List, Sequence, Tuple, TypeVar
 
@@ -19,7 +18,8 @@ def inits(elements: Sequence[ElementType]) -> Sequence[Sequence[ElementType]]:
 
 
 def venn(
-    lefts: List[ElementType], rights: List[ElementType],
+    lefts: List[ElementType],
+    rights: List[ElementType],
 ) -> Tuple[List[ElementType], List[ElementType], List[ElementType]]:
     """Calculate venn diagram of the two sequences.
 

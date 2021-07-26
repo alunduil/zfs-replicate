@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """zfs.replicate.cli.main tests."""
 from click.testing import CliRunner
 

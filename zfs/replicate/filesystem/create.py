@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ZFS FileSystem creation."""
 import os.path
 
@@ -38,7 +37,9 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
                         # https://github.com/openzfs/zfs/blob/master/cmd/zfs/zfs_main.c#L760-L777
 
             raise ZFSReplicateError(
-                f"unable to create remote dataset: '{filesystem.dataset}': {error!r}", filesystem, error,
+                f"unable to create remote dataset: '{filesystem.dataset}': {error!r}",
+                filesystem,
+                error,
             )
 
 
