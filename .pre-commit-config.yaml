@@ -128,7 +128,11 @@ repos:
       hooks:
           - id: autoflake
     # - repo: https://github.com/twu/skjold
+<<<<<<< HEAD
     #   rev: v0.5.1
+=======
+    #   rev: v0.4.1
+>>>>>>> ec26a12 (poetry update)
     #   hooks:
     #       - id: skjold
     - repo: https://github.com/pappasam/toml-sort
