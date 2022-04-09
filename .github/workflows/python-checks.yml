@@ -4,13 +4,17 @@ on: [push, pull_request] # yamllint disable-line
 jobs:
     build:
         runs-on: ubuntu-latest
+        continue-on-error: ${{ matrix.experimental }}
         strategy:
             matrix:
                 python-version:
                     - '3.7'  # EOL 2023-06-27
                     - '3.8'  # EOL 2024-10
                     - '3.9'  # EOL 2025-10
-                    - 3.x
+                experimental: [false]
+                include:
+                    - python-version: 3.x
+                      experimental: true
 
         steps:
             - uses: actions/checkout@v2
