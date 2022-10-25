@@ -57,4 +57,4 @@ jobs:
             - name: poetry build
               run: |
                   poetry build
-                  tar -zvtf dist/zfs-replicate-*.tar.gz | grep zfs/replicate/
+                  tar -zvtf dist/zfs_replicate-*.tar.gz | grep zfs/replicate/

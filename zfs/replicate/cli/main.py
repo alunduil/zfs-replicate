@@ -11,20 +11,20 @@ from ..ssh import Cipher
 from .click import EnumChoice
 
 
-@click.command()
-@click.option("--verbose", "-v", is_flag=True, help="Print additional output.")
-@click.option(
+@click.command()  # type: ignore
+@click.option("--verbose", "-v", is_flag=True, help="Print additional output.")  # type: ignore
+@click.option(  # type: ignore
     "--dry-run",
     is_flag=True,
     help="Generate replication tasks but do not execute them.",
 )
-@click.option(
+@click.option(  # type: ignore
     "--follow-delete",
     is_flag=True,
     help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS.",
 )
-@click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")
-@click.option(
+@click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")  # type: ignore
+@click.option(  # type: ignore
     "--port",
     "-p",
     type=click.IntRange(1, 65535),
@@ -32,7 +32,7 @@ from .click import EnumChoice
     default=22,
     help="Connect to SSH on PORT.",
 )
-@click.option(
+@click.option(  # type: ignore
     "--login",
     "-l",
     "--user",
@@ -41,28 +41,28 @@ from .click import EnumChoice
     metavar="USER",
     help="Connect to SSH as USER.",
 )
-@click.option(
+@click.option(  # type: ignore
     "-i",
     "--identity-file",
     type=click.Path(exists=True, dir_okay=False),
     required=True,
     help="SSH identity file to use.",
 )
-@click.option(
+@click.option(  # type: ignore
     "--cipher",
     type=EnumChoice(Cipher),
     default=Cipher.STANDARD,
     help="One of: disable (no ciphers), fast (only fast ciphers), or standard (default ciphers).",
 )
-@click.option(
+@click.option(  # type: ignore
     "--compression",
     type=EnumChoice(Compression),
     default=Compression.LZ4,
     help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
 )
-@click.argument("host", required=True)
-@click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")
-@click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")
+@click.argument("host", required=True)  # type: ignore
+@click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore
+@click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore
 def main(
     verbose: bool,
     dry_run: bool,
