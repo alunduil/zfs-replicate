@@ -4,7 +4,7 @@ from typing import Any
 from click import ClickException
 
 
-class ZFSReplicateError(ClickException):
+class ZFSReplicateError(ClickException):  # type: ignore
     """Base ZFS Replication Error."""
 
     def __init__(self, message: str, *_args: Any) -> None:

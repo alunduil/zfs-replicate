@@ -6,7 +6,7 @@ import click
 import stringcase
 
 
-class EnumChoice(click.Choice):
+class EnumChoice(click.Choice):  # type: ignore
     """Choice made from Enum."""
 
     # Need any due to the private member only existing on subclasses through
