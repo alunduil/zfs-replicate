@@ -1,13 +1,17 @@
 """ZFS Snapshot listing."""
 from typing import List, Optional
 
-from .. import subprocess
+from .. import subprocess  # nosec
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
 
 
-def list(filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = None) -> List[Snapshot]:
+def list(  # pylint: disable=W0622
+    filesystem: FileSystem,  # pylint: disable=W0621
+    recursive: bool,
+    ssh_command: Optional[str] = None,
+) -> List[Snapshot]:
     """List ZFS snapshots."""
     command = _list(filesystem, recursive)
     if ssh_command is not None:
@@ -17,7 +21,11 @@ def list(filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = N
 
     output, error = proc.communicate()
     if error is not None:
-        error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
+        error = (
+            error.strip(b"\n")
+            .strip(b"\r")
+            .replace(b"WARNING: ENABLED NONE CIPHER", b"")
+        )
 
     if proc.returncode:
         raise ZFSReplicateError(
@@ -29,7 +37,7 @@ def list(filesystem: FileSystem, recursive: bool, ssh_command: Optional[str] = N
     return _snapshots(output)
 
 
-def _list(filesystem: FileSystem, recursive: bool) -> str:
+def _list(filesystem: FileSystem, recursive: bool) -> str:  # pylint: disable=W0621
     """ZFS List Snapshot command."""
     options = ["-H", "-t snapshot", "-p", "-o name,creation", "-r"]
 
@@ -47,7 +55,9 @@ def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:
 
     snapshots[0] = _add_previous(snapshots[0], None)
 
-    return [snapshots[0]] + [_add_previous(s, p) for s, p in zip(snapshots[1:], snapshots)]
+    return [snapshots[0]] + [
+        _add_previous(s, p) for s, p in zip(snapshots[1:], snapshots)
+    ]
 
 
 def _snapshot(zfs_list_line: bytes) -> Snapshot:

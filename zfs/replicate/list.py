@@ -3,10 +3,10 @@ from typing import List, Sequence, Tuple, TypeVar
 
 __all__ = ("inits", "venn")
 
-ElementType = TypeVar("ElementType")
+T = TypeVar("T")
 
 
-def inits(elements: Sequence[ElementType]) -> Sequence[Sequence[ElementType]]:
+def inits(elements: Sequence[T]) -> Sequence[Sequence[T]]:
     """All initial segments of the given list.
 
     The shortest lists are first.
@@ -18,9 +18,9 @@ def inits(elements: Sequence[ElementType]) -> Sequence[Sequence[ElementType]]:
 
 
 def venn(
-    lefts: List[ElementType],
-    rights: List[ElementType],
-) -> Tuple[List[ElementType], List[ElementType], List[ElementType]]:
+    lefts: List[T],
+    rights: List[T],
+) -> Tuple[List[T], List[T], List[T]]:
     """Calculate venn diagram of the two sequences.
 
     A venn diagram shows the elements both sets contain individually as

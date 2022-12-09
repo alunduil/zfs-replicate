@@ -1,17 +1,23 @@
 """subprocess wrapper."""
 import shlex
-import subprocess
+import subprocess  # nosec
 from typing import IO, Union
 
 STDOUT = subprocess.STDOUT
 
 
-def open(
+def open(  # pylint: disable=W0622
     command: str,
     shell: bool = False,
     stdin: Union[IO[str], int] = subprocess.PIPE,
     stdout: Union[IO[str], int] = subprocess.PIPE,
     stderr: Union[IO[str], int] = subprocess.PIPE,
-):  # type: (...) -> subprocess.Popen[bytes]
+) -> subprocess.Popen[bytes]:
     """Wrap subprocess.Popen for convenience."""
-    return subprocess.Popen(shlex.split(command), stdin=stdin, stdout=stdout, stderr=stderr, shell=shell)
+    return subprocess.Popen(
+        shlex.split(command),
+        stdin=stdin,
+        stdout=stdout,
+        stderr=stderr,
+        shell=shell,  # nosec
+    )

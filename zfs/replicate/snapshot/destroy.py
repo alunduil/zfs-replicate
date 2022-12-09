@@ -1,5 +1,5 @@
 """ZFS Snapshot destruction."""
-from .. import subprocess
+from .. import subprocess  # nosec
 from ..error import ZFSReplicateError
 from .type import Snapshot
 

@@ -1,5 +1,5 @@
 """ZFS FileSystem destruction."""
-from .. import subprocess
+from .. import subprocess  # nosec
 from ..error import ZFSReplicateError
 from .type import FileSystem
 
