@@ -12,7 +12,7 @@ def open(  # pylint: disable=W0622
     stdin: Union[IO[str], int] = subprocess.PIPE,
     stdout: Union[IO[str], int] = subprocess.PIPE,
     stderr: Union[IO[str], int] = subprocess.PIPE,
-) -> subprocess.Popen[bytes]:
+) -> "subprocess.Popen[bytes]":
     """Wrap subprocess.Popen for convenience."""
     return subprocess.Popen(
         shlex.split(command),
