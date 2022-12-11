@@ -1,5 +1,5 @@
 """ZFS Snapshot Send."""
-import subprocess
+import subprocess  # nosec
 from typing import Optional
 
 from .. import compress, filesystem
@@ -9,7 +9,7 @@ from ..filesystem import FileSystem
 from .type import Snapshot
 
 
-def send(
+def send(  # pylint: disable=R0913
     remote: FileSystem,
     current: Snapshot,
     ssh_command: str,
@@ -22,13 +22,22 @@ def send(
 
     compress_command, decompress_command = compress.command(compression)
 
-    receive_command = compress_command + ssh_command + " " + f'"{_receive(remote, current, decompress_command)}"'
+    receive_command = (
+        compress_command
+        + ssh_command
+        + " "
+        + f'"{_receive(remote, current, decompress_command)}"'
+    )
 
     command = send_command + " | " + receive_command
 
-    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(  # pylint: disable=R1732
+        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
+    )
     output, error = proc.communicate()
-    output = output.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
+    output = (
+        output.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
+    )
 
     if proc.returncode:
         if b"failed to create mountpoint" in error:
@@ -41,7 +50,9 @@ def send(
         )
 
 
-def _send(current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False) -> str:
+def _send(
+    current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False
+) -> str:
     options = []  # ["-V"]
 
     if follow_delete:

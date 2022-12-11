@@ -12,9 +12,12 @@ def test_invokes_without_stacktrace() -> None:
         zfs-replicate -l alunduil -i mypy.ini example.com bogus bogus
     """
     runner = CliRunner()
-    result = runner.invoke(main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
-    assert isinstance(result.exception, SystemExit) or (
-        isinstance(result.exception, FileNotFoundError) and result.exception.filename == "/usr/bin/env"
+    result = runner.invoke(
+        main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"]
+    )
+    assert isinstance(result.exception, SystemExit) or (  # nosec
+        isinstance(result.exception, FileNotFoundError)
+        and result.exception.filename == "/usr/bin/env"
     ), "Expected SystemExit or FileNotFoundError."
 
 
@@ -26,7 +29,20 @@ def test_invokes_without_stacktrace_verbose() -> None:
         zfs-replicate --verbose -l alunduil -i mypy.ini example.com bogus bogus.
     """
     runner = CliRunner()
-    result = runner.invoke(main, ["--verbose", "-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
-    assert isinstance(result.exception, SystemExit) or (
-        isinstance(result.exception, FileNotFoundError) and result.exception.filename == "/usr/bin/env"
+    result = runner.invoke(
+        main,
+        [
+            "--verbose",
+            "-l",
+            "alunduil",
+            "-i",
+            "mypy.ini",
+            "example.com",
+            "bogus",
+            "bogus",
+        ],
+    )
+    assert isinstance(result.exception, SystemExit) or (  # nosec
+        isinstance(result.exception, FileNotFoundError)
+        and result.exception.filename == "/usr/bin/env"
     ), "Expected SystemExit or FileNotFoundError."

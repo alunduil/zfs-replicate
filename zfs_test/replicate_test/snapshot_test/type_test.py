@@ -7,4 +7,4 @@ def test_eq_ignore_previous() -> None:
     """Ignore previous in Snapshot equality."""
     zero = Snapshot(filesystem=filesystem(""), name="", previous=None, timestamp=0)
     previous = Snapshot(filesystem=filesystem(""), name="", previous=zero, timestamp=0)
-    assert zero == previous
+    assert zero == previous  # nosec
