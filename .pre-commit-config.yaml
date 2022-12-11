@@ -38,16 +38,23 @@ repos:
     rev: v2.15.5
     hooks:
       - id: pylint
+        additional_dependencies:
+          - click
+          - hypothesis
   - repo: https://github.com/PyCQA/pydocstyle
     rev: 6.1.1
     hooks:
       - id: pydocstyle
-        additional_dependencies: [toml]
+        additional_dependencies:
+          - toml
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v0.990
     hooks:
       - id: mypy
-        additional_dependencies: [types-requests, types-toml, types-retry]
+        additional_dependencies:
+          - types-requests
+          - types-retry
+          - types-toml
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.9.0
     hooks:
