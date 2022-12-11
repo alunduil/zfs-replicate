@@ -1,46 +1,14 @@
-# This workflow runs pre-commit against the repository.
-#
-# You can adjust the behavior by modifying this file.
-name: Run pre-commit
+name: pre-commit
 
-on: [pull_request]
-
-permissions:
-  contents: read
+on:
+  pull_request:
+  push:
+    branches: [main]
 
 jobs:
   pre-commit:
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.experimental }}
-    strategy:
-      matrix:
-        python-version:
-          # TODO When 3.7 is removed add dead to pre-commit-config.yaml
-          - "3.7"  # EOL 2023-06-27
-          - "3.8"  # EOL 2024-10
-          - "3.9"  # EOL 2025-10
-          - "3.10"  # EOL 2026-10
-          - "3.11"  # EOL 2027-10
-        experimental: [false]
-        include:
-          - python-version: 3.x
-            experimental: true
     steps:
-      - uses: actions/checkout@v2
-      - name: install poetry
-        run: pipx install poetry
-      - name: setup python-${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: poetry
-      - name: poetry install
-        run: poetry install
-      - name: cache pre-commit
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pre-commit
-          key:  ${{ runner.os }}-pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
-          restore-keys: ${{ runner.os }}-pre-commit-
-      - name: pre-commit run
-        run: poetry run pre-commit run --all-files
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v3
+    - uses: pre-commit/action@v3.0.0
