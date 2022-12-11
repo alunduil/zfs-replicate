@@ -5,10 +5,10 @@ in
   pkgs.mkShell {
     inputsFrom = [zfs-replicate];
     buildInputs = [
-      zfs-replicate
       pkgs.poetry
-      pkgs.pre-commit
+      pkgs.python38Packages.pre-commit
       pkgs.python38Packages.virtualenv
+      zfs-replicate
     ];
     shellHook = ''
       unset SOURCE_DATE_EPOCH

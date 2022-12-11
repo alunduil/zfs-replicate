@@ -2,12 +2,20 @@
 import string
 from typing import Any, Dict
 
-from hypothesis.strategies import SearchStrategy, fixed_dictionaries, integers, none, text
+from hypothesis.strategies import (
+    SearchStrategy,
+    fixed_dictionaries,
+    integers,
+    none,
+    text,
+)
 
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 
-_NOT_WHITESPACE = [x for x in string.printable if x not in string.whitespace and x != "@"]
+_NOT_WHITESPACE = [
+    x for x in string.printable if x not in string.whitespace and x != "@"
+]
 
 _FILESYSTEMS = text(_NOT_WHITESPACE).map(lambda x: "a{x}").map(filesystem)
 

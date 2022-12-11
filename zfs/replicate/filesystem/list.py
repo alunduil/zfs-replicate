@@ -2,15 +2,17 @@
 import re
 from typing import List
 
-from .. import subprocess
+from .. import subprocess  # nosec
 from ..error import ZFSReplicateError
-from . import type
+from . import type  # pylint: disable=W0622
 from .type import FileSystem
 
 RE_WHITESPACE = re.compile(b"[ \t]+")
 
 
-def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:
+def list(  # pylint: disable=W0622
+    filesystem: FileSystem, ssh_command: str
+) -> List[FileSystem]:
     """List ZFS FileSystem."""
     command = _list(filesystem)
     if ssh_command is not None:
@@ -20,7 +22,11 @@ def list(filesystem: FileSystem, ssh_command: str) -> List[FileSystem]:
 
     output, error = proc.communicate()
     if error is not None:
-        error = error.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
+        error = (
+            error.strip(b"\n")
+            .strip(b"\r")
+            .replace(b"WARNING: ENABLED NONE CIPHER", b"")
+        )
 
     if proc.returncode:
         raise ZFSReplicateError(

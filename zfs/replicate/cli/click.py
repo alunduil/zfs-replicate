@@ -3,10 +3,9 @@ from enum import Enum
 from typing import Any
 
 import click
-import stringcase
 
 
-class EnumChoice(click.Choice):
+class EnumChoice(click.Choice):  # type: ignore[misc]
     """Choice made from Enum."""
 
     # Need any due to the private member only existing on subclasses through
@@ -27,12 +26,3 @@ class EnumChoice(click.Choice):
             value = super().convert(value.lower(), param, ctx)
 
         return next(x for x in self.__enum if x.name.lower() == value.lower())
-
-    def get_metavar(self, param: Any) -> str:
-        """Use Enum name as metavar."""
-        metavar: str = stringcase.snakecase(self.__enum.__name__)
-
-        if metavar.endswith("_enum"):
-            metavar = metavar[:-5]
-
-        return metavar.upper()

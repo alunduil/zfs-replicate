@@ -1,27 +1,27 @@
----
-name: pypi publish
-on:  # yamllint disable-line
-    release:
-        types: [created]
+# This workflow runs poetry against the repository.
+#
+# You can adjust the behavior by modifying this file.
+name: Publish to PyPi
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
 
 jobs:
-    deploy:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v2
-            - name: setup python
-              uses: actions/setup-python@v2
-              with:
-                  python-version: 3.x
-            - name: install dependencies
-              run: |
-                  python -m pip install --upgrade pip
-                  pip install poetry
-            - name: build and publish
-              env:
-                  PYPI_USER: ${{ secrets.PYPI_USERNAME }}
-                  PYPI_PASS: ${{ secrets.PYPI_PASSWORD }}
-              run: |
-                  poetry config http-basic.pypi $PYPI_USER $PYPI_PASS
-                  poetry build
-                  poetry publish
+  poetry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: install poetry
+        run: pipx install poetry
+      - name: setup python
+        uses: actions/setup-python@v4
+        with:
+          cache: poetry
+      - name: poetry build
+        run: poetry build
+      - name: poetry publish
+        run: poetry publish  --username __token__ --password=${{ secrets.PYPI_API_TOKEN }}
