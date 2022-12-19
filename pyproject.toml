@@ -13,7 +13,7 @@ authors = [
   "Alex Brandt <alunduil@gmail.com>",
 ]
 license = "BSD-2-Clause"
-readme = "README.rst"
+readme = "README.md"
 repository = "https://github.com/alunduil/zfs-replicate"
 keywords = [
   "zfs",
