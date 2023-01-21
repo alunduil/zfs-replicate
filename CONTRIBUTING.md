@@ -50,7 +50,7 @@ issue.
    change
 
 For small changes, feel free to use the in GitHub editor or skip running the
-tests locally (they'll be double checkeed in the pull request automatically).
+tests locally (they'll be double checked in the pull request automatically).
 
 Small change examples:
 
@@ -73,8 +73,7 @@ the following information:
 ## How to Suggest a Feature or Enhancement
 
 zfs-replicate aims to be a simple to use wrapper around the ssh and zfs command
-line tools.  Other tools exist for more complex interactions than ship my
-snapshots from here to there.
+line tools.  Other tools exist that fill more complicated use cases.
 
 To request a new feature or ask if a feature fits the above philosophy, open an
 issue describing the behaviour you desire and why it would be useful to you or
@@ -95,5 +94,5 @@ you have an interest in being an owner of this project, simply ask.
 
 [First Timers Only]: https://www.firsttimersonly.com/
 [good first issues]: https://github.com/alunduil/zfs-replicate/issues?q=is%3Aissue+label%3A%22good+first+issue%22+is%3Aopen
-[How to Contribute to an Open Source Project on GitHub]: https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github
+[How to Contribute to an Open Source Project on GitHub]: https://app.egghead.io/playlists/how-to-contribute-to-an-open-source-project-on-github
 [Make a Pull Request]: https://makeapullrequest.com/
