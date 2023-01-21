@@ -23,7 +23,7 @@ repos:
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
-    rev: 5.11.2
+    rev: 5.11.4
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
@@ -35,7 +35,7 @@ repos:
     hooks:
       - id: bandit
   - repo: https://github.com/PyCQA/pylint
-    rev: v2.15.8
+    rev: v2.16.0b0
     hooks:
       - id: pylint
         additional_dependencies:
@@ -43,7 +43,7 @@ repos:
           - hypothesis
           - pytest
   - repo: https://github.com/PyCQA/pydocstyle
-    rev: 6.1.1
+    rev: 6.3.0
     hooks:
       - id: pydocstyle
         additional_dependencies:
@@ -57,7 +57,7 @@ repos:
           - types-retry
           - types-toml
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.9.0
+    rev: v1.10.0
     hooks:
       - id: python-check-blanket-noqa
       - id: python-check-blanket-type-ignore
@@ -70,11 +70,11 @@ repos:
     hooks:
       - id: yesqa
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.6
+    rev: v2.7
     hooks:
       - id: vulture
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.5.0
+    rev: v2.6.0
     hooks:
       - id: pretty-format-toml
         args: [--autofix]
