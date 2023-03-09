@@ -51,7 +51,7 @@ stringcase = "^1.2.0"
 [tool.poetry.group.dev.dependencies]
 coveralls = ">=2.1.1,<4.0.0"
 hypothesis = "^6.56.4"
-pip = "^22.3"
+pip = ">=22.3,<24.0"
 pre-commit = "^2.16.0"
 pylint = "^2.15.5"
 pytest = "^7.2.0"
