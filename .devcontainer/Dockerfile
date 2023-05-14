@@ -4,7 +4,8 @@
 ARG VARIANT="3.10-bullseye"
 FROM mcr.microsoft.com/vscode/devcontainers/python:0-${VARIANT}
 
-RUN su vscode -c "curl -sSL https://install.python-poetry.org | python3 -"
+USER vscode
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # [Optional] If your pip requirements rarely change, uncomment this section to add them to the image.
 # COPY requirements.txt /tmp/pip-tmp/
