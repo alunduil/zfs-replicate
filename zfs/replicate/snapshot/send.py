@@ -53,7 +53,7 @@ def send(  # pylint: disable=R0913
 def _send(
     current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False
 ) -> str:
-    options = []  # ["-V"]
+    options = ["--raw"]  # ["-V"]
 
     if follow_delete:
         options.append("-p")
