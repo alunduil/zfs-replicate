@@ -1,41 +1,14 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/python-3
 {
 	"name": "zfs-replicate",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"context": "..",
-		"args": {
-			// Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
-			// Append -bullseye or -buster to pin to an OS version.
-			// Use -bullseye variants on local on arm64/Apple Silicon.
-			"VARIANT": "3.10-bullseye",
-		}
-	},
+	"image": "mcr.microsoft.com/devcontainers/base:ubuntu",
 
-	// Configure tool-specific properties.
-	"customizations": {
-		// Configure properties specific to VS Code.
-		"vscode": {
-			// Set *default* container specific settings.json values on container create.
-			"settings": {
-				"python.analysis.typeCheckingMode": "basic",
-				"python.pythonPath": "${workspaceFolder}/.venv/bin/python",
-				"python.linting.pylintPath": "${workspaceFolder}/.venv/bin/pylint",
-				"python.testing.pytestArgs": [
-					"--no-cov", "zfs_test"
-				],
-				"python.testing.unittestEnabled": false,
-				"python.testing.pytestEnabled": true
-			},
-			"extensions": [
-				"GitHub.vscode-pull-request-github",
-				"eamodio.gitlens",
-				"ms-azuretools.vscode-docker",
-				"DavidAnson.vscode-markdownlint",
-				"tamasfe.even-better-toml"
-			]
-		}
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers-contrib/features/poetry:2": {},
+		"ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/python:1": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -44,8 +17,30 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "poetry install",
 
-	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode",
-	"features": {
-	}
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.analysis.typeCheckingMode": "basic",
+				"python.pythonPath": "${workspaceFolder}/.venv/bin/python",
+				"python.testing.pytestArgs": [
+					"--no-cov", "zfs_test"
+				],
+				"python.testing.unittestEnabled": false,
+				"python.testing.pytestEnabled": true
+			},
+			"extensions": [
+				"DavidAnson.vscode-markdownlint",
+				"eamodio.gitlens",
+				"GitHub.vscode-pull-request-github",
+				"ms-azuretools.vscode-docker",
+				"ms-python.pylint",
+				"ms-python.python",
+				"tamasfe.even-better-toml"
+			]
+		}
+	},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	"remoteUser": "vscode"
 }
