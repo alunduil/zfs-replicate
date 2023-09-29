@@ -79,3 +79,9 @@ repos:
       - id: pretty-format-toml
         args: [--autofix]
         exclude: poetry\.lock
+  - repo: https://github.com/tweag/FawltyDeps
+    rev: v0.13.1
+    hooks:
+      - id: check
+        args:
+          - --detailed
