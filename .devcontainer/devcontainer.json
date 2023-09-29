@@ -36,7 +36,8 @@
 				"ms-azuretools.vscode-docker",
 				"ms-python.pylint",
 				"ms-python.python",
-				"tamasfe.even-better-toml"
+				"tamasfe.even-better-toml",
+				"redhat.vscode-yaml"
 			]
 		}
 	},
