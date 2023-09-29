@@ -6,9 +6,7 @@ requires = ["poetry-core"]
 profile = "black"
 
 [tool.poetry]
-authors = [
-  "Alex Brandt <alunduil@gmail.com>"
-]
+authors = ["Alex Brandt <alunduil@gmail.com>"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Console",
@@ -27,17 +25,10 @@ classifiers = [
   "Topic :: System :: Filesystems"
 ]
 description = "ZFS Snapshot Replicator"
-keywords = [
-  "zfs",
-  "replication",
-  "backup",
-  "remote"
-]
+keywords = ["zfs", "replication", "backup", "remote"]
 license = "BSD-2-Clause"
 name = "zfs-replicate"
-packages = [
-  {include = "zfs"}
-]
+packages = [{include = "zfs"}, {include = "zfs_test", format = "sdist"}]
 readme = "README.md"
 repository = "https://github.com/alunduil/zfs-replicate"
 version = "3.1.4"
