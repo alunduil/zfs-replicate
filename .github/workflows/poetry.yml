@@ -36,5 +36,6 @@ jobs:
         run: |
           poetry build
           tar -zvtf dist/zfs_replicate-*.tar.gz | grep zfs/replicate/
+          tar -zvtf dist/zfs_replicate-*.tar.gz | grep zfs_test/replicate_test/
       - name: poetry check
         run: poetry check
