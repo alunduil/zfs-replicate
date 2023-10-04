@@ -37,7 +37,8 @@
 				"ms-python.pylint",
 				"ms-python.python",
 				"tamasfe.even-better-toml",
-				"redhat.vscode-yaml"
+				"redhat.vscode-yaml",
+				"GitHub.vscode-github-actions"
 			]
 		}
 	},
