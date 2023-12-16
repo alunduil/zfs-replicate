@@ -39,4 +39,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           poetry run pytest
-          poetry run coveralls --service=github
+          poetry run coveralls
