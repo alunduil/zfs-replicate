@@ -85,3 +85,19 @@ repos:
       - id: check
         args:
           - --detailed
+  - repo: local
+    hooks:
+      - id: vale
+        name: vale
+        entry: vale
+        language: python
+        exclude: ^(LICENSE|.gitignore)$
+        types: [file, text]
+        exclude_types:
+          - ini
+          - json
+          - python
+          - toml
+          - yaml
+        additional_dependencies:
+          - vale
