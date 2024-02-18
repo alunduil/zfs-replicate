@@ -1,34 +1,36 @@
+<!-- vale Google.Headings = NO -->
 # zfs-replicate
+<!-- vale Google.Headings = YES -->
 
-https://github.com/alunduil/zfs-replicate
+<https://github.com/alunduil/zfs-replicate>
 
 By Alex Brandt <alunduil@gmail.com>
 
 ## Description
 
-zfs-replicate sends all ZFS snapshots to a remote host via SSH.  zfs-replicate
+zfs-replicate sends all Zettabyte File System (ZFS) snapshots to a remote host via SSH.  zfs-replicate
 does **not** create ZFS snapshots.
 
-zfs-replicate is based on [autorepl.py] used by [FreeNAS].
+zfs-replicate forks [autorepl.py] used by [FreeNAS].
 
-zfs-replicate is related to several other projects which fit other niches:
+zfs-replicate relates to several other projects which fit other niches:
 
-1. [sanoid]: A full snapshot management system.  Its companion application,
-   syncoid, handles replication with many available options.
-1. [zfs-replicate (BASH)]: A very similar project.  The major differences are
-   configuration style (our project uses parameters whereas this project uses a
-   BASH script), and the system expectations (e.g., logging controls).
+1. [sanoid]: A full snapshot management system. Its companion,
+   `syncoid`, handles replication with many available options.
+1. [zfs-replicate (BASH)]: A very similar project. The major differences are
+   configuration style and system expectations (for example, logging controls).
+   zfs-replicate uses parameters whereas zfs-replicate (BASH) uses a BASH script.
 1. [znapzend]: Another scheduling and replicating system.
 1. [zrep]: A SH script with several control commands for snapshot replication.
 
-## Terms of Use
+## Terms of use
 
 You are free to copy, modify, and distribute zfs-replicate with attribution
-under the terms of the BSD-2-Clause licence.  See the LICENSE for details.
+under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
 
 ## Prerequisites
 
-1. A remote system with a ZFS filesystem and the zfs CLI tools
+1. A remote system with a ZFS filesystem and the `zfs` command-line tools
 1. SSH access to that remote system
 1. If you're not using the root user remotely:
    1. Ensure the user can mount filesystems
@@ -36,21 +38,21 @@ under the terms of the BSD-2-Clause licence.  See the LICENSE for details.
    1. Add ZFS permissions
       1. Command: `zfs allow ${USER} ${PERMISSIONS} ${BACKUP_DATASET}`
       1. Permissions
-         1. clone
-         1. create
-         1. destroy
-         1. hold
-         1. mount
-         1. promote
-         1. quota
-         1. readonly
-         1. receive
-         1. rename
-         1. reservation
-         1. rollback
-         1. send
-         1. snapshot
-1. A local ZFS filesystem and zfs CLI tools
+         1. `clone`
+         1. `create`
+         1. `destroy`
+         1. `hold`
+         1. `mount`
+         1. `promote`
+         1. `quota`
+         1. `readonly`
+         1. `receive`
+         1. `rename`
+         1. `reservation`
+         1. `rollback`
+         1. `send`
+         1. `snapshot`
+1. A local ZFS filesystem and `zfs` command-line tools
 
 _N.B., don't use the root user to access your remote system._
 
@@ -62,16 +64,18 @@ _N.B., don't use the root user to access your remote system._
 ## Documentation
 
 * `zfs-replicate --help`: Help for zfs-replicate.
-* LICENSE: Licence file explaining usage of zfs-replicate.
+* [LICENSE]: Licence file explaining usage of zfs-replicate.
 * [Survey of ZFS Replication Tools][survey]: Overview of various ZFS replication
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
   working with ZFS snapshots.
+<!-- vale Google.Acronyms = NO -->
 * [ZFS REMOTE REPLICATION SCRIPT WITH REPORTING]
+<!-- vale Google.Acronyms = YES -->
 * [ZFS replication without using Root user]: How to configure ZFS replication
   for a non-root user.
 
-## Getting Support
+## Getting support
 
 * [GitHub issues]: Report any problems or features requests to GitHub issues.
 
@@ -79,6 +83,7 @@ _N.B., don't use the root user to access your remote system._
 [FreeBSD]: https://www.freebsd.org/
 [FreeNAS]: http://www.freenas.org/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
+[LICENSE]: ./LICENSE
 [sanoid]: https://github.com/jimsalterjrs/sanoid
 [survey]: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 [Working With Oracle Solaris ZFS Snapshots and Clones]: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc

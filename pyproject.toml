@@ -3,7 +3,7 @@ build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core"]
 
 [tool.fawltydeps]
-ignore_unused = ["coveralls", "pytest-cov"]
+ignore_unused = ["coveralls", "pytest-cov", "vale"]
 
 [tool.isort]
 profile = "black"
@@ -45,6 +45,7 @@ coveralls = ">=2.1.1,<4.0.0"
 hypothesis = "^6.56.4"
 pytest = ">=7.2,<9.0"
 pytest-cov = "^4.0.0"
+vale = "^3.0.7.0"
 
 [tool.poetry.scripts]
 zfs-replicate = "zfs.replicate.cli.main:main"
