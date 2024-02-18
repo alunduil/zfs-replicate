@@ -91,11 +91,12 @@ repos:
         name: vale
         entry: vale
         language: python
-        exclude: ^(LICENSE|.gitignore)$
+        exclude: ^(LICENSE|.gitignore|.envrc|styles/.*)$
         types: [file, text]
         exclude_types:
           - ini
           - json
+          - nix
           - python
           - toml
           - yaml
