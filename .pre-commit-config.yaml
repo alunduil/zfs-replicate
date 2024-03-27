@@ -85,20 +85,16 @@ repos:
       - id: check
         args:
           - --detailed
-  - repo: local
+  - repo: https://github.com/errata-ai/vale
+    rev: v3.3.1
     hooks:
       - id: vale
-        name: vale
-        entry: vale
-        language: python
-        exclude: ^(LICENSE|.gitignore|.envrc|styles/.*)$
-        types: [file, text]
+        exclude: '^(styles/|LICENSE$|\.envrc$)'
         exclude_types:
+          - gitignore
           - ini
           - json
           - nix
           - python
           - toml
           - yaml
-        additional_dependencies:
-          - vale
