@@ -1,6 +1,6 @@
-<!-- vale Google.Headings = NO -->
+<!-- vale RedHat.Headings = NO -->
 # zfs-replicate
-<!-- vale Google.Headings = YES -->
+<!-- vale RedHat.Headings = YES -->
 
 <https://github.com/alunduil/zfs-replicate>
 
@@ -8,16 +8,16 @@ By Alex Brandt <alunduil@gmail.com>
 
 ## Description
 
-zfs-replicate sends all Zettabyte File System (ZFS) snapshots to a remote host via SSH.  zfs-replicate
+zfs-replicate sends all Zettabyte File System (ZFS) snapshots to a remote host by SSH.  zfs-replicate
 does **not** create ZFS snapshots.
 
-zfs-replicate forks [autorepl.py] used by [FreeNAS].
+zfs-replicate forks [autorepl.py] used by [`FreeNAS`].
 
-zfs-replicate relates to several other projects which fit other niches:
+zfs-replicate relates to several other projects, which fit other niches:
 
 1. [sanoid]: A full snapshot management system. Its companion,
-   `syncoid`, handles replication with many available options.
-1. [zfs-replicate (BASH)]: A very similar project. The major differences are
+   `syncoid`, handles replication with copious options.
+1. [zfs-replicate (BASH)]: A similar project. The major differences include
    configuration style and system expectations (for example, logging controls).
    zfs-replicate uses parameters whereas zfs-replicate (BASH) uses a BASH script.
 1. [znapzend]: Another scheduling and replicating system.
@@ -25,7 +25,7 @@ zfs-replicate relates to several other projects which fit other niches:
 
 ## Terms of use
 
-You are free to copy, modify, and distribute zfs-replicate with attribution
+You are free to copy, change, and distribute zfs-replicate with attribution
 under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
 
 ## Prerequisites
@@ -69,9 +69,9 @@ _N.B., don't use the root user to access your remote system._
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
   working with ZFS snapshots.
-<!-- vale Google.Acronyms = NO -->
+<!-- vale RedHat.Definitions = NO -->
 * [ZFS REMOTE REPLICATION SCRIPT WITH REPORTING]
-<!-- vale Google.Acronyms = YES -->
+<!-- vale RedHat.Definitions = YES -->
 * [ZFS replication without using Root user]: How to configure ZFS replication
   for a non-root user.
 
@@ -81,7 +81,7 @@ _N.B., don't use the root user to access your remote system._
 
 [autorepl.py]: https://github.com/freenas/freenas/blob/master/gui/tools/autorepl.py
 [FreeBSD]: https://www.freebsd.org/
-[FreeNAS]: http://www.freenas.org/
+[`FreeNAS`]: http://www.freenas.org/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
 [LICENSE]: ./LICENSE
 [sanoid]: https://github.com/jimsalterjrs/sanoid

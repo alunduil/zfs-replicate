@@ -2,9 +2,8 @@
 
 ## Introduction
 
-Thanks for considering contributing to zfs-replicate. Contributors are
-instrumental for ensuring zfs-replicate remains easy to use and functioning
-correctly.
+Thanks for considering contributing to zfs-replicate. Contributors ensure
+zfs-replicate continues to be usable and functional.
 
 Following these guidelines ensures everyone is working with consistent
 expectations. Repository owners and contributors are busy people and want to
@@ -12,7 +11,7 @@ ensure respectful interactions that push this project to improve.
 
 Owners are open to pretty much any contributions you want to submit as a pull request
 or issue to this repository. This community doesn't have other communication channels at
-this time so feel free to use issues to report problems or ask for assistance.
+this time so feel free to use issues to report problems or ask for help.
 
 ## Ground rules
 
@@ -29,7 +28,7 @@ See [Code of Conduct](./CODE_OF_CONDUCT.md) for more.
 If you're unsure of what to contribute, view the list of "[good first
 issues]."
 
-If you're completely new to GitHub and Open Source, view:
+If you're new to GitHub and Open Source, view:
 
 * [How to Contribute to an Open Source Project on GitHub]
 * [Make a Pull Request]
@@ -41,8 +40,8 @@ issue.
 ## Getting started
 
 1. Create your own fork of zfs-replicate
-1. If not using VS Code, run `poetry install`
-1. If not using VS Code, run `poetry shell`
+1. If not using Visual Studio Code, run `poetry install`
+1. If not using Visual Studio Code, run `poetry shell`
 1. Run `pre-commit install` in your local checkout
 1. Make the changes in your fork
 1. Test your changes with `pytest`
@@ -55,7 +54,7 @@ tests locally. Tests are double checked in the pull request automatically.
 Small change examples:
 
 * Spelling or grammar fixes
-* Typo corrections, white space, and formatting changes
+* Typographical error corrections, space, and formatting changes
 * Comment clean ups
 
 ## How to report a bug
@@ -64,7 +63,7 @@ When creating an issue for a bug or unexpected behaviour, make sure you include
 the following information:
 
 1. A link to a paste with your `poetry.lock` file if available
-1. A link to a paste with your `/etc/os-release` file (or equivalent for Mac or
+1. A link to a paste with your `/etc/os-release` file (or similar for Mac or
    Windows)
 1. What command did you run? _Remove passwords or secrets if present_
 1. What happened?
@@ -72,20 +71,20 @@ the following information:
 
 ## How to suggest a feature or enhancement
 
-zfs-replicate aims to be a simple to use wrapper around the ssh and `zfs` command
+zfs-replicate aims to be an uncomplicated to use wrapper around SSH and `zfs` command
 line tools. Other tools exist that fill more complicated use cases.
 
-To request a new feature or ask if a feature fits the preceding philosophy, open an
-issue describing the behaviour you desire and why it would be useful to you or
+To request a new feature, open an
+issue describing the behaviour you want and why it would be useful to you or
 others. If you can, include specific examples of command invocations and side
-effects to ensure owners understand the request correctly.
+effects to ensure owners understand the request.
 
 ## Code review process
 
-The owners regularly review pull requests (_if the stale issue actions comments,
+The owners review pull requests (_if the stale issue actions comments,
 feel free to comment asking for an estimate_).  Once an owner has accepted a pull
 request they merge it if all status checks pass. If you have an
-interest in being an owner of this project, simply ask.
+interest in being an owner of this project, ask.
 
 ## Community
 
