@@ -444,13 +444,13 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "vale"
-version = "3.6.0.0"
+version = "3.6.1.0"
 description = "Install and use Vale (grammar & style check tool) in python environments."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "vale-3.6.0.0-py3-none-any.whl", hash = "sha256:ed018c2704ddd76435d359988d8faea954e1c8747513b1e363e1ae933b2509d3"},
-    {file = "vale-3.6.0.0.tar.gz", hash = "sha256:a1686451504a9ecb0bfee0ed86dc566bfc4832dc0611eae11ea10a12ec8573c3"},
+    {file = "vale-3.6.1.0-py3-none-any.whl", hash = "sha256:973a23e2ad5a6bce9c9f6e0e3cad72f74ab1d5893c4b7560d220642f73e87846"},
+    {file = "vale-3.6.1.0.tar.gz", hash = "sha256:87e2fd654e5fb5229549449cd6cccf6c5b22f6b0f09e5f225106ffc226a77555"},
 ]
 
 [metadata]
