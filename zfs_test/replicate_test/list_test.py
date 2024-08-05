@@ -1,4 +1,5 @@
 """Tests for zfs.replicate.list."""
+
 from typing import List, Set
 
 from hypothesis import given

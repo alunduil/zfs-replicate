@@ -1,4 +1,5 @@
 """Common List Functions."""
+
 from typing import List, Sequence, Tuple, TypeVar
 
 __all__ = ("inits", "venn")

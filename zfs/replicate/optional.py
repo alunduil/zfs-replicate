@@ -1,4 +1,5 @@
 """Optional Functions."""
+
 from typing import Optional, TypeVar
 
 Value = TypeVar("Value")

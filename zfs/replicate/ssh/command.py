@@ -1,4 +1,5 @@
 """SSH Command Generator."""
+
 from .cipher import Cipher
 
 

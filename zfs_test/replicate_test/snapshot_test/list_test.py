@@ -1,4 +1,5 @@
 """zfs.replicate.snapshot tests."""
+
 from typing import List
 
 from hypothesis import given

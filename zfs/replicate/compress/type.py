@@ -1,4 +1,5 @@
 """ZFS Replication Stream Compression."""
+
 from enum import Enum, auto
 
 

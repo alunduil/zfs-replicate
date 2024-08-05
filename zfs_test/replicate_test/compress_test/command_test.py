@@ -1,4 +1,5 @@
 """Test compress command generation."""
+
 import pytest
 
 from zfs.replicate.compress.command import command

@@ -1,4 +1,5 @@
 """ZFS FileySystem Type."""
+
 from dataclasses import dataclass
 
 
