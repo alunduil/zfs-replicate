@@ -1,4 +1,5 @@
 """Snapshot Hypothesis Strategies."""
+
 import string
 from typing import Any, Dict
 

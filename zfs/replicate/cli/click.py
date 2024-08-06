@@ -1,4 +1,5 @@
 """ZFS Replication Options."""
+
 from enum import Enum
 from typing import Any
 

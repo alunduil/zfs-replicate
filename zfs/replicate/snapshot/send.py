@@ -1,4 +1,5 @@
 """ZFS Snapshot Send."""
+
 import subprocess  # nosec
 from typing import Optional
 

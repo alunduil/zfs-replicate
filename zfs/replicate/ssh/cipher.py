@@ -1,4 +1,5 @@
 """SSH Cipher Type."""
+
 from enum import Enum, auto
 
 

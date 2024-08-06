@@ -1,4 +1,5 @@
 """Main function zfs-replicate."""
+
 import itertools
 
 import click

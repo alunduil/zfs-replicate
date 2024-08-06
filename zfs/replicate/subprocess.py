@@ -1,4 +1,5 @@
 """subprocess wrapper."""
+
 import shlex
 import subprocess  # nosec
 from typing import IO, Union

@@ -1,4 +1,5 @@
 """zfs.replicate.task.generate tests."""
+
 import itertools
 import operator
 from typing import List

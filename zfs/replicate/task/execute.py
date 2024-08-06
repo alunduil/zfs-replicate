@@ -1,4 +1,5 @@
 """Task Execution."""
+
 import itertools
 from typing import List, Tuple
 

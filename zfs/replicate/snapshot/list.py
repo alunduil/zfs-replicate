@@ -1,4 +1,5 @@
 """ZFS Snapshot listing."""
+
 from typing import List, Optional
 
 from .. import subprocess  # nosec
