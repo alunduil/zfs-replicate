@@ -51,7 +51,7 @@ repos:
         additional_dependencies:
           - toml
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.1
+    rev: v1.11.2
     hooks:
       - id: mypy
         additional_dependencies:
@@ -88,7 +88,7 @@ repos:
         args:
           - --detailed
   - repo: https://github.com/errata-ai/vale
-    rev: v3.7.0
+    rev: v3.7.1
     hooks:
       - id: vale
         exclude: '^(styles/|LICENSE$|\.envrc$)'
