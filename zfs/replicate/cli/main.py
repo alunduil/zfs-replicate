@@ -64,7 +64,7 @@ from .click import EnumChoice
 @click.argument("host", required=True)  # type: ignore[misc]
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
-def main(  # pylint: disable=R0914,R0913
+def main(  # pylint: disable=R0917,R0914,R0913
     verbose: bool,
     dry_run: bool,
     follow_delete: bool,
