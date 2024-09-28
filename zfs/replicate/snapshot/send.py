@@ -10,7 +10,7 @@ from ..filesystem import FileSystem
 from .type import Snapshot
 
 
-def send(  # pylint: disable=R0913
+def send(  # pylint: disable=R0917,R0913
     remote: FileSystem,
     current: Snapshot,
     ssh_command: str,
