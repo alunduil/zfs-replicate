@@ -31,6 +31,7 @@ under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
 ## Prerequisites
 
 1. A remote system with a ZFS filesystem and the `zfs` command-line tools
+1. If using lz4 compression, local and remote systems must have lz4 in their environments
 1. SSH access to that remote system
 1. If you're not using the root user remotely:
    1. Ensure the user can mount filesystems
