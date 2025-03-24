@@ -37,7 +37,7 @@ repos:
     hooks:
       - id: bandit
   - repo: https://github.com/PyCQA/pylint
-    rev: v3.3.5
+    rev: v3.3.6
     hooks:
       - id: pylint
         additional_dependencies:
@@ -88,7 +88,7 @@ repos:
         args:
           - --detailed
   - repo: https://github.com/errata-ai/vale
-    rev: v3.9.6
+    rev: v3.10.0
     hooks:
       - id: vale
         exclude: '^(styles/|LICENSE$|\.envrc$)'
