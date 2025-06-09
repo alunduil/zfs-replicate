@@ -88,7 +88,7 @@ repos:
         args:
           - --detailed
   - repo: https://github.com/errata-ai/vale
-    rev: v3.11.2
+    rev: v3.12.0
     hooks:
       - id: vale
         exclude: '^(styles/|LICENSE$|\.envrc$)'
