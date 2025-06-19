@@ -81,7 +81,7 @@ def _get_resume_token(
     proc = subprocess.Popen(  # pylint: disable=R1732
         command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
     )
-    output, error = proc.communicate()
+    output, _ = proc.communicate()
 
     if proc.returncode == 0:
         token = output.decode().strip()
@@ -132,7 +132,7 @@ def _handle_resume(
     proc = subprocess.Popen(  # pylint: disable=R1732
         command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
     )
-    output, error = proc.communicate()
+    _, error = proc.communicate()
 
     if proc.returncode:
         raise ZFSReplicateError(
