@@ -21,7 +21,7 @@ repos:
       - id: check-vcs-permalinks
       - id: check-toml
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 25.9.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
@@ -51,7 +51,7 @@ repos:
         additional_dependencies:
           - toml
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.1
+    rev: v1.18.2
     hooks:
       - id: mypy
         additional_dependencies:
