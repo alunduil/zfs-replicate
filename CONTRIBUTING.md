@@ -20,8 +20,14 @@ this time so feel free to use issues to report problems or ask for help.
 * Expect discussion on your pull requests so more than just you understand the
   changes you're making
 * Remember to explain why you want your issue or pull request included
+* Commit and PR titles follow [Conventional Commits] — see
+  [`.github/copilot/commit-message.instructions.md`] for the repo-specific dialect
+  (allowed types, scopes, breaking-change marker, and `release-please` semver mapping)
 
 See [Code of Conduct](./CODE_OF_CONDUCT.md) for more.
+
+[Conventional Commits]: https://www.conventionalcommits.org/
+[`.github/copilot/commit-message.instructions.md`]: ./.github/copilot/commit-message.instructions.md
 
 ## Your first contribution
 
