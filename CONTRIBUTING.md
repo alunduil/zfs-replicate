@@ -100,21 +100,9 @@ interest in being an owner of this project, ask.
 zfs-replicate uses [Conventional Commits](https://www.conventionalcommits.org/) so that
 the CI commit-lint check passes on the first try and `release-please` places each
 commit in the right section of the CHANGELOG and applies the correct semver bump.
-
-### The seven rules
-
-These come from [Tim Pope's well-known note on git commit messages](https://cbea.ms/git-commit/):
-
-1. **Separate subject from body with a blank line.**
-2. **Limit the subject line to 50 characters.** Hard target; lint may flag at 72.
-3. **Capitalize the subject line.** The first letter after `type(scope):` is lower-case;
-   capitalize the first word of the description.
-4. **Do not end the subject line with a period.**
-5. **Use the imperative mood in the subject line.** `add`, `fix`, `remove` - not
-   `added`, `fixes`, `removing`. The convention is "if applied, this commit will
-   _\<subject\>_".
-6. **Wrap the body at 72 characters.**
-7. **Use the body to explain _what_ and _why_ vs _how_.** The diff already shows _how_.
+Subjects are imperative, capped near 50 characters, no trailing period; bodies wrap at
+72 and explain _what_ and _why_. See [Tim Pope's note on git commit messages](https://cbea.ms/git-commit/)
+for the underlying rules.
 
 ### Subject format
 
@@ -189,103 +177,6 @@ chooses the bump based on the highest-impact commit:
 
 `docs`, `test`, `refactor`, `build`, `ci`, `chore`, `revert` (without `!`) do not
 release on their own.
-
-### Examples for each type
-
-These are real changes from this repo, retrofitted to the format. Use them as templates.
-
-```
-feat(send): emit progress over stderr when --progress is set
-
-Wraps the `mbuffer` invocation so callers piping to systemd journal
-get one line per gigabyte instead of a single ETA at the end. Falls
-back to silent transport when --progress is absent so existing cron
-output stays unchanged.
-```
-
-```
-fix(executor): close ssh transport on early exit
-
-When `zfs list` failed before the recv pipeline started, the SSH
-control socket leaked and the next replicate run would fail to
-authenticate against the same host within the cache window. Wrap the
-client construction in a try/finally and close on every exit path.
-```
-
-```
-perf(send): pipeline mbuffer between local and remote zfs
-
-Routing the `zfs send | zfs recv` pair through a 256 MB mbuffer
-smooths the bandwidth curve and shortens replication of a 1.2 TB
-dataset from 41 min to 28 min on the test bench (`pytest -k bench`).
-```
-
-```
-refactor(cli): extract argument parsing into its own module
-
-Pulls the argparse setup out of `__main__.py` into `cli/arguments.py`
-to make the entry point easier to read and to let the CLI be
-exercised without invoking `main()`. No behavior change.
-```
-
-```
-docs: clarify --recursive flag in README
-
-`--recursive` only walks ZFS children, not snapshots - note the
-distinction so users do not assume snapshots are also recursive.
-```
-
-```
-test(executor): cover the timeout-vs-cancel branch
-
-Adds a parametrized test that exercises both the `asyncio.TimeoutError`
-and `asyncio.CancelledError` branches in `Executor.run`, which were
-previously only exercised by the integration suite.
-```
-
-```
-build(deps): bump cryptography to 44.0.1
-
-Pulls in the upstream fix for CVE-2025-12345.
-```
-
-```
-ci: run pytest on Python 3.13
-
-Adds 3.13 to the pytest matrix in `.github/workflows/pytest.yml` and
-drops 3.10 (EOL April 2026).
-```
-
-```
-chore: regenerate CHANGELOG
-
-`release-please` PR for v1.4.0.
-```
-
-```
-revert: feat(send): support --resume for interrupted snapshots
-
-This reverts commit abc1234. Resume mode broke replication when the
-remote dataset already had a partial snapshot from a previous run;
-see #321 for the failure mode. Will re-attempt with a different
-strategy.
-```
-
-```
-feat(cli)!: rename --hosts to --targets
-
-The CLI accepted both --hosts and --targets for the destination
-list; --targets matches the documentation and the option name in
-the underlying executor module. Drop --hosts.
-
-BREAKING CHANGE: --hosts has been renamed to --targets. Wrapper
-scripts and crontabs that pass --hosts must be updated.
-```
-
-### Out of scope for this file
-
-CI enforcement of these conventions is tracked separately. This file teaches; the
-linter (when configured) enforces.
 
 [First Timers Only]: https://www.firsttimersonly.com/
 [good first issues]: https://github.com/alunduil/zfs-replicate/issues?q=is%3Aissue+label%3A%22good+first+issue%22+is%3Aopen

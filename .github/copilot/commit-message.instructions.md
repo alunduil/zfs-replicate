@@ -21,5 +21,5 @@ When generating a commit message, produce this shape:
 - Breaking change: add `!` before the colon **and** a `BREAKING CHANGE:` footer. See
   [CONTRIBUTING.md - Breaking changes](../../CONTRIBUTING.md#breaking-changes).
 
-If the full set of rules or the worked examples are needed, follow the CONTRIBUTING.md
-links above; don't duplicate them here.
+For type definitions, scope guidance, and the breaking-change format, follow the
+CONTRIBUTING.md links above; don't duplicate them here.
