@@ -20,8 +20,12 @@ this time so feel free to use issues to report problems or ask for help.
 * Expect discussion on your pull requests so more than just you understand the
   changes you're making
 * Remember to explain why you want your issue or pull request included
+* Commit and PR titles follow [Conventional Commits]; see [Commit
+  messages](#commit-messages) below for the repo-specific dialect
 
 See [Code of Conduct](./CODE_OF_CONDUCT.md) for more.
+
+[Conventional Commits]: https://www.conventionalcommits.org/
 
 ## Your first contribution
 
@@ -90,6 +94,89 @@ interest in being an owner of this project, ask.
 
 * [Current Contributors](https://github.com/alunduil/zfs-replicate/graphs/contributors)
 * Responses to issues and pull requests should take less than two weeks from submission.
+
+## Commit messages
+
+zfs-replicate uses [Conventional Commits](https://www.conventionalcommits.org/) so that
+the CI commit-lint check passes the first time, `release-please` places each commit in
+the right section of the CHANGELOG, and the correct semver bump comes out the other end.
+Subjects are imperative, capped near 50 characters, no trailing period; bodies wrap at
+72 and explain _what_ and _why_. See [Tim Pope's note on git commit messages](https://cbea.ms/git-commit/)
+for the underlying rules.
+
+### Subject format
+
+```
+<type>[optional scope][!]: <description>
+```
+
+A breaking-change marker (`!`) immediately before the colon causes `release-please` to
+issue a major-version bump regardless of `<type>`.
+
+### Allowed types
+
+| Type       | When to use it                                                     | release-please bump | Example                                                              |
+| ---------- | ------------------------------------------------------------------ | ------------------- | -------------------------------------------------------------------- |
+| `feat`     | New user-visible capability                                        | minor               | `feat(send): support --resume for interrupted snapshots`             |
+| `fix`      | Bug fix                                                            | patch               | `fix(executor): close ssh transport on early exit`                   |
+| `perf`     | Performance improvement with no functional change                  | patch               | `perf(send): pipeline mbuffer between local and remote zfs`          |
+| `refactor` | Internal change with no functional or performance impact           | none                | `refactor(cli): extract argument parsing into its own module`        |
+| `docs`     | Documentation only                                                 | none                | `docs: clarify --recursive flag in README`                           |
+| `test`     | Adding or fixing tests                                             | none                | `test(executor): cover the timeout-vs-cancel branch`                 |
+| `build`    | Build system, packaging, or dependency updates                     | none                | `build(deps): bump cryptography to 44.0.1`                           |
+| `ci`       | CI configuration                                                   | none                | `ci: run pytest on Python 3.13`                                      |
+| `chore`    | Maintenance with no source impact                                  | none                | `chore: regenerate CHANGELOG`                                        |
+| `revert`   | Revert of a previous commit                                        | matches reverted    | `revert: feat(send): support --resume for interrupted snapshots`     |
+
+A commit that introduces a breaking change uses the type that best describes the change
+and adds the `!` marker, regardless of which bump that type would normally produce.
+
+### Scope policy
+
+Scope is **optional**. When the change touches a single module, use the module name in
+parentheses. The scopes currently in active use:
+
+- `send` - `zfs/send.py` and adjacent send-pipeline code
+- `cli` - argparse plumbing and entry points
+- `executor` - subprocess / SSH wrappers
+- `ci` - anything under `.github/workflows/`
+- `docs` - README, CONTRIBUTING, this file
+- `deps` - paired with `build:` for dependency bumps (`build(deps): ...`)
+
+Add new scopes when they earn it; a one-off edit in a module isn't a new scope.
+
+### Breaking changes
+
+Two ways to mark a breaking change. **Both** must appear; the marker without the footer
+slips past code review more often than you'd expect.
+
+1. The `!` marker in the subject:
+
+   ```
+   feat(cli)!: rename --hosts to --targets
+   ```
+
+2. A `BREAKING CHANGE:` footer in the body:
+
+   ```
+   BREAKING CHANGE: --hosts has been renamed to --targets to match the rest
+   of the documentation. Update your wrapper scripts.
+   ```
+
+Either type can take `!`. A breaking `fix!` still produces a major bump.
+
+### release-please type to semver bump
+
+`release-please` reads the commit messages on `main` since the last release tag and
+chooses the bump based on the highest-impact commit:
+
+- Any commit with `BREAKING CHANGE:` footer or `!` marker - **major**
+- Otherwise, any `feat:` - **minor**
+- Otherwise, any `fix:` or `perf:` - **patch**
+- Otherwise - no release
+
+`docs`, `test`, `refactor`, `build`, `ci`, `chore`, `revert` (without `!`) don't
+release on their own.
 
 [First Timers Only]: https://www.firsttimersonly.com/
 [good first issues]: https://github.com/alunduil/zfs-replicate/issues?q=is%3Aissue+label%3A%22good+first+issue%22+is%3Aopen

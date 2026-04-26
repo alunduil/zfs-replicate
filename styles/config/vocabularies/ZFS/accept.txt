@@ -1,1 +1,5 @@
+argparse
+release-please
+semver
+subprocess
 Zettabyte
