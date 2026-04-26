@@ -98,8 +98,8 @@ interest in being an owner of this project, ask.
 ## Commit messages
 
 zfs-replicate uses [Conventional Commits](https://www.conventionalcommits.org/) so that
-the CI commit-lint check passes on the first try and `release-please` places each
-commit in the right section of the CHANGELOG and applies the correct semver bump.
+the CI commit-lint check passes the first time, `release-please` places each commit in
+the right section of the CHANGELOG, and the correct semver bump comes out the other end.
 Subjects are imperative, capped near 50 characters, no trailing period; bodies wrap at
 72 and explain _what_ and _why_. See [Tim Pope's note on git commit messages](https://cbea.ms/git-commit/)
 for the underlying rules.
@@ -117,15 +117,15 @@ issue a major-version bump regardless of `<type>`.
 
 | Type       | When to use it                                                     | release-please bump | Example                                                              |
 | ---------- | ------------------------------------------------------------------ | ------------------- | -------------------------------------------------------------------- |
-| `feat`     | New user-visible functionality                                     | minor               | `feat(send): support --resume for interrupted snapshots`             |
+| `feat`     | New user-visible capability                                        | minor               | `feat(send): support --resume for interrupted snapshots`             |
 | `fix`      | Bug fix                                                            | patch               | `fix(executor): close ssh transport on early exit`                   |
 | `perf`     | Performance improvement with no functional change                  | patch               | `perf(send): pipeline mbuffer between local and remote zfs`          |
 | `refactor` | Internal change with no functional or performance impact           | none                | `refactor(cli): extract argument parsing into its own module`        |
 | `docs`     | Documentation only                                                 | none                | `docs: clarify --recursive flag in README`                           |
 | `test`     | Adding or fixing tests                                             | none                | `test(executor): cover the timeout-vs-cancel branch`                 |
-| `build`    | Build system, packaging, or dependency updates (poetry, nix, etc.) | none                | `build(deps): bump cryptography to 44.0.1`                           |
+| `build`    | Build system, packaging, or dependency updates                     | none                | `build(deps): bump cryptography to 44.0.1`                           |
 | `ci`       | CI configuration                                                   | none                | `ci: run pytest on Python 3.13`                                      |
-| `chore`    | Maintenance with no source impact (release notes, etc.)            | none                | `chore: regenerate CHANGELOG`                                        |
+| `chore`    | Maintenance with no source impact                                  | none                | `chore: regenerate CHANGELOG`                                        |
 | `revert`   | Revert of a previous commit                                        | matches reverted    | `revert: feat(send): support --resume for interrupted snapshots`     |
 
 A commit that introduces a breaking change uses the type that best describes the change
@@ -133,8 +133,8 @@ and adds the `!` marker, regardless of which bump that type would normally produ
 
 ### Scope policy
 
-Scope is **optional**. When the change is bounded to one module, use the module name in
-parentheses. The scopes in active use right now:
+Scope is **optional**. When the change touches a single module, use the module name in
+parentheses. The scopes currently in active use:
 
 - `send` - `zfs/send.py` and adjacent send-pipeline code
 - `cli` - argparse plumbing and entry points
@@ -143,12 +143,12 @@ parentheses. The scopes in active use right now:
 - `docs` - README, CONTRIBUTING, this file
 - `deps` - paired with `build:` for dependency bumps (`build(deps): ...`)
 
-Add new scopes when they earn it - a one-off touch in a module is not a new scope.
+Add new scopes when they earn it; a one-off edit in a module isn't a new scope.
 
 ### Breaking changes
 
 Two ways to mark a breaking change. **Both** must appear; the marker without the footer
-is easy to miss in code review.
+slips past code review more often than you'd expect.
 
 1. The `!` marker in the subject:
 
@@ -175,7 +175,7 @@ chooses the bump based on the highest-impact commit:
 - Otherwise, any `fix:` or `perf:` - **patch**
 - Otherwise - no release
 
-`docs`, `test`, `refactor`, `build`, `ci`, `chore`, `revert` (without `!`) do not
+`docs`, `test`, `refactor`, `build`, `ci`, `chore`, `revert` (without `!`) don't
 release on their own.
 
 [First Timers Only]: https://www.firsttimersonly.com/
