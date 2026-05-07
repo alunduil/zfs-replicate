@@ -23,10 +23,10 @@ class Snapshot:
         if not isinstance(other, Snapshot):
             raise NotImplementedError
 
-        is_suffix = self.filesystem.name.endswith(
-            other.filesystem.name
-        ) or other.filesystem.name.endswith(
-            self.filesystem.name,
+        left = self.filesystem.name
+        right = other.filesystem.name
+        is_suffix = (
+            left == right or left.endswith("/" + right) or right.endswith("/" + left)
         )
 
         return (
