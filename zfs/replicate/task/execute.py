@@ -9,12 +9,13 @@ from ..filesystem import FileSystem
 from .type import Action, Task
 
 
-def execute(
+def execute(  # pylint: disable=R0917,R0913
     remote: FileSystem,
     tasks: List[Tuple[FileSystem, List[Task]]],
     ssh_command: str,
     follow_delete: bool,
     compression: Compression,
+    raw: bool,
 ) -> None:
     """Execute all tasks."""
     sorted_tasks = sorted(tasks, key=lambda x: len(x[0].name.split("/")), reverse=True)
@@ -39,6 +40,7 @@ def execute(
                     ssh_command=ssh_command,
                     follow_delete=follow_delete,
                     compression=compression,
+                    raw=raw,
                 )
 
 
@@ -55,12 +57,13 @@ def _destroy(tasks: List[Task], ssh_command: str) -> None:
             snapshot.destroy(task.snapshot, ssh_command=ssh_command)
 
 
-def _send(
+def _send(  # pylint: disable=R0917,R0913
     remote: FileSystem,
     tasks: List[Task],
     ssh_command: str,
     follow_delete: bool,
     compression: Compression,
+    raw: bool,
 ) -> None:
     for task in tasks:
         snapshot.send(
@@ -69,5 +72,6 @@ def _send(
             ssh_command=ssh_command,
             compression=compression,
             follow_delete=follow_delete,
+            raw=raw,
             previous=optional.value(task.snapshot).previous,
         )

@@ -1,8 +1,14 @@
 """zfs.replicate.cli.main tests."""
 
+from typing import Any, Dict, List
+
+import pytest
 from click.testing import CliRunner
 
 from zfs.replicate.cli.main import main
+from zfs.replicate.filesystem.type import filesystem
+from zfs.replicate.snapshot.send import _send
+from zfs.replicate.snapshot.type import Snapshot
 
 
 def test_invokes_without_stacktrace() -> None:
@@ -20,6 +26,51 @@ def test_invokes_without_stacktrace() -> None:
         isinstance(result.exception, FileNotFoundError)
         and result.exception.filename == "/usr/bin/env"
     ), "Expected SystemExit or FileNotFoundError."
+
+
+def test_no_raw_threads_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`--no-raw` reaches task.execute and the resulting send command omits --raw.
+
+    .. code:: bash
+
+        zfs-replicate --no-raw -l alunduil -i mypy.ini example.com bogus bogus
+    """
+    captured: Dict[str, Any] = {}
+
+    def fake_list(*_args: Any, **_kwargs: Any) -> List[Snapshot]:
+        return []
+
+    def fake_create(*_args: Any, **_kwargs: Any) -> None:
+        return None
+
+    def fake_execute(*_args: Any, **kwargs: Any) -> None:
+        captured.update(kwargs)
+
+    monkeypatch.setattr("zfs.replicate.cli.main.snapshot.list", fake_list)
+    monkeypatch.setattr("zfs.replicate.cli.main.filesystem.create", fake_create)
+    monkeypatch.setattr("zfs.replicate.cli.main.task.execute", fake_execute)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        main,
+        [
+            "--no-raw",
+            "-l",
+            "alunduil",
+            "-i",
+            "mypy.ini",
+            "example.com",
+            "bogus",
+            "bogus",
+        ],
+    )
+    assert result.exit_code == 0, result.output  # nosec
+    assert captured.get("raw") is False  # nosec
+
+    snapshot = Snapshot(
+        filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0
+    )
+    assert "--raw" not in _send(snapshot, raw=captured["raw"])  # nosec
 
 
 def test_invokes_without_stacktrace_verbose() -> None:

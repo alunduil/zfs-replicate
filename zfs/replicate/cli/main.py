@@ -61,6 +61,15 @@ from .click import EnumChoice
     default=Compression.LZ4,
     help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
 )
+@click.option(  # type: ignore[misc]
+    "--raw/--no-raw",
+    default=True,
+    help=(
+        "Pass --raw to zfs send so encrypted datasets replicate without"
+        " decryption (default). Use --no-raw to send decrypted data, for"
+        " example when the destination cannot preserve encryption."
+    ),
+)
 @click.argument("host", required=True)  # type: ignore[misc]
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
@@ -74,6 +83,7 @@ def main(  # pylint: disable=R0917,R0914,R0913
     identity_file: str,
     cipher: Cipher,
     compression: Compression,
+    raw: bool,
     host: str,
     remote_fs: FileSystem,
     local_fs: FileSystem,
@@ -134,5 +144,6 @@ def main(  # pylint: disable=R0917,R0914,R0913
             filesystem_tasks,
             follow_delete=follow_delete,
             compression=compression,
+            raw=raw,
             ssh_command=ssh_command,
         )
