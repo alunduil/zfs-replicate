@@ -16,10 +16,11 @@ def send(  # pylint: disable=R0917,R0913
     ssh_command: str,
     compression: Compression,
     follow_delete: bool,
+    raw: bool,
     previous: Optional[Snapshot] = None,
 ) -> None:
     """Send ZFS Snapshot."""
-    send_command = _send(current, previous, follow_delete=follow_delete)
+    send_command = _send(current, previous, follow_delete=follow_delete, raw=raw)
 
     compress_command, decompress_command = compress.command(compression)
 
@@ -52,9 +53,15 @@ def send(  # pylint: disable=R0917,R0913
 
 
 def _send(
-    current: Snapshot, previous: Optional[Snapshot] = None, follow_delete: bool = False
+    current: Snapshot,
+    previous: Optional[Snapshot] = None,
+    follow_delete: bool = False,
+    raw: bool = True,
 ) -> str:
-    options = ["--raw"]  # ["-V"]
+    options = []
+
+    if raw:
+        options.append("--raw")
 
     if follow_delete:
         options.append("-p")
