@@ -2,6 +2,8 @@
 
 ## unreleased
 
+## 4.1.0 -- 2026-05-08
+
 ### Added
 
 - `--raw / --no-raw` toggles `zfs send --raw`. The default `--raw` preserves the existing behaviour for encrypted datasets; pass `--no-raw` when replicating to a destination that can't preserve encryption (#391).
