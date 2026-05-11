@@ -98,5 +98,6 @@ repos:
           - json
           - nix
           - python
+          - shell
           - toml
           - yaml
