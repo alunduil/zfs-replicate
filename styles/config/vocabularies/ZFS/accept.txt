@@ -1,5 +1,9 @@
 argparse
+Codespaces
+docstrings
+Doctest
 release-please
 semver
 subprocess
+unshipped
 Zettabyte
