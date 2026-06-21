@@ -80,10 +80,10 @@ def generate(
                 ],
             )
 
-    for filesystem in remote_snapshots:
+    for remote_snapshot_filesystem in remote_snapshots:
         filesystem = filesystem_t(
-            name=filesystem.name.replace(remote.name + "/", ""),
-            readonly=filesystem.readonly,
+            name=remote_snapshot_filesystem.name.replace(remote.name + "/", ""),
+            readonly=remote_snapshot_filesystem.readonly,
         )
 
         if filesystem not in local_snapshots:
@@ -94,7 +94,7 @@ def generate(
                         filesystem=remote_filesystem(remote, filesystem),
                         snapshot=s,
                     )
-                    for s in remote_snapshots[filesystem]
+                    for s in remote_snapshots[remote_snapshot_filesystem]
                 ],
             )
             tasks.append(
