@@ -7,16 +7,17 @@ from .. import compress, filesystem
 from ..compress import Compression
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem
-from .type import Snapshot
+from .type import ReceiveOptions, Snapshot
 
 
-def send(  # pylint: disable=R0917,R0913
+def send(  # pylint: disable=R0917,R0913,R0914
     remote: FileSystem,
     current: Snapshot,
     ssh_command: str,
     compression: Compression,
     follow_delete: bool,
     raw: bool,
+    receive_options: ReceiveOptions,
     previous: Optional[Snapshot] = None,
 ) -> None:
     """Send ZFS Snapshot."""
@@ -28,7 +29,7 @@ def send(  # pylint: disable=R0917,R0913
         compress_command
         + ssh_command
         + " "
-        + f'"{_receive(remote, current, decompress_command)}"'
+        + f'"{_receive(remote, current, decompress_command, receive_options)}"'
     )
 
     command = send_command + " | " + receive_command
@@ -72,6 +73,31 @@ def _send(
     return f"/usr/bin/env - zfs send {' '.join(options)} '{current.filesystem.name}@{current.name}'"
 
 
-def _receive(remote: FileSystem, current: Snapshot, decompress_command: str) -> str:
+def _receive(
+    remote: FileSystem,
+    current: Snapshot,
+    decompress_command: str,
+    options: ReceiveOptions,
+) -> str:
     destination = filesystem.remote_dataset(remote, current.filesystem)
-    return f"{decompress_command}/usr/bin/env - zfs receive -F -d '{destination.name}'"
+
+    flags = []
+
+    if options.force:
+        flags.append("-F")
+
+    if options.no_mount:
+        flags.append("-u")
+
+    if options.resume:
+        flags.append("-s")
+
+    for key, value in options.properties.items():
+        flags.append(f"-o {key}={value}")
+
+    flags.append("-d")
+
+    return (
+        f"{decompress_command}/usr/bin/env - zfs receive"
+        f" {' '.join(flags)} '{destination.name}'"
+    )

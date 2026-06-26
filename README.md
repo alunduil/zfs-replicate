@@ -62,6 +62,20 @@ _N.B., don't use the root user to access your remote system._
 1. `poetry install`
 1. `poetry run -- zfs-replicate --help`
 
+## Setting properties on the replica
+
+Use `--set KEY=VALUE` (repeatable) to set ZFS properties on the received data set, and
+`--no-mount` to leave it unmounted. For example, to mark the replica `readonly` and stop it
+mounting on the destination:
+
+```bash
+zfs-replicate --no-mount --set readonly=on --set canmount=noauto \
+  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
+```
+
+`--no-force` opts out of the default `-F` rollback. Pass `--resume-token-capable` (`-s`) to
+keep resume tokens on the destination so interrupted transfers can restart.
+
 ## Documentation
 
 * `zfs-replicate --help`: Help for zfs-replicate.

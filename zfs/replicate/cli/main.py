@@ -1,6 +1,7 @@
 """Main function zfs-replicate."""
 
 import itertools
+from typing import Dict, Tuple
 
 import click
 
@@ -70,6 +71,40 @@ from .click import EnumChoice
         " example when the destination cannot preserve encryption."
     ),
 )
+@click.option(  # type: ignore[misc]
+    "--force/--no-force",
+    default=True,
+    help=(
+        "Pass -F to zfs receive so the destination rolls back to match the"
+        " stream (default). Use --no-force to fail instead of discarding"
+        " divergent destination snapshots."
+    ),
+)
+@click.option(  # type: ignore[misc]
+    "--no-mount",
+    is_flag=True,
+    help="Pass -u to zfs receive so received datasets are not mounted.",
+)
+@click.option(  # type: ignore[misc]
+    "--resume-token-capable",
+    "-s",
+    is_flag=True,
+    help=(
+        "Pass -s to zfs receive so an interrupted transfer saves a resume"
+        " token on the destination."
+    ),
+)
+@click.option(  # type: ignore[misc]
+    "--set",
+    "properties",
+    multiple=True,
+    metavar="KEY=VALUE",
+    help=(
+        "Set a property on the received dataset (maps to -o KEY=VALUE on zfs"
+        " receive). Repeatable, for example --set readonly=on --set"
+        " canmount=noauto."
+    ),
+)
 @click.argument("host", required=True)  # type: ignore[misc]
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
@@ -84,11 +119,22 @@ def main(  # pylint: disable=R0917,R0914,R0913
     cipher: Cipher,
     compression: Compression,
     raw: bool,
+    force: bool,
+    no_mount: bool,
+    resume_token_capable: bool,
+    properties: Tuple[str, ...],
     host: str,
     remote_fs: FileSystem,
     local_fs: FileSystem,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
+    receive_options = snapshot.ReceiveOptions(
+        force=force,
+        no_mount=no_mount,
+        resume=resume_token_capable,
+        properties=_parse_properties(properties),
+    )
+
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
     if verbose:
@@ -145,5 +191,20 @@ def main(  # pylint: disable=R0917,R0914,R0913
             follow_delete=follow_delete,
             compression=compression,
             raw=raw,
+            receive_options=receive_options,
             ssh_command=ssh_command,
         )
+
+
+def _parse_properties(properties: Tuple[str, ...]) -> Dict[str, str]:
+    parsed: Dict[str, str] = {}
+
+    for item in properties:
+        key, separator, value = item.partition("=")
+        if not separator or not key:
+            raise click.BadParameter(
+                f"expected KEY=VALUE, got {item!r}", param_hint="--set"
+            )
+        parsed[key] = value
+
+    return parsed

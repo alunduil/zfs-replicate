@@ -1,9 +1,23 @@
 """ZFS Snapshot Type."""
 
-from dataclasses import dataclass
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Mapping, Optional
 
 from ..filesystem import FileSystem
+
+
+@dataclass(frozen=True)
+class ReceiveOptions:
+    """Options controlling the remote ``zfs receive``.
+
+    ``force`` maps to ``-F``, ``no_mount`` to ``-u``, ``resume`` to ``-s``,
+    and each ``properties`` entry to a ``-o KEY=VALUE`` argument.
+    """
+
+    force: bool = True
+    no_mount: bool = False
+    resume: bool = False
+    properties: Mapping[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)

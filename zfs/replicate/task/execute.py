@@ -6,6 +6,7 @@ from typing import List, Tuple
 from .. import filesystem, optional, snapshot
 from ..compress import Compression
 from ..filesystem import FileSystem
+from ..snapshot import ReceiveOptions
 from .type import Action, Task
 
 
@@ -16,6 +17,7 @@ def execute(  # pylint: disable=R0917,R0913
     follow_delete: bool,
     compression: Compression,
     raw: bool,
+    receive_options: ReceiveOptions,
 ) -> None:
     """Execute all tasks."""
     sorted_tasks = sorted(tasks, key=lambda x: len(x[0].name.split("/")), reverse=True)
@@ -41,6 +43,7 @@ def execute(  # pylint: disable=R0917,R0913
                     follow_delete=follow_delete,
                     compression=compression,
                     raw=raw,
+                    receive_options=receive_options,
                 )
 
 
@@ -64,6 +67,7 @@ def _send(  # pylint: disable=R0917,R0913
     follow_delete: bool,
     compression: Compression,
     raw: bool,
+    receive_options: ReceiveOptions,
 ) -> None:
     for task in tasks:
         snapshot.send(
@@ -73,5 +77,6 @@ def _send(  # pylint: disable=R0917,R0913
             compression=compression,
             follow_delete=follow_delete,
             raw=raw,
+            receive_options=receive_options,
             previous=optional.value(task.snapshot).previous,
         )
