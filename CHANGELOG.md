@@ -4,7 +4,7 @@
 
 ### Added
 
-- Receive-side flags for `zfs receive`: `--force / --no-force` toggles `-F` (default `--force`), `--no-mount` passes `-u`, `--resume-token-capable / -s` passes `-s`, and the repeatable `--set KEY=VALUE` maps to `-o KEY=VALUE` so properties like `readonly`, `canmount`, or `mountpoint` can be set on the replica without a post-receive patch-up (#393).
+- Receive-side flags for `zfs receive`, grouped under the `--receive-` prefix: `--receive-force / --receive-no-force` toggles `-F` (default on), `--receive-mount / --receive-no-mount` toggles `-u` (default mounts), `--receive-resume-token-capable` passes `-s`, and the repeatable `--receive-set KEY=VALUE` maps to `-o KEY=VALUE` for properties such as `readonly`, `canmount`, or `mountpoint` on the replica without a post-receive patch-up (#393).
 
 ## 4.1.0 -- 2026-05-09
 

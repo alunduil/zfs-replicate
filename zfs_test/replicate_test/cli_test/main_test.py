@@ -78,7 +78,7 @@ def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> N
 
     .. code:: bash
 
-        zfs-replicate --no-force --no-mount --resume-token-capable --set readonly=on ...
+        zfs-replicate --receive-no-force --receive-no-mount --receive-resume-token-capable --receive-set readonly=on ...
     """
     captured: Dict[str, Any] = {}
 
@@ -99,10 +99,10 @@ def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> N
     result = runner.invoke(
         main,
         [
-            "--no-force",
-            "--no-mount",
-            "--resume-token-capable",
-            "--set",
+            "--receive-no-force",
+            "--receive-no-mount",
+            "--receive-resume-token-capable",
+            "--receive-set",
             "readonly=on",
             "-l",
             "alunduil",
@@ -131,17 +131,17 @@ def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> N
 
 
 def test_set_rejects_malformed_property() -> None:
-    """`--set` without an equals sign is rejected before execution.
+    """`--receive-set` without an equals sign is rejected before execution.
 
     .. code:: bash
 
-        zfs-replicate --set readonly -l alunduil -i mypy.ini example.com bogus bogus
+        zfs-replicate --receive-set readonly -l alunduil -i mypy.ini example.com bogus bogus
     """
     runner = CliRunner()
     result = runner.invoke(
         main,
         [
-            "--set",
+            "--receive-set",
             "readonly",
             "-l",
             "alunduil",
