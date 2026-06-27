@@ -31,12 +31,9 @@ def send(  # pylint: disable=R0917,R0913,R0914
 
     destination = filesystem.remote_dataset(remote, current.filesystem)
 
-    receive_command = (
-        compress_command
-        + ssh_command
-        + " "
-        + f'"{decompress_command}{command(destination, receive_options)}"'
-    )
+    remote_command = decompress_command + command(destination, receive_options)
+
+    receive_command = compress_command + ssh_command + " " + f'"{remote_command}"'
 
     pipeline = send_command + " | " + receive_command
 
