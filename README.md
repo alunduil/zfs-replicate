@@ -76,6 +76,24 @@ zfs-replicate --receive-no-mount --receive-set readonly=on --receive-set canmoun
 
 See `zfs-replicate --help` for the full set of `--receive-` flags.
 
+## Tuning the send stream
+
+The `--send-` flags map onto `zfs send` properties of the stream. `--send-raw`
+(default) sends encrypted data sets without decryption; pass `--send-no-raw`
+when the destination can't preserve encryption. `--send-large-block`,
+`--send-embed`, and `--send-compressed` pass `-L`, `-e`, and `-c` so large
+blocks, embedded data, and already-compressed blocks replicate without being
+re-read or recompressed, and `--send-props` passes `-p` to carry data set
+properties in the stream. For example, to replicate a compressed, large-block
+data set whole:
+
+```bash
+zfs-replicate --send-large-block --send-compressed \
+  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
+```
+
+See `zfs-replicate --help` for the full set of `--send-` flags.
+
 ## Documentation
 
 * `zfs-replicate --help`: Help for zfs-replicate.

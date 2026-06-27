@@ -4,7 +4,7 @@ import itertools
 
 import click
 
-from .. import filesystem, receive, snapshot, ssh, task
+from .. import filesystem, receive, send, snapshot, ssh, task
 from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
@@ -62,15 +62,7 @@ from .click import EnumChoice
     default=Compression.LZ4,
     help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
 )
-@click.option(  # type: ignore[misc]
-    "--raw/--no-raw",
-    default=True,
-    help=(
-        "Pass --raw to zfs send so encrypted datasets replicate without"
-        " decryption (default). Use --no-raw to send decrypted data, for"
-        " example when the destination cannot preserve encryption."
-    ),
-)
+@options.send_group
 @options.receive_group
 @click.argument("host", required=True)  # type: ignore[misc]
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
@@ -85,7 +77,7 @@ def main(  # pylint: disable=R0917,R0914,R0913
     identity_file: str,
     cipher: Cipher,
     compression: Compression,
-    raw: bool,
+    send_options: send.Options,
     receive_options: receive.Options,
     host: str,
     remote_fs: FileSystem,
@@ -145,9 +137,8 @@ def main(  # pylint: disable=R0917,R0914,R0913
         task.execute(
             remote_fs,
             filesystem_tasks,
-            follow_delete=follow_delete,
             compression=compression,
-            raw=raw,
+            send_options=send_options,
             receive_options=receive_options,
             ssh_command=ssh_command,
         )
