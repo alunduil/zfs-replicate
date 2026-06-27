@@ -6,7 +6,7 @@ from typing import Any
 import click
 
 
-class EnumChoice(click.Choice):  # type: ignore[misc]
+class EnumChoice(click.Choice):
     """Choice made from Enum."""
 
     # Need any due to the private member only existing on subclasses through
