@@ -11,6 +11,9 @@ from ..receive.command import command
 from .type import Snapshot
 
 
+# Threads the whole replication surface and assembles the pipeline from
+# several command-string locals, so the parameter and local counts cross
+# pylint's thresholds.
 def send(  # pylint: disable=R0917,R0913,R0914
     remote: FileSystem,
     current: Snapshot,

@@ -58,6 +58,8 @@ def receive_group(command: Callable[..., None]) -> Callable[..., None]:
         ),
     )(command)
 
+    # Forwards every command parameter plus the four receive flags, so the
+    # argument count is inherent to collapsing them into one kwarg.
     @functools.wraps(command)
     def wrapper(  # pylint: disable=R0913
         *args: object,
