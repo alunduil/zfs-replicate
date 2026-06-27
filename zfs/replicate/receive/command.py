@@ -13,6 +13,6 @@ def command(destination: FileSystem, options: Options) -> str:
     remote data set, so it carries no knowledge of how local data sets map
     onto the remote.
     """
-    flags = [*options.to_flags(), "-d"]
+    arguments = [*options.to_flags(), f"-d '{destination.name}'"]
 
-    return f"/usr/bin/env - zfs receive {' '.join(flags)} '{destination.name}'"
+    return f"/usr/bin/env - zfs receive {' '.join(arguments)}"
