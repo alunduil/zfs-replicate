@@ -64,17 +64,17 @@ _N.B., don't use the root user to access your remote system._
 
 ## Setting properties on the replica
 
-Receive-side flags share a `--receive-` prefix. Use `--receive-set KEY=VALUE` (repeatable) to
-set ZFS properties on the received data set, and `--receive-no-mount` to leave it unmounted.
-For example, to mark the replica `readonly` and stop it mounting on the destination:
+To match your destination's policy without a post-receive patch-up, set ZFS
+properties on the received data set with `--receive-set KEY=VALUE` (repeatable)
+and control mounting with `--receive-no-mount`. For example, to set the replica
+`readonly` and keep it from mounting on the destination:
 
 ```bash
 zfs-replicate --receive-no-mount --receive-set readonly=on --receive-set canmount=noauto \
   -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
 ```
 
-`--receive-no-force` opts out of the default `-F` rollback. Pass `--receive-resume-token-capable`
-to keep resume tokens on the destination so interrupted transfers can restart.
+See `zfs-replicate --help` for the full set of `--receive-` flags.
 
 ## Documentation
 
