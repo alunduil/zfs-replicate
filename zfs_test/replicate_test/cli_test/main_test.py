@@ -6,9 +6,7 @@ import pytest
 from click.testing import CliRunner
 
 import zfs.replicate.cli.main as sut
-from zfs.replicate import receive
-from zfs.replicate.filesystem.type import filesystem
-from zfs.replicate.snapshot.send import _send
+from zfs.replicate import receive, send
 from zfs.replicate.snapshot.type import Snapshot
 
 
@@ -29,12 +27,12 @@ def test_invokes_without_stacktrace() -> None:
     ), "Expected SystemExit or FileNotFoundError."
 
 
-def test_no_raw_threads_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
-    """`--no-raw` reaches task.execute and the resulting send command omits --raw.
+def test_send_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Send flags reach task.execute as the expected send.Options.
 
     .. code:: bash
 
-        zfs-replicate --no-raw -l alunduil -i mypy.ini example.com bogus bogus
+        zfs-replicate --send-no-raw --send-large-block --send-embed --send-compressed --send-props ...
     """
     captured: Dict[str, Any] = {}
 
@@ -55,7 +53,11 @@ def test_no_raw_threads_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
     result = runner.invoke(
         sut.main,
         [
-            "--no-raw",
+            "--send-no-raw",
+            "--send-large-block",
+            "--send-embed",
+            "--send-compressed",
+            "--send-props",
             "-l",
             "alunduil",
             "-i",
@@ -66,12 +68,10 @@ def test_no_raw_threads_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
         ],
     )
     assert result.exit_code == 0, result.output  # nosec
-    assert captured.get("raw") is False  # nosec
 
-    snapshot = Snapshot(
-        filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0
+    assert captured.get("send_options") == send.Options(  # nosec
+        large_block=True, raw=False, embed=True, compressed=True, props=True
     )
-    assert "--raw" not in _send(snapshot, raw=captured["raw"])  # nosec
 
 
 def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:

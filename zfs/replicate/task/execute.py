@@ -3,7 +3,7 @@
 import itertools
 from typing import List, Tuple
 
-from .. import filesystem, optional, receive, snapshot
+from .. import filesystem, optional, receive, send, snapshot
 from ..compress import Compression
 from ..filesystem import FileSystem
 from .type import Action, Task
@@ -13,9 +13,8 @@ def execute(  # pylint: disable=R0917,R0913
     remote: FileSystem,
     tasks: List[Tuple[FileSystem, List[Task]]],
     ssh_command: str,
-    follow_delete: bool,
     compression: Compression,
-    raw: bool,
+    send_options: send.Options,
     receive_options: receive.Options,
 ) -> None:
     """Execute all tasks."""
@@ -39,9 +38,8 @@ def execute(  # pylint: disable=R0917,R0913
                     remote,
                     a_tasks,
                     ssh_command=ssh_command,
-                    follow_delete=follow_delete,
                     compression=compression,
-                    raw=raw,
+                    send_options=send_options,
                     receive_options=receive_options,
                 )
 
@@ -63,9 +61,8 @@ def _send(  # pylint: disable=R0917,R0913
     remote: FileSystem,
     tasks: List[Task],
     ssh_command: str,
-    follow_delete: bool,
     compression: Compression,
-    raw: bool,
+    send_options: send.Options,
     receive_options: receive.Options,
 ) -> None:
     for task in tasks:
@@ -74,8 +71,7 @@ def _send(  # pylint: disable=R0917,R0913
             optional.value(task.snapshot),
             ssh_command=ssh_command,
             compression=compression,
-            follow_delete=follow_delete,
-            raw=raw,
+            send_options=send_options,
             receive_options=receive_options,
             previous=optional.value(task.snapshot).previous,
         )

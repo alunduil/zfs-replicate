@@ -76,6 +76,19 @@ zfs-replicate --receive-no-mount --receive-set readonly=on --receive-set canmoun
 
 See `zfs-replicate --help` for the full set of `--receive-` flags.
 
+## Tuning the send stream
+
+To replicate a large-block, already-compressed data set without re-reading or
+recompressing it on the way out, tune the `zfs send` stream with the `--send-`
+flags:
+
+```bash
+zfs-replicate --send-large-block --send-compressed \
+  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
+```
+
+See `zfs-replicate --help` for the full set of `--send-` flags.
+
 ## Documentation
 
 * `zfs-replicate --help`: Help for zfs-replicate.
