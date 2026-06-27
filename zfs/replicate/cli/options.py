@@ -14,9 +14,9 @@ def receive_group(command: Callable[..., None]) -> Callable[..., None]:
     The decorated command must take a single ``receive_options:
     receive.Options`` parameter and must not declare the ``--receive-*``
     flags itself -- this owns them and collapses them into that argument.
-    Reach for this (and the eventual ``send_group``) instead of listing the
-    flags inline, so each side stays grouped and the ``--receive-`` prefix
-    keeps them from clashing with the global and transport options.
+    Reach for this instead of listing the flags inline, so they stay
+    grouped and the ``--receive-`` prefix keeps them from clashing with the
+    global and transport options.
     """
     command = click.option(
         "--receive-set",
