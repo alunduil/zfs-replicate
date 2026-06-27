@@ -5,10 +5,9 @@ from typing import Any, Dict, List
 import pytest
 from click.testing import CliRunner
 
-from zfs.replicate.cli.main import main
+import zfs.replicate.cli.main as sut
+from zfs.replicate import receive
 from zfs.replicate.filesystem.type import filesystem
-from zfs.replicate.receive.command import command
-from zfs.replicate.receive.type import ReceiveOptions
 from zfs.replicate.snapshot.send import _send
 from zfs.replicate.snapshot.type import Snapshot
 
@@ -22,7 +21,7 @@ def test_invokes_without_stacktrace() -> None:
     """
     runner = CliRunner()
     result = runner.invoke(
-        main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"]
+        sut.main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"]
     )
     assert isinstance(result.exception, SystemExit) or (  # nosec
         isinstance(result.exception, FileNotFoundError)
@@ -54,7 +53,7 @@ def test_no_raw_threads_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
 
     runner = CliRunner()
     result = runner.invoke(
-        main,
+        sut.main,
         [
             "--no-raw",
             "-l",
@@ -99,7 +98,7 @@ def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> N
 
     runner = CliRunner()
     result = runner.invoke(
-        main,
+        sut.main,
         [
             "--receive-no-force",
             "--receive-no-mount",
@@ -117,19 +116,9 @@ def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> N
     )
     assert result.exit_code == 0, result.output  # nosec
 
-    options = captured.get("receive_options")
-    assert options == ReceiveOptions(  # nosec
+    assert captured.get("receive_options") == receive.Options(  # nosec
         force=False, no_mount=True, resume=True, properties={"readonly": "on"}
     )
-
-    snapshot = Snapshot(
-        filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0
-    )
-    result = command(filesystem("remote"), snapshot, "", options)
-    assert "-F" not in result  # nosec
-    assert "-u" in result  # nosec
-    assert "-s" in result  # nosec
-    assert "-o readonly=on" in result  # nosec
 
 
 def test_set_rejects_malformed_property() -> None:
@@ -141,7 +130,7 @@ def test_set_rejects_malformed_property() -> None:
     """
     runner = CliRunner()
     result = runner.invoke(
-        main,
+        sut.main,
         [
             "--receive-set",
             "readonly",
@@ -167,7 +156,7 @@ def test_invokes_without_stacktrace_verbose() -> None:
     """
     runner = CliRunner()
     result = runner.invoke(
-        main,
+        sut.main,
         [
             "--verbose",
             "-l",

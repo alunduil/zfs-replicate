@@ -7,7 +7,7 @@ from .. import compress, receive
 from ..compress import Compression
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem
-from ..receive import ReceiveOptions
+from ..receive.command import command
 from .type import Snapshot
 
 
@@ -18,7 +18,7 @@ def send(  # pylint: disable=R0917,R0913,R0914
     compression: Compression,
     follow_delete: bool,
     raw: bool,
-    receive_options: ReceiveOptions,
+    receive_options: receive.Options,
     previous: Optional[Snapshot] = None,
 ) -> None:
     """Send ZFS Snapshot."""
@@ -30,13 +30,13 @@ def send(  # pylint: disable=R0917,R0913,R0914
         compress_command
         + ssh_command
         + " "
-        + f'"{receive.command(remote, current, decompress_command, receive_options)}"'
+        + f'"{command(remote, current.filesystem, decompress_command, receive_options)}"'
     )
 
-    command = send_command + " | " + receive_command
+    pipeline = send_command + " | " + receive_command
 
     proc = subprocess.Popen(  # pylint: disable=R1732
-        command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
+        pipeline, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE  # nosec
     )
     output, error = proc.communicate()
     output = (

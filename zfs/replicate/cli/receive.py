@@ -5,11 +5,11 @@ from typing import Callable, Dict, Tuple
 
 import click
 
-from ..receive import ReceiveOptions
+from .. import receive
 
 
 def receive_option_group(command: Callable[..., None]) -> Callable[..., None]:
-    """Attach the ``--receive-*`` option group and collapse it to ReceiveOptions.
+    """Attach the ``--receive-*`` option group and collapse it to receive.Options.
 
     Keeps the receive-side flags defined together and namespaced under
     ``--receive-`` so they can't collide with the global and transport
@@ -67,7 +67,7 @@ def receive_option_group(command: Callable[..., None]) -> Callable[..., None]:
     ) -> None:
         return command(
             *args,
-            receive_options=ReceiveOptions(
+            receive_options=receive.Options(
                 force=receive_force,
                 no_mount=not receive_mount,
                 resume=receive_resume,

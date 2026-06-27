@@ -2,18 +2,17 @@
 
 from .. import filesystem
 from ..filesystem import FileSystem
-from ..snapshot.type import Snapshot
-from .type import ReceiveOptions
+from .type import Options
 
 
 def command(
     remote: FileSystem,
-    current: Snapshot,
+    local: FileSystem,
     decompress_command: str,
-    options: ReceiveOptions,
+    options: Options,
 ) -> str:
-    """Receive command string for a snapshot and receive options."""
-    destination = filesystem.remote_dataset(remote, current.filesystem)
+    """Receive command string for a destination and receive options."""
+    destination = filesystem.remote_dataset(remote, local)
 
     flags = []
 

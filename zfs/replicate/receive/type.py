@@ -5,7 +5,7 @@ from typing import Mapping
 
 
 @dataclass(frozen=True)
-class ReceiveOptions:
+class Options:
     """Options controlling the remote ``zfs receive``.
 
     ``force`` maps to ``-F``, ``no_mount`` to ``-u``, ``resume`` to ``-s``,

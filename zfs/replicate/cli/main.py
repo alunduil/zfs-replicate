@@ -4,11 +4,10 @@ import itertools
 
 import click
 
-from .. import filesystem, snapshot, ssh, task
+from .. import filesystem, receive, snapshot, ssh, task
 from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
-from ..receive import ReceiveOptions
 from ..ssh import Cipher
 from .click import EnumChoice
 from .receive import receive_option_group
@@ -87,7 +86,7 @@ def main(  # pylint: disable=R0917,R0914,R0913
     cipher: Cipher,
     compression: Compression,
     raw: bool,
-    receive_options: ReceiveOptions,
+    receive_options: receive.Options,
     host: str,
     remote_fs: FileSystem,
     local_fs: FileSystem,

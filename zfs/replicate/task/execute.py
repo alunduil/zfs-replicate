@@ -3,10 +3,9 @@
 import itertools
 from typing import List, Tuple
 
-from .. import filesystem, optional, snapshot
+from .. import filesystem, optional, receive, snapshot
 from ..compress import Compression
 from ..filesystem import FileSystem
-from ..receive import ReceiveOptions
 from .type import Action, Task
 
 
@@ -17,7 +16,7 @@ def execute(  # pylint: disable=R0917,R0913
     follow_delete: bool,
     compression: Compression,
     raw: bool,
-    receive_options: ReceiveOptions,
+    receive_options: receive.Options,
 ) -> None:
     """Execute all tasks."""
     sorted_tasks = sorted(tasks, key=lambda x: len(x[0].name.split("/")), reverse=True)
@@ -67,7 +66,7 @@ def _send(  # pylint: disable=R0917,R0913
     follow_delete: bool,
     compression: Compression,
     raw: bool,
-    receive_options: ReceiveOptions,
+    receive_options: receive.Options,
 ) -> None:
     for task in tasks:
         snapshot.send(
