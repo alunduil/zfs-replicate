@@ -6,7 +6,7 @@ from zfs.replicate.receive.type import Options
 
 
 def test_command_assembles_receive_invocation() -> None:
-    """Wrap the flags and quoted destination after the decompress prefix."""
-    result = sut.command(filesystem("remote/pool"), "lz4 -d | ", Options())
+    """Wrap the flags and quoted destination in a zfs receive invocation."""
+    result = sut.command(filesystem("remote/pool"), Options())
 
-    assert result == "lz4 -d | /usr/bin/env - zfs receive -F -d 'remote/pool'"  # nosec
+    assert result == "/usr/bin/env - zfs receive -F -d 'remote/pool'"  # nosec

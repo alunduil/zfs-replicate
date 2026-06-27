@@ -32,7 +32,7 @@ def send(  # pylint: disable=R0917,R0913,R0914
         compress_command
         + ssh_command
         + " "
-        + f'"{command(destination, decompress_command, receive_options)}"'
+        + f'"{decompress_command}{command(destination, receive_options)}"'
     )
 
     pipeline = send_command + " | " + receive_command
