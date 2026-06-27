@@ -6,7 +6,7 @@ from typing import List, Tuple
 from .. import filesystem, optional, snapshot
 from ..compress import Compression
 from ..filesystem import FileSystem
-from ..snapshot import ReceiveOptions
+from ..receive import ReceiveOptions
 from .type import Action, Task
 
 

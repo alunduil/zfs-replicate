@@ -7,8 +7,10 @@ from click.testing import CliRunner
 
 from zfs.replicate.cli.main import main
 from zfs.replicate.filesystem.type import filesystem
-from zfs.replicate.snapshot.send import _receive, _send
-from zfs.replicate.snapshot.type import ReceiveOptions, Snapshot
+from zfs.replicate.receive.command import command
+from zfs.replicate.receive.type import ReceiveOptions
+from zfs.replicate.snapshot.send import _send
+from zfs.replicate.snapshot.type import Snapshot
 
 
 def test_invokes_without_stacktrace() -> None:
@@ -123,11 +125,11 @@ def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> N
     snapshot = Snapshot(
         filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0
     )
-    command = _receive(filesystem("remote"), snapshot, "", options)
-    assert "-F" not in command  # nosec
-    assert "-u" in command  # nosec
-    assert "-s" in command  # nosec
-    assert "-o readonly=on" in command  # nosec
+    result = command(filesystem("remote"), snapshot, "", options)
+    assert "-F" not in result  # nosec
+    assert "-u" in result  # nosec
+    assert "-s" in result  # nosec
+    assert "-o readonly=on" in result  # nosec
 
 
 def test_set_rejects_malformed_property() -> None:
