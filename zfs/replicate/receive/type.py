@@ -6,10 +6,12 @@ from typing import Mapping
 
 @dataclass(frozen=True)
 class Options:
-    """Options controlling the remote ``zfs receive``.
+    """Receive-side settings, built by the CLI and read by ``receive.command``.
 
-    ``force`` maps to ``-F``, ``no_mount`` to ``-u``, ``resume`` to ``-s``,
-    and each ``properties`` entry to a ``-o KEY=VALUE`` argument.
+    The defaults reproduce zfs-replicate's long-standing ``zfs receive -F``
+    behaviour, so a bare ``Options()`` means "nothing changes from before".
+    ``properties`` values are interpolated into the remote shell command
+    unquoted, so keep them shell-safe.
     """
 
     force: bool = True

@@ -11,7 +11,14 @@ def command(
     decompress_command: str,
     options: Options,
 ) -> str:
-    """Receive command string for a destination and receive options."""
+    """Build the remote ``zfs receive`` half of the replication pipe.
+
+    Returns a shell fragment to embed in an SSH command -- it is not run
+    here; ``snapshot.send`` pipes the local ``zfs send`` into it. Takes the
+    source filesystem rather than the snapshot, since the receive side only
+    needs the destination (derived via ``filesystem.remote_dataset``); that
+    keeps ``receive`` independent of ``snapshot``.
+    """
     destination = filesystem.remote_dataset(remote, local)
 
     flags = []

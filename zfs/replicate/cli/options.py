@@ -9,12 +9,14 @@ from .. import receive
 
 
 def receive_group(command: Callable[..., None]) -> Callable[..., None]:
-    """Attach the ``--receive-*`` option group and collapse it to receive.Options.
+    """Add the ``--receive-*`` flag group to a Click command.
 
-    Keeps the receive-side flags defined together and namespaced under
-    ``--receive-`` so they can't collide with the global and transport
-    options, and hands the command a single ``receive_options`` argument
-    rather than one parameter per flag.
+    The decorated command must take a single ``receive_options:
+    receive.Options`` parameter and must not declare the ``--receive-*``
+    flags itself -- this owns them and collapses them into that argument.
+    Reach for this (and the eventual ``send_group``) instead of listing the
+    flags inline, so each side stays grouped and the ``--receive-`` prefix
+    keeps them from clashing with the global and transport options.
     """
     command = click.option(
         "--receive-set",
