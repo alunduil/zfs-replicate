@@ -16,11 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: install poetry
-        run: pipx install poetry
+        run: pipx install 'poetry<3'
       - name: setup python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.8"
+          python-version: "3.x"
           cache: poetry
       - name: poetry build
         run: poetry build
