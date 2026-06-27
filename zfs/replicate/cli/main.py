@@ -9,8 +9,8 @@ from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
 from ..ssh import Cipher
+from . import options
 from .click import EnumChoice
-from .receive import receive_option_group
 
 
 @click.command()  # type: ignore[misc]
@@ -71,7 +71,7 @@ from .receive import receive_option_group
         " example when the destination cannot preserve encryption."
     ),
 )
-@receive_option_group
+@options.receive_group
 @click.argument("host", required=True)  # type: ignore[misc]
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]

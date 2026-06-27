@@ -1,4 +1,4 @@
-"""Receive-side command-line options."""
+"""Command-line option groups."""
 
 import functools
 from typing import Callable, Dict, Tuple
@@ -8,7 +8,7 @@ import click
 from .. import receive
 
 
-def receive_option_group(command: Callable[..., None]) -> Callable[..., None]:
+def receive_group(command: Callable[..., None]) -> Callable[..., None]:
     """Attach the ``--receive-*`` option group and collapse it to receive.Options.
 
     Keeps the receive-side flags defined together and namespaced under
