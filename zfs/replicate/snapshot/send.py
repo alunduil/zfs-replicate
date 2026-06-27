@@ -3,7 +3,7 @@
 import subprocess  # nosec
 from typing import Optional
 
-from .. import compress, receive
+from .. import compress, filesystem, receive
 from ..compress import Compression
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem
@@ -26,11 +26,13 @@ def send(  # pylint: disable=R0917,R0913,R0914
 
     compress_command, decompress_command = compress.command(compression)
 
+    destination = filesystem.remote_dataset(remote, current.filesystem)
+
     receive_command = (
         compress_command
         + ssh_command
         + " "
-        + f'"{command(remote, current.filesystem, decompress_command, receive_options)}"'
+        + f'"{command(destination, decompress_command, receive_options)}"'
     )
 
     pipeline = send_command + " | " + receive_command
