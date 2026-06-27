@@ -4,11 +4,12 @@ import itertools
 
 import click
 
-from .. import filesystem, snapshot, ssh, task
+from .. import filesystem, receive, snapshot, ssh, task
 from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
 from ..ssh import Cipher
+from . import options
 from .click import EnumChoice
 
 
@@ -70,6 +71,7 @@ from .click import EnumChoice
         " example when the destination cannot preserve encryption."
     ),
 )
+@options.receive_group
 @click.argument("host", required=True)  # type: ignore[misc]
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
@@ -84,6 +86,7 @@ def main(  # pylint: disable=R0917,R0914,R0913
     cipher: Cipher,
     compression: Compression,
     raw: bool,
+    receive_options: receive.Options,
     host: str,
     remote_fs: FileSystem,
     local_fs: FileSystem,
@@ -145,5 +148,6 @@ def main(  # pylint: disable=R0917,R0914,R0913
             follow_delete=follow_delete,
             compression=compression,
             raw=raw,
+            receive_options=receive_options,
             ssh_command=ssh_command,
         )
