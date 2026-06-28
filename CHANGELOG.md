@@ -2,6 +2,16 @@
 
 ## unreleased
 
+### Added
+
+- Send-side flags for `zfs send`, grouped under the `--send-` prefix and mirroring `--receive-`: `--send-large-block` passes `-L`, `--send-embed` passes `-e`, `--send-compressed` passes `-c`, `--send-props` passes `-p`, and `--send-raw / --send-no-raw` toggles `-w` (default on, for encrypted data sets) (#392).
+- Receive-side flags for `zfs receive`, grouped under the `--receive-` prefix: `--receive-force / --receive-no-force` toggles `-F` (default on), `--receive-mount / --receive-no-mount` toggles `-u` (default mounts), `--receive-resume-token-capable` passes `-s`, and the repeatable `--receive-set KEY=VALUE` maps to `-o KEY=VALUE` for properties such as `readonly`, `canmount`, or `mountpoint` on the replica without a post-receive patch-up (#393).
+
+### Changed
+
+- Renamed `--raw / --no-raw` (4.1.0) to `--send-raw / --send-no-raw` so every send flag shares the `--send-` prefix; the default still sends `zfs send -w` for encrypted data sets (#392).
+- `--follow-delete` no longer implies `zfs send -p`. Send properties are now controlled solely by `--send-props`; pass it alongside `--follow-delete` to keep the earlier behaviour (#392).
+
 ## 4.1.0 -- 2026-05-09
 
 ### Added

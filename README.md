@@ -62,6 +62,33 @@ _N.B., don't use the root user to access your remote system._
 1. `poetry install`
 1. `poetry run -- zfs-replicate --help`
 
+## Setting properties on the replica
+
+To match your destination's policy without a post-receive patch-up, set ZFS
+properties on the received data set with `--receive-set KEY=VALUE` (repeatable)
+and control mounting with `--receive-no-mount`. For example, to set the replica
+`readonly` and keep it from mounting on the destination:
+
+```bash
+zfs-replicate --receive-no-mount --receive-set readonly=on --receive-set canmount=noauto \
+  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
+```
+
+See `zfs-replicate --help` for the full set of `--receive-` flags.
+
+## Tuning the send stream
+
+To replicate a large-block, already-compressed data set without re-reading or
+recompressing it on the way out, tune the `zfs send` stream with the `--send-`
+flags:
+
+```bash
+zfs-replicate --send-large-block --send-compressed \
+  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
+```
+
+See `zfs-replicate --help` for the full set of `--send-` flags.
+
 ## Documentation
 
 * `zfs-replicate --help`: Help for zfs-replicate.
