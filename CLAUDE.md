@@ -5,7 +5,7 @@ project-local context it needs to land changes that fit the
 conventions here. Two friction patterns surfaced during a
 recent `/insights` review and motivated this file (see issue
 #445): agents reaching for `curl` and first-principles
-scripts when local `tools` already cover the task, and agents
+scripts when local tools already cover the task, and agents
 bleeding scope across linked or sibling issues.
 
 ## Tool inventory
@@ -60,11 +60,10 @@ without having to call the skill explicitly.
 
 ## Why this project specifically
 
-Five open release milestones (4.2.0 through 5.0.0) are
-tracked with a `blocked` label already in active use, which
-signals that sequencing matters here. Clear scope discipline
-avoids prematurely shipping something blocked by an earlier
-milestone. The Python tool stack is rich enough (`black`,
+GitHub lists the open release milestones, and the active
+`blocked` label signals that sequencing matters here. Clear
+scope discipline avoids prematurely shipping something blocked
+by an earlier milestone. The Python tool stack is rich enough (`black`,
 `isort`, `flake8`, `bandit`, `pylint`, `pydocstyle`, `mypy`,
 all gated through `pre-commit`) that an agent can plausibly
 reinvent any one of those checks unless the inventory is in
