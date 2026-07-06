@@ -91,7 +91,7 @@ repos:
     rev: v3.13.0
     hooks:
       - id: vale
-        exclude: '^(styles/|LICENSE$|\.envrc$)'
+        exclude: '^(styles/|LICENSE$|\.envrc$|CLAUDE\.md$)'
         exclude_types:
           - gitignore
           - ini

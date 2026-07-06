@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(poetry run pytest:*)",
+      "Bash(poetry run zfs-replicate --help:*)",
+      "Bash(pre-commit run:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git status:*)",
+      "Bash(git show:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "poetry install --quiet && pre-commit install --quiet --install-hooks"
+          }
+        ]
+      }
+    ]
+  }
+}
