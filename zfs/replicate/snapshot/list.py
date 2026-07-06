@@ -2,7 +2,8 @@
 
 from typing import List, Optional
 
-from .. import subprocess  # nosec
+from .. import subprocess
+from ..command import Command, remote, scrubbed
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
@@ -11,41 +12,39 @@ from .type import Snapshot
 def list(  # pylint: disable=W0622
     filesystem: FileSystem,  # pylint: disable=W0621
     recursive: bool,
-    ssh_command: Optional[str] = None,
+    ssh_command: Optional[Command] = None,
 ) -> List[Snapshot]:
     """List ZFS snapshots."""
     command = _list(filesystem, recursive)
     if ssh_command is not None:
-        command = ssh_command + " " + command
+        command = remote(ssh_command, command)
 
-    proc = subprocess.open(command)
+    result = subprocess.run(command)
 
-    output, error = proc.communicate()
-    if error is not None:
-        error = (
-            error.strip(b"\n")
-            .strip(b"\r")
-            .replace(b"WARNING: ENABLED NONE CIPHER", b"")
-        )
+    error = (
+        result.stderr.strip(b"\n")
+        .strip(b"\r")
+        .replace(b"WARNING: ENABLED NONE CIPHER", b"")
+    )
 
-    if proc.returncode:
+    if result.returncode:
         raise ZFSReplicateError(
             f"error encountered while listing snapshots of '{filesystem.name}': {error!r}",
             filesystem,
             error,
         )
 
-    return _snapshots(output)
+    return _snapshots(result.stdout)
 
 
-def _list(filesystem: FileSystem, recursive: bool) -> str:  # pylint: disable=W0621
+def _list(filesystem: FileSystem, recursive: bool) -> Command:  # pylint: disable=W0621
     """ZFS List Snapshot command."""
-    options = ["-H", "-t snapshot", "-p", "-o name,creation", "-r"]
+    options = ["-H", "-t", "snapshot", "-p", "-o", "name,creation", "-r"]
 
     if not recursive:
-        options.append("-d 1")
+        options.extend(["-d", "1"])
 
-    return f"/usr/bin/env - zfs list {' '.join(options)} '{filesystem.name}'"
+    return scrubbed("zfs", "list", *options, filesystem.name)
 
 
 def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:

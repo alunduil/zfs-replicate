@@ -1,9 +1,10 @@
 """ZFs FileSystem List."""
 
 import re
-from typing import List
+from typing import List, Optional
 
-from .. import subprocess  # nosec
+from .. import subprocess
+from ..command import Command, remote, scrubbed
 from ..error import ZFSReplicateError
 from . import type  # pylint: disable=W0622
 from .type import FileSystem
@@ -12,37 +13,35 @@ RE_WHITESPACE = re.compile(b"[ \t]+")
 
 
 def list(  # pylint: disable=W0622
-    filesystem: FileSystem, ssh_command: str
+    filesystem: FileSystem, ssh_command: Optional[Command] = None
 ) -> List[FileSystem]:
     """List ZFS FileSystem."""
     command = _list(filesystem)
     if ssh_command is not None:
-        command = ssh_command + " " + command
+        command = remote(ssh_command, command)
 
-    proc = subprocess.open(command)
+    result = subprocess.run(command)
 
-    output, error = proc.communicate()
-    if error is not None:
-        error = (
-            error.strip(b"\n")
-            .strip(b"\r")
-            .replace(b"WARNING: ENABLED NONE CIPHER", b"")
-        )
+    error = (
+        result.stderr.strip(b"\n")
+        .strip(b"\r")
+        .replace(b"WARNING: ENABLED NONE CIPHER", b"")
+    )
 
-    if proc.returncode:
+    if result.returncode:
         raise ZFSReplicateError(
             f"error encountered while listing filesystems of '{filesystem.name}': {error!r}",
             filesystem,
             error,
         )
 
-    return _filesystems(output)
+    return _filesystems(result.stdout)
 
 
-def _list(filesystem: FileSystem) -> str:
-    options = ["-H", "-o name,readonly", "-t filesystem,volume", "-r"]
+def _list(filesystem: FileSystem) -> Command:
+    options = ["-H", "-o", "name,readonly", "-t", "filesystem,volume", "-r"]
 
-    return f"/usr/bin/env - zfs list {' '.join(options)} '{filesystem.name}'"
+    return scrubbed("zfs", "list", *options, filesystem.name)
 
 
 def _filesystems(zfs_list_output: bytes) -> List[FileSystem]:

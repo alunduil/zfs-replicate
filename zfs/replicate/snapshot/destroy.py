@@ -1,24 +1,22 @@
 """ZFS Snapshot destruction."""
 
-from .. import subprocess  # nosec
+from .. import subprocess
+from ..command import Command, remote, scrubbed
 from ..error import ZFSReplicateError
 from .type import Snapshot
 
 
-def destroy(snapshot: Snapshot, ssh_command: str) -> None:
+def destroy(snapshot: Snapshot, ssh_command: Command) -> None:
     """Destroy a remote snapshot."""
-    command = ssh_command + " " + _destroy(snapshot)
+    result = subprocess.run(remote(ssh_command, _destroy(snapshot)))
 
-    proc = subprocess.open(command)
-
-    _, error = proc.communicate()
-    if proc.returncode:
+    if result.returncode:
         raise ZFSReplicateError(
-            f"unable to destroy snapshot: '{snapshot.filesystem.name}@{snapshot.name}': {error!r}",
+            f"unable to destroy snapshot: '{snapshot.filesystem.name}@{snapshot.name}': {result.stderr!r}",
             snapshot,
-            error,
+            result.stderr,
         )
 
 
-def _destroy(snapshot: Snapshot) -> str:
-    return f"/usr/bin/env - zfs destroy '{snapshot.filesystem.name}@{snapshot.name}'"
+def _destroy(snapshot: Snapshot) -> Command:
+    return scrubbed("zfs", "destroy", f"{snapshot.filesystem.name}@{snapshot.name}")
