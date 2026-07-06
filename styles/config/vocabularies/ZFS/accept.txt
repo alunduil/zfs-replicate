@@ -1,5 +1,8 @@
 argparse
+journald
 release-please
 semver
 subprocess
+syslog
+systemd
 Zettabyte

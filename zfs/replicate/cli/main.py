@@ -1,6 +1,7 @@
 """Main function zfs-replicate."""
 
 import itertools
+import logging
 
 import click
 
@@ -12,9 +13,43 @@ from ..ssh import Cipher
 from . import options
 from .click import EnumChoice
 
+logger = logging.getLogger(__name__)
+
+_LEVELS = {0: logging.WARNING, 1: logging.INFO}
+
+
+def _configure_logging(verbosity: int) -> None:
+    """Route the ``zfs.replicate`` logger to stderr at a verbosity-derived level.
+
+    ``-v`` lifts it to ``INFO`` and ``-vv`` (or more) to ``DEBUG``; the timestamp
+    only appears at ``DEBUG`` where correlating interleaved records matters. The
+    handler goes on the package logger so every ``getLogger(__name__)`` in the
+    tree inherits it, and existing handlers are cleared first so repeated
+    in-process invocations (e.g. tests) don't stack duplicates.
+    """
+    level = _LEVELS.get(verbosity, logging.DEBUG)
+
+    package_logger = logging.getLogger("zfs.replicate")
+    package_logger.setLevel(level)
+    package_logger.handlers.clear()
+
+    fmt = "%(levelname)s %(name)s %(message)s"
+    if level <= logging.DEBUG:
+        fmt = "%(asctime)s " + fmt
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter(fmt))
+    package_logger.addHandler(handler)
+    package_logger.propagate = False
+
 
 @click.command()  # type: ignore[misc]
-@click.option("--verbose", "-v", is_flag=True, help="Print additional output.")  # type: ignore[misc]
+@click.option(  # type: ignore[misc]
+    "--verbose",
+    "-v",
+    count=True,
+    help="Increase log verbosity (-v for INFO, -vv for DEBUG).",
+)
 @click.option(  # type: ignore[misc]
     "--dry-run",
     is_flag=True,
@@ -68,7 +103,7 @@ from .click import EnumChoice
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
 def main(  # pylint: disable=R0917,R0914,R0913
-    verbose: bool,
+    verbose: int,
     dry_run: bool,
     follow_delete: bool,
     recursive: bool,
@@ -84,29 +119,25 @@ def main(  # pylint: disable=R0917,R0914,R0913
     local_fs: FileSystem,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
+    _configure_logging(verbose)
+
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
-    if verbose:
-        click.echo(f"checking filesystem {local_fs.name}")
+    logger.info("checking filesystem %s", local_fs.name)
 
     l_snaps = snapshot.list(local_fs, recursive=recursive)
     # Improvement: exclusions from snapshots to replicate.
 
-    if verbose:
-        click.echo(f"found {len(l_snaps)} snapshots on {local_fs.name}")
-        click.echo()
+    logger.info("found %d snapshots on %s", len(l_snaps), local_fs.name)
 
     r_filesystem = filesystem.remote_dataset(remote_fs, local_fs)
     filesystem.create(r_filesystem, ssh_command=ssh_command)
 
-    if verbose:
-        click.echo(f"checking filesystem {host}/{r_filesystem.name}")
+    logger.info("checking filesystem %s/%s", host, r_filesystem.name)
 
     r_snaps = snapshot.list(r_filesystem, recursive=recursive, ssh_command=ssh_command)
 
-    if verbose:
-        click.echo(f"found {len(r_snaps)} snapshots on {r_filesystem.name}")
-        click.echo()
+    logger.info("found %d snapshots on %s", len(r_snaps), r_filesystem.name)
 
     filesystem_l_snaps = {
         filesystem: list(l_snaps)
@@ -124,7 +155,9 @@ def main(  # pylint: disable=R0917,R0914,R0913
         remote_fs, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete
     )
 
-    if verbose:
+    # The plan is the point of --dry-run, so print it to stdout on the user's
+    # explicit request; --verbose keeps surfacing it ahead of a real run.
+    if dry_run or verbose:
         click.echo(task.report(tasks))
 
     if not dry_run:
