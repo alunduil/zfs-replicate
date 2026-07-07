@@ -1,24 +1,22 @@
 """ZFS FileSystem destruction."""
 
-from .. import subprocess  # nosec
+from .. import process
+from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from .type import FileSystem
 
 
-def destroy(filesystem: FileSystem, ssh_command: str) -> None:
+def destroy(filesystem: FileSystem, ssh_command: Command) -> None:
     """Destroy a remote filesystem."""
-    command = ssh_command + " " + _destroy(filesystem)
+    result = process.run(over_ssh(ssh_command, _destroy(filesystem)))
 
-    proc = subprocess.open(command)
-
-    _, error = proc.communicate()
-    if proc.returncode:
+    if result.returncode:
         raise ZFSReplicateError(
-            f"unable to destroy dataset: '{filesystem.dataset}': {error!r}",
+            f"unable to destroy dataset: '{filesystem.dataset}': {result.stderr!r}",
             filesystem,
-            error,
+            result.stderr,
         )
 
 
-def _destroy(filesystem: FileSystem) -> str:
-    return f"/usr/bin/env - zfs destroy -r '{filesystem}'"
+def _destroy(filesystem: FileSystem) -> Command:
+    return Command.with_empty_env("zfs", "destroy", "-r", filesystem.name)

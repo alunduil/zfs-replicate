@@ -1,10 +1,11 @@
 """ZFS Receive Command Mapping."""
 
+from ..command import Command
 from ..filesystem import FileSystem
 from .type import Options
 
 
-def command(destination: FileSystem, options: Options) -> str:
+def command(destination: FileSystem, options: Options) -> Command:
     """Build the remote ``zfs receive`` invocation for a destination.
 
     Returns just the ``zfs receive`` call (like ``_send`` returns just
@@ -13,6 +14,6 @@ def command(destination: FileSystem, options: Options) -> str:
     remote data set, so it carries no knowledge of how local data sets map
     onto the remote.
     """
-    arguments = [*options.to_flags(), f"-d '{destination.name}'"]
-
-    return f"/usr/bin/env - zfs receive {' '.join(arguments)}"
+    return Command.with_empty_env(
+        "zfs", "receive", *options.to_flags(), "-d", destination.name
+    )

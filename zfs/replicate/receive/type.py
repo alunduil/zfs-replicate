@@ -10,8 +10,6 @@ class Options:
 
     The defaults reproduce zfs-replicate's long-standing ``zfs receive -F``
     behaviour, so a bare ``Options()`` means "nothing changes from before".
-    ``properties`` values are interpolated into the remote shell command
-    unquoted, so keep them shell-safe.
     """
 
     force: bool = True
@@ -20,7 +18,11 @@ class Options:
     properties: Mapping[str, str] = field(default_factory=dict)
 
     def to_flags(self) -> List[str]:
-        """Render these settings as ``zfs receive`` flags (the caller adds ``-d``)."""
+        """Render these settings as ``zfs receive`` argv tokens (the caller adds ``-d``).
+
+        Each ``-o`` property is two tokens (``"-o"`` then ``"key=value"``) so
+        the value stays a single argument no matter what it contains.
+        """
         flags = []
 
         if self.force:
@@ -32,6 +34,7 @@ class Options:
         if self.resume:
             flags.append("-s")
 
-        flags.extend(f"-o {key}={value}" for key, value in self.properties.items())
+        for key, value in self.properties.items():
+            flags.extend(["-o", f"{key}={value}"])
 
         return flags

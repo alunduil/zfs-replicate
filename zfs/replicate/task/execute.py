@@ -4,6 +4,7 @@ import itertools
 from typing import List, Tuple
 
 from .. import filesystem, optional, receive, send, snapshot
+from ..command import Command
 from ..compress import Compression
 from ..filesystem import FileSystem
 from .type import Action, Task
@@ -12,7 +13,7 @@ from .type import Action, Task
 def execute(  # pylint: disable=R0917,R0913
     remote: FileSystem,
     tasks: List[Tuple[FileSystem, List[Task]]],
-    ssh_command: str,
+    ssh_command: Command,
     compression: Compression,
     send_options: send.Options,
     receive_options: receive.Options,
@@ -44,12 +45,12 @@ def execute(  # pylint: disable=R0917,R0913
                 )
 
 
-def _create(tasks: List[Task], ssh_command: str) -> None:
+def _create(tasks: List[Task], ssh_command: Command) -> None:
     for task in tasks:
         filesystem.create(task.filesystem, ssh_command=ssh_command)
 
 
-def _destroy(tasks: List[Task], ssh_command: str) -> None:
+def _destroy(tasks: List[Task], ssh_command: Command) -> None:
     for task in tasks:
         if task.snapshot is None:
             filesystem.destroy(task.filesystem, ssh_command=ssh_command)
@@ -60,7 +61,7 @@ def _destroy(tasks: List[Task], ssh_command: str) -> None:
 def _send(  # pylint: disable=R0917,R0913
     remote: FileSystem,
     tasks: List[Task],
-    ssh_command: str,
+    ssh_command: Command,
     compression: Compression,
     send_options: send.Options,
     receive_options: receive.Options,
