@@ -4,7 +4,7 @@ import re
 from typing import List
 
 from .. import subprocess
-from ..command import Command, over_ssh, scrubbed
+from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from . import type  # pylint: disable=W0622
 from .type import FileSystem
@@ -37,7 +37,7 @@ def list(  # pylint: disable=W0622
 def _list(filesystem: FileSystem) -> Command:
     options = ["-H", "-o", "name,readonly", "-t", "filesystem,volume", "-r"]
 
-    return scrubbed("zfs", "list", *options, filesystem.name)
+    return Command.with_empty_env("zfs", "list", *options, filesystem.name)
 
 
 def _filesystems(zfs_list_output: bytes) -> List[FileSystem]:

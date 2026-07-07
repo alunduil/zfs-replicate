@@ -2,7 +2,7 @@
 
 from typing import Optional, Tuple
 
-from ..command import Command, scrubbed
+from ..command import Command
 from .type import Compression
 
 
@@ -12,7 +12,7 @@ def command(compression: Compression) -> Tuple[Optional[Command], Optional[Comma
     ``OFF`` yields ``(None, None)`` -- no compression stage.
     """
     if compression == Compression.LZ4:
-        return (scrubbed("lz4"), scrubbed("lz4", "-d"))
+        return (Command.with_empty_env("lz4"), Command.with_empty_env("lz4", "-d"))
 
     if compression == Compression.OFF:
         return (None, None)

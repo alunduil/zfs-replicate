@@ -3,7 +3,7 @@
 from typing import IO, List, Optional
 
 from .. import compress, filesystem, receive, subprocess
-from ..command import Command, over_ssh, scrubbed
+from ..command import Command, over_ssh
 from ..compress import Compression
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem
@@ -107,4 +107,6 @@ def _send(
     if previous is not None:
         flags.extend(["-i", f"{previous.filesystem.name}@{previous.name}"])
 
-    return scrubbed("zfs", "send", *flags, f"{current.filesystem.name}@{current.name}")
+    return Command.with_empty_env(
+        "zfs", "send", *flags, f"{current.filesystem.name}@{current.name}"
+    )

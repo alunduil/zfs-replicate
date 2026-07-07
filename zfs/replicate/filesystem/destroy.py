@@ -1,7 +1,7 @@
 """ZFS FileSystem destruction."""
 
 from .. import subprocess
-from ..command import Command, over_ssh, scrubbed
+from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from .type import FileSystem
 
@@ -19,4 +19,4 @@ def destroy(filesystem: FileSystem, ssh_command: Command) -> None:
 
 
 def _destroy(filesystem: FileSystem) -> Command:
-    return scrubbed("zfs", "destroy", "-r", filesystem.name)
+    return Command.with_empty_env("zfs", "destroy", "-r", filesystem.name)

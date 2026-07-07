@@ -3,7 +3,7 @@
 from typing import List, Optional
 
 from .. import subprocess
-from ..command import Command, over_ssh, scrubbed
+from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
@@ -44,7 +44,7 @@ def _list(filesystem: FileSystem, recursive: bool) -> Command:  # pylint: disabl
     if not recursive:
         options.extend(["-d", "1"])
 
-    return scrubbed("zfs", "list", *options, filesystem.name)
+    return Command.with_empty_env("zfs", "list", *options, filesystem.name)
 
 
 def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:

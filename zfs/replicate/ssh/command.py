@@ -2,7 +2,7 @@
 
 from typing import List
 
-from ..command import Command, scrubbed
+from ..command import Command
 from .cipher import Cipher
 
 
@@ -38,4 +38,4 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
 
     options.extend(["-p", str(port), host])
 
-    return scrubbed("ssh", *options)
+    return Command.with_empty_env("ssh", *options)

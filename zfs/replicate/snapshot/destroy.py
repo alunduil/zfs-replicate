@@ -1,7 +1,7 @@
 """ZFS Snapshot destruction."""
 
 from .. import subprocess
-from ..command import Command, over_ssh, scrubbed
+from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from .type import Snapshot
 
@@ -19,4 +19,6 @@ def destroy(snapshot: Snapshot, ssh_command: Command) -> None:
 
 
 def _destroy(snapshot: Snapshot) -> Command:
-    return scrubbed("zfs", "destroy", f"{snapshot.filesystem.name}@{snapshot.name}")
+    return Command.with_empty_env(
+        "zfs", "destroy", f"{snapshot.filesystem.name}@{snapshot.name}"
+    )

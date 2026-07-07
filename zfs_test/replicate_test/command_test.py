@@ -3,9 +3,9 @@
 import zfs.replicate.command as sut
 
 
-def test_scrubbed_prefixes_env() -> None:
-    """Env scrub goes in front of the program and its args."""
-    assert sut.scrubbed("zfs", "list", "-H").argv == [  # nosec
+def test_with_empty_env_prefixes_env() -> None:
+    """The env-empty prefix goes in front of the program and its args."""
+    assert sut.Command.with_empty_env("zfs", "list", "-H").argv == [  # nosec
         "/usr/bin/env",
         "-",
         "zfs",
@@ -30,8 +30,10 @@ def test_render_leaves_safe_tokens_unquoted() -> None:
 
 def test_over_ssh_appends_single_quoted_argument() -> None:
     """Wrapping hands ssh the command as one shell-safe argument."""
-    ssh = sut.scrubbed("ssh", "host")
-    wrapped = sut.over_ssh(ssh, sut.scrubbed("zfs", "receive", "pool/a b"))
+    ssh = sut.Command.with_empty_env("ssh", "host")
+    wrapped = sut.over_ssh(
+        ssh, sut.Command.with_empty_env("zfs", "receive", "pool/a b")
+    )
 
     assert wrapped.program == "/usr/bin/env"  # nosec
     assert wrapped.args[:3] == ["-", "ssh", "host"]  # nosec
@@ -40,9 +42,11 @@ def test_over_ssh_appends_single_quoted_argument() -> None:
 
 def test_over_ssh_joins_commands_as_a_pipeline() -> None:
     """Multiple wrapped commands become a single ' | ' remote pipeline argument."""
-    ssh = sut.scrubbed("ssh", "host")
+    ssh = sut.Command.with_empty_env("ssh", "host")
     wrapped = sut.over_ssh(
-        ssh, sut.scrubbed("lz4", "-d"), sut.scrubbed("zfs", "receive")
+        ssh,
+        sut.Command.with_empty_env("lz4", "-d"),
+        sut.Command.with_empty_env("zfs", "receive"),
     )
 
     assert (

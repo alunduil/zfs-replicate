@@ -1,6 +1,6 @@
 """ZFS Receive Command Mapping."""
 
-from ..command import Command, scrubbed
+from ..command import Command
 from ..filesystem import FileSystem
 from .type import Options
 
@@ -14,4 +14,6 @@ def command(destination: FileSystem, options: Options) -> Command:
     remote data set, so it carries no knowledge of how local data sets map
     onto the remote.
     """
-    return scrubbed("zfs", "receive", *options.to_flags(), "-d", destination.name)
+    return Command.with_empty_env(
+        "zfs", "receive", *options.to_flags(), "-d", destination.name
+    )

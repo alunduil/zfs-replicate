@@ -3,7 +3,7 @@
 import os.path
 
 from .. import subprocess
-from ..command import Command, over_ssh, scrubbed
+from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..list import inits
 from . import type  # pylint: disable=W0622
@@ -48,4 +48,4 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
 
 
 def _create(filesystem: str) -> Command:
-    return scrubbed("zfs", "create", "-o", "readonly=on", filesystem)
+    return Command.with_empty_env("zfs", "create", "-o", "readonly=on", filesystem)
