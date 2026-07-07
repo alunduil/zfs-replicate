@@ -37,7 +37,7 @@ class Command:
 
     @property
     def argv(self) -> List[str]:
-        """The full argument vector, ``program`` first."""
+        """The command as one list, the form the exec layer and ``render`` consume."""
         return [self.program, *self.args]
 
     def render(self) -> str:
@@ -61,10 +61,9 @@ def scrubbed(program: str, *args: str) -> Command:
 def over_ssh(ssh_command: Command, *commands: Command) -> Command:
     """Wrap ``commands`` to run over ssh through ``ssh_command``.
 
-    Each command is rendered to a remote-shell-safe string; multiple commands
-    are joined with ``" | "`` to form the remote pipeline (for example a remote
-    decompress feeding ``zfs receive``). The rendered string is appended to the
-    ssh argv as a single argument, so the local exec stays shell-free.
+    Multiple commands join with ``" | "`` into one remote pipeline (e.g. a
+    decompress feeding ``zfs receive``), rendered shell-safe and handed to ssh
+    as a single argument so the local exec stays shell-free.
     """
     pipeline = " | ".join(cmd.render() for cmd in commands)
 
