@@ -2,7 +2,7 @@
 
 import os.path
 
-from .. import subprocess
+from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..list import inits
@@ -28,7 +28,7 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
         if path in filesystems:
             continue
 
-        result = subprocess.run(over_ssh(ssh_command, _create(path)))
+        result = process.run(over_ssh(ssh_command, _create(path)))
 
         error = (
             result.stderr.strip(b"\n")

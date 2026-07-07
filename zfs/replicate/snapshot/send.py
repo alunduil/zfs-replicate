@@ -2,7 +2,7 @@
 
 from typing import IO, List, Optional
 
-from .. import compress, filesystem, receive, subprocess
+from .. import compress, filesystem, process, receive
 from ..command import Command, over_ssh
 from ..compress import Compression
 from ..error import ZFSReplicateError
@@ -57,7 +57,7 @@ def _pipeline(
     send_command: Command,
     compress_command: Optional[Command],
     remote_command: Command,
-) -> "subprocess.Popen[bytes]":
+) -> "process.Popen[bytes]":
     """Wire ``send [ | compress ] | ssh`` as local processes without a shell.
 
     Only the receive side (over ssh) runs through a shell -- the remote one,
@@ -65,25 +65,25 @@ def _pipeline(
     parent's, so send/compress errors stay visible; the ssh stage's streams are
     captured for the caller's error handling.
     """
-    upstream = subprocess.open(
-        send_command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=None
+    upstream = process.open(
+        send_command, stdin=process.DEVNULL, stdout=process.PIPE, stderr=None
     )
 
     if compress_command is not None:
-        compressor = subprocess.open(
+        compressor = process.open(
             compress_command,
             stdin=upstream.stdout,
-            stdout=subprocess.PIPE,
+            stdout=process.PIPE,
             stderr=None,
         )
         _detach(upstream.stdout)
         upstream = compressor
 
-    proc = subprocess.open(
+    proc = process.open(
         remote_command,
         stdin=upstream.stdout,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        stdout=process.PIPE,
+        stderr=process.PIPE,
     )
     _detach(upstream.stdout)
 

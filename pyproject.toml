@@ -21,13 +21,6 @@ zfs-replicate = "zfs.replicate.cli.main:main"
 [project.urls]
 repository = "https://github.com/alunduil/zfs-replicate"
 
-[tool.bandit]
-# Every subprocess call routes through zfs/replicate/subprocess.py as an argv
-# list with shell=False, so B404 (import subprocess) and B603 (call with a
-# list) are pure noise here. B602 (shell=True) stays on to catch a real
-# regression.
-skips = ["B404", "B603"]
-
 [tool.fawltydeps]
 ignore_unused = ["coveralls", "pytest-cov", "vale"]
 

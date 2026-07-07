@@ -2,7 +2,7 @@
 
 from typing import List, Optional
 
-from .. import subprocess
+from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem, filesystem
@@ -19,7 +19,7 @@ def list(  # pylint: disable=W0622
     if ssh_command is not None:
         command = over_ssh(ssh_command, command)
 
-    result = subprocess.run(command)
+    result = process.run(command)
 
     error = (
         result.stderr.strip(b"\n")

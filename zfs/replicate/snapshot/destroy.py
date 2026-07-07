@@ -1,6 +1,6 @@
 """ZFS Snapshot destruction."""
 
-from .. import subprocess
+from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from .type import Snapshot
@@ -8,7 +8,7 @@ from .type import Snapshot
 
 def destroy(snapshot: Snapshot, ssh_command: Command) -> None:
     """Destroy a remote snapshot."""
-    result = subprocess.run(over_ssh(ssh_command, _destroy(snapshot)))
+    result = process.run(over_ssh(ssh_command, _destroy(snapshot)))
 
     if result.returncode:
         raise ZFSReplicateError(

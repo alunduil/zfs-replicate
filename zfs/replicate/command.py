@@ -1,8 +1,8 @@
-"""Structured subprocess commands.
+"""Structured commands executed without a shell.
 
 A :class:`Command` is an argv list -- a program plus its arguments -- rather
 than a shell string. Callers build one with :meth:`Command.with_empty_env`
-and hand it to ``subprocess.open``/``subprocess.run``, which exec it with
+and hand it to ``process.open``/``process.run``, which exec it with
 ``shell=False`` so dataset names, hostnames, and options are never re-parsed
 by a local shell.
 

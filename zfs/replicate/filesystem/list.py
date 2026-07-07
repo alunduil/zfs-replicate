@@ -3,7 +3,7 @@
 import re
 from typing import List
 
-from .. import subprocess
+from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from . import type  # pylint: disable=W0622
@@ -16,7 +16,7 @@ def list(  # pylint: disable=W0622
     filesystem: FileSystem, ssh_command: Command
 ) -> List[FileSystem]:
     """List ZFS FileSystem on the remote reachable through ``ssh_command``."""
-    result = subprocess.run(over_ssh(ssh_command, _list(filesystem)))
+    result = process.run(over_ssh(ssh_command, _list(filesystem)))
 
     error = (
         result.stderr.strip(b"\n")

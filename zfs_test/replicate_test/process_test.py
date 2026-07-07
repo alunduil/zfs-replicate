@@ -1,6 +1,6 @@
-"""Test the shell-free subprocess wrapper."""
+"""Test the shell-free process wrapper."""
 
-import zfs.replicate.subprocess as sut
+import zfs.replicate.process as sut
 from zfs.replicate.command import Command
 
 
