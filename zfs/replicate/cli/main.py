@@ -25,7 +25,9 @@ def _configure_logging(verbosity: int) -> None:
     only appears at ``DEBUG`` where correlating interleaved records matters. The
     handler goes on the package logger so every ``getLogger(__name__)`` in the
     tree inherits it, and existing handlers are cleared first so repeated
-    in-process invocations (e.g. tests) don't stack duplicates.
+    in-process invocations (e.g. tests) don't stack duplicates. Propagation is
+    left on -- the root logger carries no handlers of its own, so records reach
+    only this one, and keeping it lets ``caplog`` capture during tests.
     """
     level = _LEVELS.get(verbosity, logging.DEBUG)
 
@@ -40,7 +42,6 @@ def _configure_logging(verbosity: int) -> None:
     handler = logging.StreamHandler()
     handler.setFormatter(logging.Formatter(fmt))
     package_logger.addHandler(handler)
-    package_logger.propagate = False
 
 
 @click.command()  # type: ignore[misc]
