@@ -152,13 +152,14 @@ def test_invokes_without_stacktrace_verbose() -> None:
 
     .. code:: bash
 
-        zfs-replicate --verbose -l alunduil -i mypy.ini example.com bogus bogus.
+        zfs-replicate --verbosity DEBUG -l alunduil -i mypy.ini example.com bogus bogus.
     """
     runner = CliRunner()
     result = runner.invoke(
         sut.main,
         [
-            "--verbose",
+            "--verbosity",
+            "DEBUG",
             "-l",
             "alunduil",
             "-i",

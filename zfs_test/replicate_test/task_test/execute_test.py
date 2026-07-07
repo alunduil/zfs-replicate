@@ -22,6 +22,9 @@ def test_send_dispatch_logs(
         return None
 
     monkeypatch.setattr(snapshot, "send", fake_send)
+    # click_log.basic_config disables propagation on zfs.replicate, so caplog
+    # (which captures via the root logger) sees nothing without this.
+    monkeypatch.setattr(logging.getLogger("zfs.replicate"), "propagate", True)
 
     local = filesystem("tank/data")
     snap = Snapshot(filesystem=local, name="snap1", previous=None, timestamp=0)

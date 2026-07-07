@@ -4,6 +4,7 @@ import itertools
 import logging
 
 import click
+import click_log
 
 from .. import filesystem, receive, send, snapshot, ssh, task
 from ..compress import Compression
@@ -13,44 +14,13 @@ from ..ssh import Cipher
 from . import options
 from .click import EnumChoice
 
-logger = logging.getLogger(__name__)
-
-_LEVELS = {0: logging.WARNING, 1: logging.INFO}
-
-
-def _configure_logging(verbosity: int) -> None:
-    """Route the ``zfs.replicate`` logger to stderr at a verbosity-derived level.
-
-    ``-v`` lifts it to ``INFO`` and ``-vv`` (or more) to ``DEBUG``; the timestamp
-    only appears at ``DEBUG`` where correlating interleaved records matters. The
-    handler goes on the package logger so every ``getLogger(__name__)`` in the
-    tree inherits it, and existing handlers are cleared first so repeated
-    in-process invocations (e.g. tests) don't stack duplicates. Propagation is
-    left on -- the root logger carries no handlers of its own, so records reach
-    only this one, and keeping it lets ``caplog`` capture during tests.
-    """
-    level = _LEVELS.get(verbosity, logging.DEBUG)
-
-    package_logger = logging.getLogger("zfs.replicate")
-    package_logger.setLevel(level)
-    package_logger.handlers.clear()
-
-    fmt = "%(levelname)s %(name)s %(message)s"
-    if level <= logging.DEBUG:
-        fmt = "%(asctime)s " + fmt
-
-    handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter(fmt))
-    package_logger.addHandler(handler)
+logger = logging.getLogger("zfs.replicate")
+click_log.basic_config(logger)
 
 
 @click.command()  # type: ignore[misc]
-@click.option(  # type: ignore[misc]
-    "--verbose",
-    "-v",
-    count=True,
-    help="Increase log verbosity (-v for INFO, -vv for DEBUG).",
-)
+# Default WARNING keeps a plain run quiet; click-log's own default is INFO.
+@click_log.simple_verbosity_option(logger, default="WARNING")  # type: ignore[misc]
 @click.option(  # type: ignore[misc]
     "--dry-run",
     is_flag=True,
@@ -104,7 +74,6 @@ def _configure_logging(verbosity: int) -> None:
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
 def main(  # pylint: disable=R0917,R0914,R0913
-    verbose: int,
     dry_run: bool,
     follow_delete: bool,
     recursive: bool,
@@ -120,8 +89,6 @@ def main(  # pylint: disable=R0917,R0914,R0913
     local_fs: FileSystem,
 ) -> None:
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
-    _configure_logging(verbose)
-
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
     logger.info("checking filesystem %s", local_fs.name)
@@ -157,8 +124,8 @@ def main(  # pylint: disable=R0917,R0914,R0913
     )
 
     # The plan is the point of --dry-run, so print it to stdout on the user's
-    # explicit request; --verbose keeps surfacing it ahead of a real run.
-    if dry_run or verbose:
+    # explicit request. Operational progress is on the logger instead.
+    if dry_run:
         click.echo(task.report(tasks))
 
     if not dry_run:

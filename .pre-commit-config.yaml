@@ -42,6 +42,7 @@ repos:
       - id: pylint
         additional_dependencies:
           - click
+          - click-log
           - hypothesis
           - pytest
   - repo: https://github.com/PyCQA/pydocstyle
