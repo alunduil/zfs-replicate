@@ -3,7 +3,7 @@
 from typing import List, Optional
 
 from .. import subprocess
-from ..command import Command, remote, scrubbed
+from ..command import Command, over_ssh, scrubbed
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
@@ -17,7 +17,7 @@ def list(  # pylint: disable=W0622
     """List ZFS snapshots."""
     command = _list(filesystem, recursive)
     if ssh_command is not None:
-        command = remote(ssh_command, command)
+        command = over_ssh(ssh_command, command)
 
     result = subprocess.run(command)
 

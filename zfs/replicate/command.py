@@ -7,7 +7,7 @@ dataset names, hostnames, and options are never re-parsed by a local shell.
 
 The one shell that cannot be avoided is the *remote* one: ``ssh host a b c``
 joins its arguments with spaces and runs the result through the remote login
-shell. :func:`remote` renders the wrapped command with :func:`shlex.join`, so
+shell. :func:`over_ssh` renders the wrapped command with :func:`shlex.join`, so
 the remote side is quoted correctly for that shell instead of relying on
 hand-placed quotes.
 """
@@ -58,8 +58,8 @@ def scrubbed(program: str, *args: str) -> Command:
     return Command(program=ENV[0], args=[ENV[1], program, *args])
 
 
-def remote(ssh_command: Command, *commands: Command) -> Command:
-    """Wrap ``commands`` as a remote invocation of ``ssh_command``.
+def over_ssh(ssh_command: Command, *commands: Command) -> Command:
+    """Wrap ``commands`` to run over ssh through ``ssh_command``.
 
     Each command is rendered to a remote-shell-safe string; multiple commands
     are joined with ``" | "`` to form the remote pipeline (for example a remote

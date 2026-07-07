@@ -3,7 +3,7 @@
 from typing import IO, List, Optional
 
 from .. import compress, filesystem, receive, subprocess
-from ..command import Command, remote, scrubbed
+from ..command import Command, over_ssh, scrubbed
 from ..compress import Compression
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem
@@ -15,7 +15,7 @@ from .type import Snapshot
 # Threads the whole replication surface to assemble the send pipeline, so the
 # parameter count crosses pylint's threshold.
 def send(  # pylint: disable=R0917,R0913
-    remote_fs: FileSystem,
+    remote: FileSystem,
     current: Snapshot,
     ssh_command: Command,
     compression: Compression,
@@ -26,7 +26,7 @@ def send(  # pylint: disable=R0917,R0913
     """Send ZFS Snapshot."""
     compress_command, decompress_command = compress.command(compression)
 
-    destination = filesystem.remote_dataset(remote_fs, current.filesystem)
+    destination = filesystem.remote_dataset(remote, current.filesystem)
 
     remote_side: List[Command] = [
         cmd
@@ -37,7 +37,7 @@ def send(  # pylint: disable=R0917,R0913
     proc = _pipeline(
         _send(current, previous, options=send_options),
         compress_command,
-        remote(ssh_command, *remote_side),
+        over_ssh(ssh_command, *remote_side),
     )
 
     _, error = proc.communicate()
@@ -56,7 +56,7 @@ def send(  # pylint: disable=R0917,R0913
 def _pipeline(
     send_command: Command,
     compress_command: Optional[Command],
-    ssh_command: Command,
+    remote_command: Command,
 ) -> "subprocess.Popen[bytes]":
     """Wire ``send [ | compress ] | ssh`` as local processes without a shell.
 
@@ -80,7 +80,7 @@ def _pipeline(
         upstream = compressor
 
     proc = subprocess.open(
-        ssh_command,
+        remote_command,
         stdin=upstream.stdout,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

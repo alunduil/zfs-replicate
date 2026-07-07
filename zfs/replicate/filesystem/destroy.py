@@ -1,14 +1,14 @@
 """ZFS FileSystem destruction."""
 
 from .. import subprocess
-from ..command import Command, remote, scrubbed
+from ..command import Command, over_ssh, scrubbed
 from ..error import ZFSReplicateError
 from .type import FileSystem
 
 
 def destroy(filesystem: FileSystem, ssh_command: Command) -> None:
     """Destroy a remote filesystem."""
-    result = subprocess.run(remote(ssh_command, _destroy(filesystem)))
+    result = subprocess.run(over_ssh(ssh_command, _destroy(filesystem)))
 
     if result.returncode:
         raise ZFSReplicateError(

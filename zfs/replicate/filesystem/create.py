@@ -3,7 +3,7 @@
 import os.path
 
 from .. import subprocess
-from ..command import Command, remote, scrubbed
+from ..command import Command, over_ssh, scrubbed
 from ..error import ZFSReplicateError
 from ..list import inits
 from . import type  # pylint: disable=W0622
@@ -28,7 +28,7 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
         if path in filesystems:
             continue
 
-        result = subprocess.run(remote(ssh_command, _create(path)))
+        result = subprocess.run(over_ssh(ssh_command, _create(path)))
 
         error = (
             result.stderr.strip(b"\n")

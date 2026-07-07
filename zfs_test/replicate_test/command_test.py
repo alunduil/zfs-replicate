@@ -28,20 +28,22 @@ def test_render_leaves_safe_tokens_unquoted() -> None:
     )  # nosec
 
 
-def test_remote_appends_single_quoted_argument() -> None:
+def test_over_ssh_appends_single_quoted_argument() -> None:
     """Wrapping hands ssh the command as one shell-safe argument."""
     ssh = sut.scrubbed("ssh", "host")
-    wrapped = sut.remote(ssh, sut.scrubbed("zfs", "receive", "pool/a b"))
+    wrapped = sut.over_ssh(ssh, sut.scrubbed("zfs", "receive", "pool/a b"))
 
     assert wrapped.program == "/usr/bin/env"  # nosec
     assert wrapped.args[:3] == ["-", "ssh", "host"]  # nosec
     assert wrapped.args[-1] == "/usr/bin/env - zfs receive 'pool/a b'"  # nosec
 
 
-def test_remote_joins_commands_as_a_pipeline() -> None:
+def test_over_ssh_joins_commands_as_a_pipeline() -> None:
     """Multiple wrapped commands become a single ' | ' remote pipeline argument."""
     ssh = sut.scrubbed("ssh", "host")
-    wrapped = sut.remote(ssh, sut.scrubbed("lz4", "-d"), sut.scrubbed("zfs", "receive"))
+    wrapped = sut.over_ssh(
+        ssh, sut.scrubbed("lz4", "-d"), sut.scrubbed("zfs", "receive")
+    )
 
     assert (
         wrapped.args[-1] == "/usr/bin/env - lz4 -d | /usr/bin/env - zfs receive"
