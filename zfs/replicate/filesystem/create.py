@@ -2,7 +2,8 @@
 
 import os.path
 
-from .. import subprocess  # nosec
+from .. import process
+from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..list import inits
 from . import type  # pylint: disable=W0622
@@ -10,7 +11,7 @@ from .list import list  # pylint: disable=W0622
 from .type import FileSystem
 
 
-def create(filesystem: FileSystem, ssh_command: str) -> None:
+def create(filesystem: FileSystem, ssh_command: Command) -> None:
     """Create a Remote FileSystem."""
     if filesystem.name is None:
         raise ZFSReplicateError(
@@ -27,18 +28,15 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
         if path in filesystems:
             continue
 
-        command = ssh_command + " " + _create(path)
+        result = process.run(over_ssh(ssh_command, _create(path)))
 
-        proc = subprocess.open(command)
-
-        _, error = proc.communicate()
         error = (
-            error.strip(b"\n")
+            result.stderr.strip(b"\n")
             .strip(b"\r")
             .replace(b"WARNING: ENABLED NONE CIPHER", b"")
         )
 
-        if proc.returncode:
+        if result.returncode:
             if b"successfully created, but not mounted" in error:
                 return  # Ignore this error.
 
@@ -49,5 +47,5 @@ def create(filesystem: FileSystem, ssh_command: str) -> None:
             )
 
 
-def _create(filesystem: str) -> str:
-    return f"/usr/bin/env - zfs create -o readonly=on {filesystem}"
+def _create(filesystem: str) -> Command:
+    return Command.with_empty_env("zfs", "create", "-o", "readonly=on", filesystem)

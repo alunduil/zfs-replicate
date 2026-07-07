@@ -179,3 +179,7 @@ cython_debug/
 #.idea/
 
 # End of https://www.toptal.com/developers/gitignore/api/python,git
+
+### Claude Code ###
+# User-specific overrides; committed defaults live in .claude/settings.json.
+.claude/settings.local.json
