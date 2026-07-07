@@ -97,6 +97,10 @@ sets the threshold to any of `CRITICAL`, `ERROR`, `WARNING` (the default),
 `INFO`, or `DEBUG`. The `--dry-run` plan and other command-level messages stay
 on standard output, so you can capture logs and results apart from each other.
 
+Off a terminal each line carries its sd-daemon priority prefix, so journald
+records the level and `journalctl -p err` (and the other priorities) filters by
+it. On a terminal the level stays a colored `error:`/`warning:` label instead.
+
 Under systemd, standard error already lands in the journal, with no extra
 configuration needed:
 
