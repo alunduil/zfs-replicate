@@ -1,3 +1,11 @@
+[MAIN]
+# zfs is a namespace package (no zfs/__init__.py), so pylint won't infer the
+# repository root as a source root from a file subset -- pre-commit passes only
+# changed files, so commits not touching an __init__-chained test module would
+# fail to resolve zfs.* imports. Declaring it keeps resolution independent of
+# which files are linted.
+source-roots=.
+
 [FORMAT]
 max-line-length=120
 
