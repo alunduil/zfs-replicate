@@ -1,7 +1,7 @@
 """ZFs FileSystem List."""
 
 import re
-from typing import List, Optional
+from typing import List
 
 from .. import subprocess
 from ..command import Command, over_ssh, scrubbed
@@ -13,14 +13,10 @@ RE_WHITESPACE = re.compile(b"[ \t]+")
 
 
 def list(  # pylint: disable=W0622
-    filesystem: FileSystem, ssh_command: Optional[Command] = None
+    filesystem: FileSystem, ssh_command: Command
 ) -> List[FileSystem]:
-    """List ZFS FileSystem."""
-    command = _list(filesystem)
-    if ssh_command is not None:
-        command = over_ssh(ssh_command, command)
-
-    result = subprocess.run(command)
+    """List ZFS FileSystem on the remote reachable through ``ssh_command``."""
+    result = subprocess.run(over_ssh(ssh_command, _list(filesystem)))
 
     error = (
         result.stderr.strip(b"\n")
