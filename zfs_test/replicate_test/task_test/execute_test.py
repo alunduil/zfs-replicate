@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 from zfs.replicate import receive, send, snapshot
+from zfs.replicate.command import Command
 from zfs.replicate.compress import Compression
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
@@ -34,7 +35,7 @@ def test_send_dispatch_logs(
         execute(
             filesystem("backup"),
             [(local, [task])],
-            ssh_command="ssh backup.example.com",
+            ssh_command=Command("ssh", ["backup.example.com"]),
             compression=Compression.LZ4,
             send_options=send.Options(
                 large_block=False, raw=True, embed=False, compressed=False, props=False
