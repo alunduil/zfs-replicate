@@ -7,10 +7,9 @@ from .type import Compression
 
 
 def command(compression: Compression) -> Tuple[Optional[Command], Optional[Command]]:
-    """Compress and decompress commands for a compression.
+    """Map a compression to its local compress and remote decompress commands.
 
-    The first runs locally on the send side; the second runs on the remote
-    receive side. ``OFF`` yields ``(None, None)`` -- no compression stage.
+    ``OFF`` yields ``(None, None)`` -- no compression stage.
     """
     if compression == Compression.LZ4:
         return (scrubbed("lz4"), scrubbed("lz4", "-d"))
