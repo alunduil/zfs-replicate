@@ -68,3 +68,17 @@ by an earlier milestone. The Python tool stack is rich enough (`black`,
 all gated through `pre-commit`) that an agent can plausibly
 reinvent any one of those checks unless the inventory is in
 front of it.
+
+## Session defaults
+
+`.claude/settings.json` ships committed Claude Code defaults
+so agent sessions start productive. A `SessionStart` hook runs
+`poetry install` and `pre-commit install`, mirroring
+`.devcontainer/post-create.sh`, so the environment and git
+hooks are ready before the first turn. The `permissions.allow`
+list pre-approves the inspection commands an agent reaches for
+early: `poetry run pytest`, `pre-commit run`, `poetry run
+zfs-replicate --help`, and `git diff`, `git log`, `git
+status`, and `git show`. Machine-specific overrides go in
+`.claude/settings.local.json`, which `.gitignore` keeps out of
+version control.
