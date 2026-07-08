@@ -41,6 +41,36 @@ as though it needs `curl`, a manual API call, or a one-off
 `Bash` helper, check the inventory first; the local tool that
 already covers it produces less churn for reviewers.
 
+## Python conventions
+
+Concrete rules for the Python written here. These are the
+current defaults, not aspirations; confirm against a
+neighbouring module before assuming.
+
+- **Typing:** old-style `typing` generics (`Optional[X]`,
+  `List[X]`, `Mapping[K, V]`, `Tuple[...]`). The floor is
+  Python 3.9 (`requires-python = ">=3.9"`), so PEP 604
+  `X | None` unions and bare `list[X]` generics are out.
+- **Running commands:** build a `Command` (frozen argv
+  dataclass, `zfs/replicate/command.py`, via
+  `Command.with_empty_env`) and run it through `process.open`
+  / `process.run` rather than calling `subprocess` yourself.
+  Remote commands quote through the `over_ssh` helper
+  (`shlex.join`), not hand-placed quotes.
+- **Domain types:** `@dataclass(frozen=True)`, in the
+  per-package `type.py` modules.
+- **Errors:** raise subclasses of `ZFSReplicateError`
+  (`zfs/replicate/error.py`), which extends
+  `click.ClickException`.
+- **Output:** library modules emit through
+  `logging.getLogger(__name__)`; the application logger is
+  `logging.getLogger("zfs.replicate")` (`cli/log.py`). Use
+  `click.echo` only for CLI results printed to stdout.
+- **Tests:** mirror `zfs/replicate/...` under
+  `zfs_test/replicate_test/...` with a `_test.py` suffix.
+  Hypothesis strategies live in the sibling
+  `<pkg>_test/strategies.py`.
+
 ## Scope discipline
 
 When working from numbered issues:
