@@ -1,7 +1,6 @@
 ## Summary
 
-<!-- Why this change matters: the user-visible outcome and the reasoning
-     behind it, so a reviewer understands the point without reading the diff.
+<!-- Why this change matters: the user-visible outcome and the reasoning behind it.
      Link the issue: Closes #… / Refs #… if it doesn't fully resolve it. -->
 
 ## Gotchas
