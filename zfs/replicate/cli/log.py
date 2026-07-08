@@ -11,13 +11,10 @@ module owns how that output is presented, which is the command line's concern.
 
 import logging
 import sys
-from typing import Callable, TypeVar
 
 import click_log
 
-NAME = "zfs.replicate"
-
-logger = logging.getLogger(NAME)
+logger = logging.getLogger("zfs.replicate")
 
 # Python level -> sd-daemon(3) / syslog priority.
 _PRIORITIES = {
@@ -53,16 +50,9 @@ class _Formatter(click_log.ColorFormatter):  # type: ignore[misc]
         )
 
 
-F = TypeVar("F", bound=Callable[..., object])
-
-
-def verbosity_option(command: F) -> F:
-    """Add ``--verbosity/-v`` wired to the ``zfs.replicate`` logger.
-
-    Default WARNING keeps a plain run quiet; click-log's own default is INFO.
-    """
-    decorate = click_log.simple_verbosity_option(logger, default="WARNING")
-    return decorate(command)  # type: ignore[no-any-return]
+# The --verbosity/-v option, wired to the zfs.replicate logger. Default WARNING
+# keeps a plain run quiet; click-log's own default is INFO.
+verbosity_option = click_log.simple_verbosity_option(logger, default="WARNING")
 
 
 def configure() -> None:
