@@ -1,7 +1,7 @@
 ## Summary
 
-<!-- Explain the change so a reviewer understands it without reading the
-     diff—what changed and why, leading with the user-visible outcome.
+<!-- Why this change matters: the user-visible outcome and the reasoning.
+     A reviewer should get the intent from this alone—never the diff.
      Link the issue: Closes #… / Refs #… if it doesn't fully resolve it. -->
 
 ## Gotchas
