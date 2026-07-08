@@ -8,7 +8,7 @@ on:
   schedule:
     - cron: '20 7 * * 1'
   push:
-    branches: [master]
+    branches: [main]
 
 # Read-only by default; the analysis job opts into the writes it needs.
 permissions: read-all
