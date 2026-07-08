@@ -1,5 +1,8 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
 ci:
   autofix_prs: false
 repos:
@@ -102,3 +105,25 @@ repos:
           - shell
           - toml
           - yaml
+  # Local commit-msg mirror of the Semantic Pull Request CI check: authors see
+  # a bad type before pushing. Runs only at commit-msg stage, so it stays out
+  # of `pre-commit run` (CI, pre-commit.ci) and is bypassable with --no-verify;
+  # the CI PR-title check is the enforced gate. Keep types in sync with that
+  # workflow and the CONTRIBUTING commit-messages table.
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages:
+          - commit-msg
+        args:
+          - feat
+          - fix
+          - perf
+          - refactor
+          - docs
+          - test
+          - build
+          - ci
+          - chore
+          - revert
