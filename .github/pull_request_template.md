@@ -12,7 +12,7 @@
 
 ## Test plan
 
-<!-- How you verified beyond CI—the behavior you exercised, steps a
-     reviewer could repeat. CI already runs the suite. -->
+<!-- What you checked by hand—e.g. replicating against a test pool and
+     confirming the snapshots landed. Delete this section if you didn't. -->
 
 -
