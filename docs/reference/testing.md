@@ -6,9 +6,8 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
 
 ## Layout
 
-- A test file mirrors its source path with a `_test` suffix on every segment:
-  `zfs/replicate/foo/bar.py` has its tests in
-  `zfs_test/replicate_test/foo_test/bar_test.py`.
+- A test module mirrors the module under test, with `_test` appended to every
+  path segment, directories and file alike.
 - Each test package directory carries an `__init__.py`. Two older directories
   (`cli_test/`, `task_test/`) predate this and lack one; new directories add it.
 
