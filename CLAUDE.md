@@ -54,10 +54,9 @@ neighbouring module before assuming.
 - **Running commands:** build a `Command` (frozen argv
   dataclass, `zfs/replicate/command.py`, via
   `Command.with_empty_env`) and run it through `process.open`
-  / `process.run`, which exec with `shell=False`. Never a
-  shell string or `shell=True`. Remote commands quote through
-  the `over_ssh` helper (`shlex.join`), not hand-placed
-  quotes.
+  / `process.run` rather than calling `subprocess` yourself.
+  Remote commands quote through the `over_ssh` helper
+  (`shlex.join`), not hand-placed quotes.
 - **Domain types:** `@dataclass(frozen=True)`, in the
   per-package `type.py` modules.
 - **Errors:** raise subclasses of `ZFSReplicateError`
