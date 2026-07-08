@@ -9,15 +9,14 @@ from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
 from ..ssh import Cipher
-from . import options
+from . import log, options
 from .click import EnumChoice
-from .log import configure, logger, verbosity_option
 
-configure()
+log.configure()
 
 
 @click.command()  # type: ignore[misc]
-@verbosity_option  # type: ignore[misc]
+@log.option  # type: ignore[misc]
 @click.option(  # type: ignore[misc]
     "--dry-run",
     is_flag=True,
@@ -88,21 +87,21 @@ def main(  # pylint: disable=R0917,R0914,R0913
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
-    logger.info("checking filesystem %s", local_fs.name)
+    log.logger.info("checking filesystem %s", local_fs.name)
 
     l_snaps = snapshot.list(local_fs, recursive=recursive)
     # Improvement: exclusions from snapshots to replicate.
 
-    logger.info("found %d snapshots on %s", len(l_snaps), local_fs.name)
+    log.logger.info("found %d snapshots on %s", len(l_snaps), local_fs.name)
 
     r_filesystem = filesystem.remote_dataset(remote_fs, local_fs)
     filesystem.create(r_filesystem, ssh_command=ssh_command)
 
-    logger.info("checking filesystem %s/%s", host, r_filesystem.name)
+    log.logger.info("checking filesystem %s/%s", host, r_filesystem.name)
 
     r_snaps = snapshot.list(r_filesystem, recursive=recursive, ssh_command=ssh_command)
 
-    logger.info("found %d snapshots on %s", len(r_snaps), r_filesystem.name)
+    log.logger.info("found %d snapshots on %s", len(r_snaps), r_filesystem.name)
 
     filesystem_l_snaps = {
         filesystem: list(l_snaps)

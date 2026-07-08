@@ -51,8 +51,9 @@ class _Formatter(click_log.ColorFormatter):  # type: ignore[misc]
 
 
 # The --verbosity/-v option, wired to the zfs.replicate logger. Default WARNING
-# keeps a plain run quiet; click-log's own default is INFO.
-verbosity_option = click_log.simple_verbosity_option(logger, default="WARNING")
+# keeps a plain run quiet; click-log's own default is INFO. Read qualified as
+# ``log.option``.
+option = click_log.simple_verbosity_option(logger, default="WARNING")
 
 
 def configure() -> None:
