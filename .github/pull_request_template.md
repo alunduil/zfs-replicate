@@ -9,8 +9,3 @@
      reviewer could repeat. CI already runs the suite. -->
 
 -
-
-## Breaking changes
-
-<!-- No—or yes: what breaks and how to migrate. (A breaking change is
-     also flagged by `!` in the Conventional Commits PR title.) -->
