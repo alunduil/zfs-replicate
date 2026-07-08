@@ -1,8 +1,9 @@
 name: Semantic Pull Request
 
-# Squash-merge lands the PR title as the commit on main, so the PR title is
-# what release-please parses. Validate it against the Conventional Commits
-# dialect documented in CONTRIBUTING.md.
+# Squash-merge lands the PR title as the commit on main, so the title—not the
+# individual commits—is what release-please parses for version bumps.
+# Keep the type list in sync with CONTRIBUTING and the conventional-pre-commit
+# hook.
 
 on:
   pull_request:

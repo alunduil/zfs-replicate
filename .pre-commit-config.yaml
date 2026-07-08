@@ -105,11 +105,10 @@ repos:
           - shell
           - toml
           - yaml
-  # Local commit-msg mirror of the Semantic Pull Request CI check: authors see
-  # a bad type before pushing. Runs only at commit-msg stage, so it stays out
-  # of `pre-commit run` (CI, pre-commit.ci) and is bypassable with --no-verify;
-  # the CI PR-title check is the enforced gate. Keep types in sync with that
-  # workflow and the CONTRIBUTING commit-messages table.
+  # Advisory local mirror of the Semantic Pull Request workflow: catches a bad
+  # type at commit time. commit-msg stage keeps it out of `pre-commit run`, so
+  # it never becomes a CI gate and stays bypassable (--no-verify). Keep the
+  # type list in sync with that workflow and CONTRIBUTING.
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.4.0
     hooks:
