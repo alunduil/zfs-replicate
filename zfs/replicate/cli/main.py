@@ -17,7 +17,7 @@ configure()
 
 
 @click.command()  # type: ignore[misc]
-@verbosity_option
+@verbosity_option  # type: ignore[misc]
 @click.option(  # type: ignore[misc]
     "--dry-run",
     is_flag=True,
