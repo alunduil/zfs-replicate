@@ -21,10 +21,16 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
 
 ## Property tests
 
-Functions whose domain has shape—snapshots, filesystems, timestamps—are
-exercised with `hypothesis.given` and strategies rather than fixed inputs. Fixed
-inputs cover cases where a specific literal is the subject, such as a hostile
-string or a single boundary flag.
+A function with a checkable property over a shaped domain—a round-trip, an
+invariant, a bound—uses `hypothesis.given` with strategies rather than
+hand-picked inputs. A specific input that must always run (a regression, a known
+edge) is pinned with `@example` on the property, not split into its own
+fixed-input test.
+
+Hypothesis is dropped where generation buys nothing: an assertion of exact
+output for one input (a rendered command, an `argv` list), or an input whose
+execution has cost or side effects (a spawned process). Those tests state their
+inputs as literals.
 
 Shared strategies for a package live in
 `zfs_test/replicate_test/<pkg>_test/strategies.py` and are imported by that
