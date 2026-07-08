@@ -9,12 +9,14 @@ from ..compress import Compression
 from ..filesystem import FileSystem
 from ..filesystem import filesystem as filesystem_t
 from ..ssh import Cipher
-from . import options
+from . import log, options
 from .click import EnumChoice
+
+log.configure()
 
 
 @click.command()  # type: ignore[misc]
-@click.option("--verbose", "-v", is_flag=True, help="Print additional output.")  # type: ignore[misc]
+@log.option  # type: ignore[misc]
 @click.option(  # type: ignore[misc]
     "--dry-run",
     is_flag=True,
@@ -68,7 +70,6 @@ from .click import EnumChoice
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
 def main(  # pylint: disable=R0917,R0914,R0913
-    verbose: bool,
     dry_run: bool,
     follow_delete: bool,
     recursive: bool,
@@ -86,27 +87,21 @@ def main(  # pylint: disable=R0917,R0914,R0913
     """Replicate LOCAL_FS to REMOTE_FS on HOST."""
     ssh_command = ssh.command(cipher, user, identity_file, port, host)
 
-    if verbose:
-        click.echo(f"checking filesystem {local_fs.name}")
+    log.logger.info("checking filesystem %s", local_fs.name)
 
     l_snaps = snapshot.list(local_fs, recursive=recursive)
     # Improvement: exclusions from snapshots to replicate.
 
-    if verbose:
-        click.echo(f"found {len(l_snaps)} snapshots on {local_fs.name}")
-        click.echo()
+    log.logger.info("found %d snapshots on %s", len(l_snaps), local_fs.name)
 
     r_filesystem = filesystem.remote_dataset(remote_fs, local_fs)
     filesystem.create(r_filesystem, ssh_command=ssh_command)
 
-    if verbose:
-        click.echo(f"checking filesystem {host}/{r_filesystem.name}")
+    log.logger.info("checking filesystem %s/%s", host, r_filesystem.name)
 
     r_snaps = snapshot.list(r_filesystem, recursive=recursive, ssh_command=ssh_command)
 
-    if verbose:
-        click.echo(f"found {len(r_snaps)} snapshots on {r_filesystem.name}")
-        click.echo()
+    log.logger.info("found %d snapshots on %s", len(r_snaps), r_filesystem.name)
 
     filesystem_l_snaps = {
         filesystem: list(l_snaps)
@@ -124,7 +119,9 @@ def main(  # pylint: disable=R0917,R0914,R0913
         remote_fs, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete
     )
 
-    if verbose:
+    # The plan is the point of --dry-run, so print it to stdout on the user's
+    # explicit request. Operational progress is on the logger instead.
+    if dry_run:
         click.echo(task.report(tasks))
 
     if not dry_run:

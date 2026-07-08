@@ -1,6 +1,7 @@
 """Task Execution."""
 
 import itertools
+import logging
 from typing import List, Tuple
 
 from .. import filesystem, optional, receive, send, snapshot
@@ -8,6 +9,8 @@ from ..command import Command
 from ..compress import Compression
 from ..filesystem import FileSystem
 from .type import Action, Task
+
+logger = logging.getLogger(__name__)
 
 
 def execute(  # pylint: disable=R0917,R0913
@@ -47,14 +50,21 @@ def execute(  # pylint: disable=R0917,R0913
 
 def _create(tasks: List[Task], ssh_command: Command) -> None:
     for task in tasks:
+        logger.info("creating filesystem %s", task.filesystem.name)
         filesystem.create(task.filesystem, ssh_command=ssh_command)
 
 
 def _destroy(tasks: List[Task], ssh_command: Command) -> None:
     for task in tasks:
         if task.snapshot is None:
+            logger.info("destroying filesystem %s", task.filesystem.name)
             filesystem.destroy(task.filesystem, ssh_command=ssh_command)
         else:
+            logger.info(
+                "destroying snapshot %s@%s",
+                task.snapshot.filesystem.name,
+                task.snapshot.name,
+            )
             snapshot.destroy(task.snapshot, ssh_command=ssh_command)
 
 
@@ -67,12 +77,15 @@ def _send(  # pylint: disable=R0917,R0913
     receive_options: receive.Options,
 ) -> None:
     for task in tasks:
+        current = optional.value(task.snapshot)
+        logger.info("sending snapshot %s@%s", current.filesystem.name, current.name)
         snapshot.send(
             remote,
-            optional.value(task.snapshot),
+            current,
             ssh_command=ssh_command,
             compression=compression,
             send_options=send_options,
             receive_options=receive_options,
-            previous=optional.value(task.snapshot).previous,
+            previous=current.previous,
         )
+        logger.debug("sent snapshot %s@%s", current.filesystem.name, current.name)

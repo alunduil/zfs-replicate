@@ -148,6 +148,21 @@ files = [
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
+name = "click-log"
+version = "0.4.0"
+description = "Logging integration for Click"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "click-log-0.4.0.tar.gz", hash = "sha256:3970f8570ac54491237bcdb3d8ab5e3eef6c057df29f8c3d1151a51a9c23b975"},
+    {file = "click_log-0.4.0-py2.py3-none-any.whl", hash = "sha256:a43e394b528d52112af599f2fc9e4b7cf3c15f94e53581f74fa6867e68c91756"},
+]
+
+[package.dependencies]
+click = "*"
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -473,4 +488,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.9"
-content-hash = "16983b13eb6de3a3bf078ce5416ee88702a1a4a6552e21314c45b232bc2a5bcf"
+content-hash = "da9aae659a71105abe50f2d149924f097352ddbb0c4a86de7e174dc6af9641c8"
