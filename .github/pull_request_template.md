@@ -1,7 +1,15 @@
 ## Summary
 
-<!-- Why this change. Lead with the user-visible outcome, not the diff.
-     Link the issue: Closes #… (or Refs #… if it doesn't fully resolve it). -->
+<!-- Explain the change so a reviewer understands it without reading the
+     diff—what changed and why, leading with the user-visible outcome.
+     Link the issue: Closes #… / Refs #… if it doesn't fully resolve it. -->
+
+## Gotchas
+
+<!-- Optional. One bullet per surprise: where to spend review attention
+     and why. Delete this section if nothing surprises. -->
+
+-
 
 ## Test plan
 
