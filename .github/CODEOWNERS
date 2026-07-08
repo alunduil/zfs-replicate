@@ -1,0 +1,3 @@
+# Solo-maintained: route review on every path to @alunduil.
+# The last matching pattern wins, so add path-specific overrides below.
+* @alunduil
