@@ -1,0 +1,89 @@
+# Testing conventions
+
+The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
+`--doctest-modules --cov=zfs --cov-report=term-missing` (configured in
+[`pyproject.toml`](../../pyproject.toml)); `testpaths` is `zfs_test`.
+
+## Layout
+
+- A test file mirrors its source path with a `_test` suffix on every segment:
+  `zfs/replicate/foo/bar.py` has its tests in
+  `zfs_test/replicate_test/foo_test/bar_test.py`.
+- Each test package directory carries an `__init__.py`. Two older directories
+  (`cli_test/`, `task_test/`) predate this and lack one; new directories add it.
+
+## Imports and assertions
+
+- The module under test is imported as `sut`:
+  `import zfs.replicate.foo.bar as sut`. Tests reach into it through that alias
+  rather than re-exporting its symbols.
+- `assert` statements carry a trailing `# nosec`. Bandit flags bare asserts;
+  this is the audited exception for test code.
+
+## Property tests
+
+Functions whose domain has shape—snapshots, filesystems, timestamps—are
+exercised with `hypothesis.given` and strategies rather than fixed inputs. Fixed
+inputs cover cases where a specific literal is the subject, such as a hostile
+string or a single boundary flag.
+
+Shared strategies for a package live in
+`zfs_test/replicate_test/<pkg>_test/strategies.py` and are imported by that
+package's tests.
+
+```python
+from hypothesis import given
+from hypothesis.strategies import lists
+
+from zfs.replicate.snapshot.list import _snapshots
+from zfs.replicate.snapshot.type import Snapshot
+from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
+
+
+@given(lists(SNAPSHOTS))  # type: ignore[misc]
+def test_snapshots(snapshots: list[Snapshot]) -> None:
+    """Round-trip the rendered list back through the parser."""
+    output = "\n".join(f"{s.filesystem.name}@{s.name}\t{s.timestamp}" for s in snapshots)
+    assert _snapshots(output.encode()) == snapshots  # nosec
+```
+
+## The process boundary
+
+[`zfs/replicate/process.py`](../../zfs/replicate/process.py) is the sole place
+the project spawns a process: `process.open` for streaming and pipeline wiring,
+`process.run` for run-to-completion. Tests never spawn real `zfs` or `ssh`.
+
+- Command *builders* (`*/command.py`) construct a `Command` and spawn nothing.
+  Their tests assert on `Command.argv` and `Command.render()` directly.
+- Code that *runs* a command patches the boundary. A test replaces
+  `zfs.replicate.process.run` (or `process.open`) with `monkeypatch.setattr`,
+  returning a fake `subprocess.CompletedProcess` or `Popen`, so no external
+  binary runs.
+
+## Command-line tests
+
+The command line is exercised through `click.testing.CliRunner`. The
+collaborators a command dispatches to—`snapshot.list`, `task.execute`, and the
+like—are patched with `monkeypatch.setattr`; assertions read `result.exit_code`,
+`result.output`, or the arguments the fakes captured.
+
+```python
+import zfs.replicate.cli.main as sut
+from click.testing import CliRunner
+
+
+def test_set_rejects_malformed_property() -> None:
+    """`--receive-set` without an equals sign is rejected before execution."""
+    result = CliRunner().invoke(
+        sut.main,
+        ["--receive-set", "readonly", "-l", "alunduil", "-i", "mypy.ini",
+         "example.com", "bogus", "bogus"],
+    )
+    assert result.exit_code != 0  # nosec
+    assert "KEY=VALUE" in result.output  # nosec
+```
+
+## Regression tests
+
+A bug fix adds a test that fails before the fix and passes after. The test's
+docstring names the issue it covers (for example, `Regression test for #123.`).
