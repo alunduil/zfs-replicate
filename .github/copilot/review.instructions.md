@@ -5,6 +5,10 @@ reviewer is a person or an AI assistant (Copilot review, Claude Code `/review`
 and `/code-review`). Apply it to the diff, not the whole tree: flag what the
 change introduces, not pre-existing debt it sits beside.
 
+The pre-commit sensors run in CI (`black`, `isort`, `flake8`, `bandit`,
+`pylint`, `pydocstyle`, `mypy --strict`, and the blanket-ignore hooks). Assume
+they pass; this list covers only what they can't check.
+
 Conventions this leans on live in [`CONTRIBUTING.md`](../../CONTRIBUTING.md).
 That document is the source of truth when the two disagree.
 
@@ -15,26 +19,26 @@ That document is the source of truth when the two disagree.
 - Weigh the edge cases: empty input, a missing snapshot, an SSH or remote error,
   a half-drained pipeline, and nonzero subprocess exit codes.
 
-## Safety
+## Inline suppressions
 
-- Reject any new `shell=True`, and any user input interpolated into a shell
-  string.
-- Require each new `# type: ignore` to name a specific error code
-  (`# type: ignore[code]`) and explain itself; refuse a blanket `# type: ignore`.
-  Hold `# nosec`, `# noqa`, and `pylint: disable` to the same bar.
+- Require every new suppression -- `# type: ignore[code]`, `# nosec`, `# noqa`,
+  `pylint: disable` -- to say *why* in a comment. The hooks already force a
+  scoped code and reject a blanket ignore; the rationale is the reviewer's job.
 
 ## Typing
 
 - Require PEP 604 unions (`X | None`) over `typing.Optional` or `typing.Union`.
-- Reject `Any` that lacks a justifying comment; keep `mypy --strict` green.
+- Reject `Any` that lacks a justifying comment; `mypy --strict` permits explicit
+  `Any`, so this one falls to the reviewer.
 - Require new domain types to be `@dataclass(frozen=True)`.
 
 ## Process boundary
 
 - Route every child process through
   [`zfs/replicate/process.py`](../../zfs/replicate/process.py), the one audited
-  `subprocess` boundary (argv list, `shell=False`). Nothing else imports
-  `subprocess` or calls `Popen`/`run` directly.
+  `subprocess` boundary (argv list, `shell=False`). Any raw `subprocess` or
+  `Popen` trips bandit; the reviewer's job is confirming it belongs in
+  `process.py` and nowhere else.
 
 ## Logging
 
