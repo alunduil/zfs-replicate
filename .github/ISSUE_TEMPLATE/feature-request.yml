@@ -1,0 +1,40 @@
+name: Feature request
+description: Suggest a capability you'd like zfs-replicate to make possible.
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please describe the desired outcome, not the task. A good title
+        names the problem you're trying to solve rather than a specific
+        implementation you'd like bolted on.
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User story
+      description: Who wants this, what capability, and to what end?
+      placeholder: As a ___, I want ___, so that ___.
+    validations:
+      required: true
+  - type: textarea
+    id: current-workaround
+    attributes:
+      label: Current workaround
+      description: How do you accomplish this today, if at all?
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you weighed and why you set them aside.
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria draft
+      description: How would we know this is done? A checklist is welcome.
+    validations:
+      required: false
