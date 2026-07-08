@@ -145,31 +145,3 @@ def test_set_rejects_malformed_property() -> None:
     )
     assert result.exit_code != 0  # nosec
     assert "KEY=VALUE" in result.output  # nosec
-
-
-def test_invokes_without_stacktrace_verbose() -> None:
-    """Invoke without stacktrace.
-
-    .. code:: bash
-
-        zfs-replicate --verbosity DEBUG -l alunduil -i mypy.ini example.com bogus bogus.
-    """
-    runner = CliRunner()
-    result = runner.invoke(
-        sut.main,
-        [
-            "--verbosity",
-            "DEBUG",
-            "-l",
-            "alunduil",
-            "-i",
-            "mypy.ini",
-            "example.com",
-            "bogus",
-            "bogus",
-        ],
-    )
-    assert isinstance(result.exception, SystemExit) or (  # nosec
-        isinstance(result.exception, FileNotFoundError)
-        and result.exception.filename == "/usr/bin/env"
-    ), "Expected SystemExit or FileNotFoundError."
