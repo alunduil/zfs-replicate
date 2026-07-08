@@ -1,18 +1,18 @@
 ## Summary
 
-<!-- Why this change matters: the user-visible outcome and the reasoning behind it.
-     Link the issue: Closes #… / Refs #… if it doesn't fully resolve it. -->
+<!-- Explain why this change matters: the outcome users will see and your
+     reasoning. Link the issue with Closes #… (or Refs #… if it does not fully resolve it). -->
 
 ## Gotchas
 
-<!-- Optional. One bullet per surprise: where to spend review attention
-     and why. Delete this section if nothing surprises. -->
+<!-- Point reviewers at anything that will surprise them and say where to
+     focus. Delete this section if nothing is surprising. -->
 
 -
 
 ## Test plan
 
-<!-- What you checked by hand—e.g. replicating against a test pool and
-     confirming the snapshots landed. Delete this section if you didn't. -->
+<!-- Describe what you verified by hand, such as replicating to a test pool
+     and confirming the snapshots arrived. Delete this section if you did not. -->
 
 -
