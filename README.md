@@ -89,38 +89,6 @@ zfs-replicate --send-large-block --send-compressed \
 
 See `zfs-replicate --help` for the full set of `--send-` flags.
 
-## Routing logs to journald, syslog, or a file
-
-Operational output (progress, per-task start and end, errors) flows through the
-`zfs.replicate` logger to standard error. `--verbosity LEVEL` (or `-v LEVEL`)
-sets the threshold to any of `CRITICAL`, `ERROR`, `WARNING` (the default),
-`INFO`, or `DEBUG`. The `--dry-run` plan and other command-level messages stay
-on standard output, so you can capture logs and results apart from each other.
-
-Off a terminal each line carries its sd-daemon priority prefix, so journald
-records the level and `journalctl -p err` (and the other priorities) filters by
-it. On a terminal the level stays a colored `error:`/`warning:` label instead.
-
-Under systemd, standard error already lands in the journal, with no extra
-configuration needed:
-
-```ini
-[Service]
-ExecStart=/usr/bin/zfs-replicate --verbosity INFO -l backup -i /root/.ssh/id_ed25519 \
-  backup.example.com tank/backups tank/data
-```
-
-```bash
-journalctl -u zfs-replicate.service
-```
-
-To send logs to a file or to syslog outside systemd, redirect standard error:
-
-```bash
-zfs-replicate --verbosity INFO ... 2>>/var/log/zfs-replicate.log
-zfs-replicate --verbosity INFO ... 2> >(logger -t zfs-replicate)
-```
-
 ## Documentation
 
 * `zfs-replicate --help`: Help for zfs-replicate.
