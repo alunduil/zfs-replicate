@@ -15,4 +15,5 @@ worked examples, and exceptions when a rule here doesn't fit the case.
 - Mock the process boundary `zfs.replicate.process.open`/`.run`, never real
   `zfs`/`ssh`. Test command builders on `Command.argv`/`.render()`.
 - Command line: `click.testing.CliRunner`.
-- Bug fix: add a regression test naming the issue in its docstring.
+- Bug fix: add a regression test whose docstring describes the behavior or
+  scenario and links the issue, not the issue alone.

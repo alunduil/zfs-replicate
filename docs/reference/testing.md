@@ -90,5 +90,6 @@ def test_set_rejects_malformed_property() -> None:
 
 ## Regression tests
 
-A bug fix adds a test that fails before the fix and passes after. The test's
-docstring names the issue it covers (for example, `Regression test for #123.`).
+A bug fix adds a test that fails before the fix and passes after. Its docstring
+describes the behavior or scenario under test and links the issue, not the issue
+alone (for example, `Rejects a snapshot name containing '@'; see #123.`).
