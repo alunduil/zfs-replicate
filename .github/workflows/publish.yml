@@ -13,6 +13,10 @@ permissions:
 jobs:
   poetry:
     runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # OIDC token for PyPI Trusted Publishing
+      contents: read
     steps:
       - uses: actions/checkout@v3
       - name: install poetry
@@ -24,5 +28,5 @@ jobs:
           cache: poetry
       - name: poetry build
         run: poetry build
-      - name: poetry publish
-        run: poetry publish  --username __token__ --password=${{ secrets.PYPI_API_TOKEN }}
+      - name: publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
