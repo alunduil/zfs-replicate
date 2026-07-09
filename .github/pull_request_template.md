@@ -16,3 +16,7 @@
      and confirming the snapshots arrived. Delete this section if you did not. -->
 
 -
+
+---
+
+Reviewers: see the [review checklist](.github/copilot/review.instructions.md).
