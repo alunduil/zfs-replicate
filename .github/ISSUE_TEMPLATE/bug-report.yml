@@ -6,9 +6,9 @@ body:
   - type: markdown
     attributes:
       value: >-
-        Give us enough to reproduce the problem on the first read. The
-        environment fields below are the details maintainers most often have to
-        ask for.
+        Please search existing issues before filing. Give us enough to
+        reproduce the problem on the first read. The environment fields below
+        are the details maintainers most often have to ask for.
 
   - type: input
     id: version
@@ -66,11 +66,3 @@ body:
       description: >-
         Link or paste your `poetry.lock` and `/etc/os-release` (or the
         equivalent for your platform) if they help narrow the problem.
-
-  - type: checkboxes
-    id: acknowledgements
-    attributes:
-      label: Before you submit
-      options:
-        - label: I searched existing issues for this bug.
-          required: true
