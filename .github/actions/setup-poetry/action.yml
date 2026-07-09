@@ -1,12 +1,11 @@
 name: Set up Poetry
 description: Install Poetry and Python for a given version, with Poetry's download cache.
 
-# Sets up the toolchain only. Jobs that run project code run `poetry install`
-# themselves; jobs that only build or check (poetry build, poetry check) skip it.
+# No `poetry install`: only jobs that run project code (pytest, scripts)
+# need the environment, so they install it; build and check skip it.
 #
-# A local composite action cannot run actions/checkout: the caller must
-# check out the repository before this action's file exists on disk. Callers
-# run actions/checkout first, then invoke this action.
+# A local composite action can't check out the repo it lives in, so
+# callers run actions/checkout before invoking it.
 inputs:
   python-version:
     description: Python version passed to actions/setup-python.
