@@ -1,0 +1,76 @@
+---
+name: Bug report
+description: Report incorrect or unexpected behaviour in zfs-replicate.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Give us enough to reproduce the problem on the first read. The
+        environment fields below are the details maintainers most often have to
+        ask for.
+
+  - type: input
+    id: version
+    attributes:
+      label: zfs-replicate version
+      description: Paste the output of `zfs-replicate --version`.
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      description: Paste the output of `python --version`.
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS / distribution
+      description: Name the operating system and version you ran against.
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: Command run
+      description: Give the exact command that triggered the bug.
+      placeholder: Remove passwords or secrets before pasting.
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behaviour
+      description: Describe what happened, including any error output.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+      description: Describe what you expected to happen instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment-detail
+    attributes:
+      label: Environment detail
+      description: >-
+        Link or paste your `poetry.lock` and `/etc/os-release` (or the
+        equivalent for your platform) if they help narrow the problem.
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched existing issues for this bug.
+          required: true
