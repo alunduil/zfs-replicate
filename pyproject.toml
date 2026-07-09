@@ -83,3 +83,6 @@ select = ["E", "F", "I", "B", "SIM", "D", "N", "S", "G010", "PGH", "PL", "RUF100
 
 [tool.ruff.lint.pydocstyle]
 convention = "pep257"
+
+[tool.vulture]
+paths = ["zfs", "zfs_test"]
