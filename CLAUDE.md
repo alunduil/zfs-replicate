@@ -26,12 +26,14 @@ what's already wired into the project, not reinventing it.
   `[tool.pytest.ini_options]` in `pyproject.toml`). The test
   tree lives under `zfs_test/`. `Hypothesis` is available as
   a development dependency.
-- **Lint and format:** `pre-commit` orchestrates the local
-  hooks. Inside `.pre-commit-config.yaml` you find `black`,
-  `isort`, `flake8` (`.flake8`), `bandit`, `pylint`
-  (`.pylintrc`), `pydocstyle`, and `mypy` (`mypy.ini`).
-  Prose lint runs through `Vale` (`.vale.ini` and
-  `styles/`).
+- **Lint and format:** `ruff` (both `ruff check` and `ruff
+  format`), configured under `[tool.ruff]` in `pyproject.toml`;
+  the canonical command is `poetry run ruff`. It covers what
+  `black`, `isort`, `flake8`, `pydocstyle`, and `bandit` used
+  to. `mypy` (`[tool.mypy]`) covers types, `Vale` (`.vale.ini`,
+  `styles/`) prose, and `FawltyDeps` unused dependencies.
+  `pre-commit` orchestrates all of them from
+  `.pre-commit-config.yaml`.
 - **Entry point:** the command-line tool installs as
   `zfs-replicate = "zfs.replicate.cli.main:main"` (see
   `[tool.poetry.scripts]` in `pyproject.toml`).
@@ -63,11 +65,10 @@ without having to call the skill explicitly.
 GitHub lists the open release milestones, and the active
 `blocked` label signals that sequencing matters here. Clear
 scope discipline avoids prematurely shipping something blocked
-by an earlier milestone. The Python tool stack is rich enough (`black`,
-`isort`, `flake8`, `bandit`, `pylint`, `pydocstyle`, `mypy`,
-all gated through `pre-commit`) that an agent can plausibly
-reinvent any one of those checks unless the inventory is in
-front of it.
+by an earlier milestone. The Python tool stack (`ruff` for
+lint and format, `mypy` for types, all gated through
+`pre-commit`) is one an agent can plausibly reinvent unless the
+inventory is in front of it.
 
 ## Session defaults
 

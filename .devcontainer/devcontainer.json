@@ -31,7 +31,7 @@
 				"eamodio.gitlens",
 				"GitHub.vscode-pull-request-github",
 				"ms-azuretools.vscode-docker",
-				"ms-python.pylint",
+				"charliermarsh.ruff",
 				"ms-python.python",
 				"tamasfe.even-better-toml",
 				"redhat.vscode-yaml",
