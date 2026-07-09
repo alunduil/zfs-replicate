@@ -10,6 +10,11 @@ on:
 permissions:
   contents: read
 
+# No cancel-in-progress: a publish cancelled mid-upload can leave PyPI in a
+# partial state.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
   poetry:
     runs-on: ubuntu-latest
