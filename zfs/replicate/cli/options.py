@@ -22,7 +22,7 @@ def send_group(command: Callable[..., None]) -> Callable[..., None]:
         "--send-props",
         "send_props",
         is_flag=True,
-        help=("Pass -p to zfs send so the stream carries data set properties such as compression and recordsize."),
+        help="Pass -p to zfs send so the stream carries data set properties such as compression and recordsize.",
     )(command)
     command = click.option(
         "--send-compressed",
@@ -114,13 +114,13 @@ def receive_group(command: Callable[..., None]) -> Callable[..., None]:
         "--receive-resume-token-capable",
         "receive_resume",
         is_flag=True,
-        help=("Pass -s to zfs receive so an interrupted transfer saves a resume token on the destination."),
+        help="Pass -s to zfs receive so an interrupted transfer saves a resume token on the destination.",
     )(command)
     command = click.option(
         "--receive-mount/--receive-no-mount",
         "receive_mount",
         default=True,
-        help=("Mount received data sets (default). Use --receive-no-mount to pass -u so they are left unmounted."),
+        help="Mount received data sets (default). Use --receive-no-mount to pass -u so they are left unmounted.",
     )(command)
     command = click.option(
         "--receive-force/--receive-no-force",
