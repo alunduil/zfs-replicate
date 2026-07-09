@@ -18,11 +18,7 @@ def list(  # pylint: disable=W0622
     """List ZFS FileSystem on the remote reachable through ``ssh_command``."""
     result = process.run(over_ssh(ssh_command, _list(filesystem)))
 
-    error = (
-        result.stderr.strip(b"\n")
-        .strip(b"\r")
-        .replace(b"WARNING: ENABLED NONE CIPHER", b"")
-    )
+    error = result.stderr.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
     if result.returncode:
         raise ZFSReplicateError(

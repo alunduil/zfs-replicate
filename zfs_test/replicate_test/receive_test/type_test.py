@@ -25,8 +25,6 @@ def test_to_flags_adds_resume() -> None:
 
 def test_to_flags_renders_properties() -> None:
     """Each property renders a -o token followed by its KEY=VALUE token."""
-    flags = sut.Options(
-        force=False, properties={"readonly": "on", "canmount": "noauto"}
-    ).to_flags()
+    flags = sut.Options(force=False, properties={"readonly": "on", "canmount": "noauto"}).to_flags()
 
     assert flags == ["-o", "readonly=on", "-o", "canmount=noauto"]  # nosec

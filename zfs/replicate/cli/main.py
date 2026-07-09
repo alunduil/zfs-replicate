@@ -104,20 +104,12 @@ def main(  # pylint: disable=R0917,R0914,R0913
     log.logger.info("found %d snapshots on %s", len(r_snaps), r_filesystem.name)
 
     filesystem_l_snaps = {
-        filesystem: list(l_snaps)
-        for filesystem, l_snaps in itertools.groupby(
-            l_snaps, key=lambda x: x.filesystem
-        )
+        filesystem: list(l_snaps) for filesystem, l_snaps in itertools.groupby(l_snaps, key=lambda x: x.filesystem)
     }
     filesystem_r_snaps = {
-        filesystem: list(r_snaps)
-        for filesystem, r_snaps in itertools.groupby(
-            r_snaps, key=lambda x: x.filesystem
-        )
+        filesystem: list(r_snaps) for filesystem, r_snaps in itertools.groupby(r_snaps, key=lambda x: x.filesystem)
     }
-    tasks = task.generate(
-        remote_fs, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete
-    )
+    tasks = task.generate(remote_fs, filesystem_l_snaps, filesystem_r_snaps, follow_delete=follow_delete)
 
     # The plan is the point of --dry-run, so print it to stdout on the user's
     # explicit request. Operational progress is on the logger instead.
@@ -126,10 +118,7 @@ def main(  # pylint: disable=R0917,R0914,R0913
 
     if not dry_run:
         filesystem_tasks = [
-            (filesystem, list(tasks))
-            for filesystem, tasks in itertools.groupby(
-                tasks, key=lambda x: x.filesystem
-            )
+            (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
         ]
         task.execute(
             remote_fs,

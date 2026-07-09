@@ -2,9 +2,8 @@
 
 from typing import Dict, List
 
-from ..filesystem import FileSystem
+from ..filesystem import FileSystem, remote_filesystem
 from ..filesystem import filesystem as filesystem_t
-from ..filesystem import remote_filesystem
 from ..list import venn
 from ..snapshot import Snapshot
 from .type import Action, Task
@@ -36,21 +35,14 @@ def generate(
                     snapshot=None,
                 )
             )
-            tasks.extend(
-                [
-                    Task(action=Action.SEND, filesystem=remote, snapshot=s)
-                    for s in local_snapshots[filesystem]
-                ]
-            )
+            tasks.extend([Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in local_snapshots[filesystem]])
             continue
 
         lefts: List[Snapshot]
         middles: List[Snapshot]
         rights: List[Snapshot]
 
-        lefts, middles, rights = venn(
-            local_snapshots[filesystem], remote_snapshots[filesystem]
-        )
+        lefts, middles, rights = venn(local_snapshots[filesystem], remote_snapshots[filesystem])
 
         if not middles:
             tasks.extend(
@@ -64,9 +56,7 @@ def generate(
                 ],
             )
 
-        tasks.extend(
-            [Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in lefts]
-        )
+        tasks.extend([Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in lefts])
 
         if middles and follow_delete:
             tasks.extend(

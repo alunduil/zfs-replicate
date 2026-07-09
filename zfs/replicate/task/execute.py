@@ -27,9 +27,7 @@ def execute(  # pylint: disable=R0917,R0913
     for _, filesystem_tasks in sorted_tasks:
         action_tasks = {
             action: list(action_tasks)
-            for action, action_tasks in itertools.groupby(
-                filesystem_tasks, key=lambda x: x.action
-            )
+            for action, action_tasks in itertools.groupby(filesystem_tasks, key=lambda x: x.action)
         }
 
         for action, a_tasks in action_tasks.items():

@@ -22,18 +22,14 @@ def send_group(command: Callable[..., None]) -> Callable[..., None]:
         "--send-props",
         "send_props",
         is_flag=True,
-        help=(
-            "Pass -p to zfs send so the stream carries data set properties"
-            " such as compression and recordsize."
-        ),
+        help=("Pass -p to zfs send so the stream carries data set properties such as compression and recordsize."),
     )(command)
     command = click.option(
         "--send-compressed",
         "send_compressed",
         is_flag=True,
         help=(
-            "Pass -c to zfs send so already-compressed blocks replicate"
-            " without being decompressed and recompressed."
+            "Pass -c to zfs send so already-compressed blocks replicate without being decompressed and recompressed."
         ),
     )(command)
     command = click.option(
@@ -118,19 +114,13 @@ def receive_group(command: Callable[..., None]) -> Callable[..., None]:
         "--receive-resume-token-capable",
         "receive_resume",
         is_flag=True,
-        help=(
-            "Pass -s to zfs receive so an interrupted transfer saves a resume"
-            " token on the destination."
-        ),
+        help=("Pass -s to zfs receive so an interrupted transfer saves a resume token on the destination."),
     )(command)
     command = click.option(
         "--receive-mount/--receive-no-mount",
         "receive_mount",
         default=True,
-        help=(
-            "Mount received data sets (default). Use --receive-no-mount to pass"
-            " -u so they are left unmounted."
-        ),
+        help=("Mount received data sets (default). Use --receive-no-mount to pass -u so they are left unmounted."),
     )(command)
     command = click.option(
         "--receive-force/--receive-no-force",
@@ -174,9 +164,7 @@ def _parse_properties(properties: Tuple[str, ...]) -> Dict[str, str]:
     for item in properties:
         key, separator, value = item.partition("=")
         if not separator or not key:
-            raise click.BadParameter(
-                f"expected KEY=VALUE, got {item!r}", param_hint="--receive-set"
-            )
+            raise click.BadParameter(f"expected KEY=VALUE, got {item!r}", param_hint="--receive-set")
         parsed[key] = value
 
     return parsed

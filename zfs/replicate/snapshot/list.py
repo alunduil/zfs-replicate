@@ -21,11 +21,7 @@ def list(  # pylint: disable=W0622
 
     result = process.run(command)
 
-    error = (
-        result.stderr.strip(b"\n")
-        .strip(b"\r")
-        .replace(b"WARNING: ENABLED NONE CIPHER", b"")
-    )
+    error = result.stderr.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
     if result.returncode:
         raise ZFSReplicateError(
@@ -55,9 +51,7 @@ def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:
 
     snapshots[0] = _add_previous(snapshots[0], None)
 
-    return [snapshots[0]] + [
-        _add_previous(s, p) for s, p in zip(snapshots[1:], snapshots)
-    ]
+    return [snapshots[0]] + [_add_previous(s, p) for s, p in zip(snapshots[1:], snapshots)]
 
 
 def _snapshot(zfs_list_line: bytes) -> Snapshot:

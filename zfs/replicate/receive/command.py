@@ -14,6 +14,4 @@ def command(destination: FileSystem, options: Options) -> Command:
     remote data set, so it carries no knowledge of how local data sets map
     onto the remote.
     """
-    return Command.with_empty_env(
-        "zfs", "receive", *options.to_flags(), "-d", destination.name
-    )
+    return Command.with_empty_env("zfs", "receive", *options.to_flags(), "-d", destination.name)

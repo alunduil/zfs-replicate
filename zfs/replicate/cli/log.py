@@ -45,9 +45,7 @@ class _Formatter(click_log.ColorFormatter):  # type: ignore[misc]
             return super().format(record)  # type: ignore[no-any-return]
 
         priority = _PRIORITIES.get(record.levelno, _PRIORITIES[logging.INFO])
-        return "\n".join(
-            f"<{priority}>{line}" for line in record.getMessage().splitlines()
-        )
+        return "\n".join(f"<{priority}>{line}" for line in record.getMessage().splitlines())
 
 
 # The --verbosity/-v option, wired to the zfs.replicate logger. Default WARNING

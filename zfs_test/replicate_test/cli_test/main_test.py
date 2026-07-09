@@ -18,12 +18,9 @@ def test_invokes_without_stacktrace() -> None:
         zfs-replicate -l alunduil -i mypy.ini example.com bogus bogus
     """
     runner = CliRunner()
-    result = runner.invoke(
-        sut.main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"]
-    )
+    result = runner.invoke(sut.main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
     assert isinstance(result.exception, SystemExit) or (  # nosec
-        isinstance(result.exception, FileNotFoundError)
-        and result.exception.filename == "/usr/bin/env"
+        isinstance(result.exception, FileNotFoundError) and result.exception.filename == "/usr/bin/env"
     ), "Expected SystemExit or FileNotFoundError."
 
 

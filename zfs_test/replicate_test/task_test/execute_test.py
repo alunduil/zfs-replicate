@@ -14,9 +14,7 @@ from zfs.replicate.task.execute import execute
 from zfs.replicate.task.type import Action, Task
 
 
-def test_send_dispatch_logs(
-    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_send_dispatch_logs(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch) -> None:
     """Dispatching a SEND task logs the snapshot at INFO."""
 
     def fake_send(*_args: Any, **_kwargs: Any) -> None:
@@ -37,12 +35,8 @@ def test_send_dispatch_logs(
             [(local, [task])],
             ssh_command=Command("ssh", ["backup.example.com"]),
             compression=Compression.LZ4,
-            send_options=send.Options(
-                large_block=False, raw=True, embed=False, compressed=False, props=False
-            ),
-            receive_options=receive.Options(
-                force=True, no_mount=False, resume=False, properties={}
-            ),
+            send_options=send.Options(large_block=False, raw=True, embed=False, compressed=False, props=False),
+            receive_options=receive.Options(force=True, no_mount=False, resume=False, properties={}),
         )
 
     # Assert on the snapshot identity, not the exact phrasing, so rewording the

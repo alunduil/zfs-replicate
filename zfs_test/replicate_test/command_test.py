@@ -23,17 +23,13 @@ def test_render_quotes_shell_metacharacters() -> None:
 
 def test_render_leaves_safe_tokens_unquoted() -> None:
     """Safe tokens with no shell-special characters are left unquoted."""
-    assert (
-        sut.Command("zfs", ["list", "pool/data"]).render() == "zfs list pool/data"
-    )  # nosec
+    assert sut.Command("zfs", ["list", "pool/data"]).render() == "zfs list pool/data"  # nosec
 
 
 def test_over_ssh_appends_single_quoted_argument() -> None:
     """Wrapping hands ssh the command as one shell-safe argument."""
     ssh = sut.Command.with_empty_env("ssh", "host")
-    wrapped = sut.over_ssh(
-        ssh, sut.Command.with_empty_env("zfs", "receive", "pool/a b")
-    )
+    wrapped = sut.over_ssh(ssh, sut.Command.with_empty_env("zfs", "receive", "pool/a b"))
 
     assert wrapped.program == "/usr/bin/env"  # nosec
     assert wrapped.args[:3] == ["-", "ssh", "host"]  # nosec
@@ -49,6 +45,4 @@ def test_over_ssh_joins_commands_as_a_pipeline() -> None:
         sut.Command.with_empty_env("zfs", "receive"),
     )
 
-    assert (
-        wrapped.args[-1] == "/usr/bin/env - lz4 -d | /usr/bin/env - zfs receive"
-    )  # nosec
+    assert wrapped.args[-1] == "/usr/bin/env - lz4 -d | /usr/bin/env - zfs receive"  # nosec

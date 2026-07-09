@@ -14,9 +14,7 @@ from hypothesis.strategies import (
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 
-_NOT_WHITESPACE = [
-    x for x in string.printable if x not in string.whitespace and x != "@"
-]
+_NOT_WHITESPACE = [x for x in string.printable if x not in string.whitespace and x != "@"]
 
 _FILESYSTEMS = text(_NOT_WHITESPACE).map(lambda x: "a{x}").map(filesystem)
 
