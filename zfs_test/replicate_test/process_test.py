@@ -10,12 +10,12 @@ def test_run_passes_arguments_without_a_shell() -> None:
 
     result = sut.run(Command("printf", ["%s", hostile]))
 
-    assert result.returncode == 0  # nosec
-    assert result.stdout == hostile.encode()  # nosec
+    assert result.returncode == 0
+    assert result.stdout == hostile.encode()
 
 
 def test_run_reports_nonzero_returncode() -> None:
     """A failing program surfaces its exit status on the result."""
     result = sut.run(Command("false", []))
 
-    assert result.returncode != 0  # nosec
+    assert result.returncode != 0

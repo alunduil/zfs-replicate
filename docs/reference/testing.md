@@ -16,8 +16,8 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
 - The module under test is imported as `sut`:
   `import zfs.replicate.foo.bar as sut`. Tests reach into it through that alias
   rather than re-exporting its symbols.
-- `assert` statements carry a trailing `# nosec`. Bandit flags bare asserts;
-  this is the audited exception for test code.
+- `assert` statements need no marker. `ruff` ignores `S101` (assert-used)
+  under `zfs_test/` through `per-file-ignores`, so test code asserts directly.
 
 ## Property tests
 
@@ -49,7 +49,7 @@ from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 def test_snapshots(snapshots: list[Snapshot]) -> None:
     """Round-trip the rendered list back through the parser."""
     output = "\n".join(f"{s.filesystem.name}@{s.name}\t{s.timestamp}" for s in snapshots)
-    assert _snapshots(output.encode()) == snapshots  # nosec
+    assert _snapshots(output.encode()) == snapshots
 ```
 
 ## The process boundary
@@ -81,11 +81,11 @@ def test_set_rejects_malformed_property() -> None:
     """`--receive-set` without an equals sign is rejected before execution."""
     result = CliRunner().invoke(
         sut.main,
-        ["--receive-set", "readonly", "-l", "alunduil", "-i", "mypy.ini",
+        ["--receive-set", "readonly", "-l", "alunduil", "-i", "pyproject.toml",
          "example.com", "bogus", "bogus"],
     )
-    assert result.exit_code != 0  # nosec
-    assert "KEY=VALUE" in result.output  # nosec
+    assert result.exit_code != 0
+    assert "KEY=VALUE" in result.output
 ```
 
 ## Regression tests

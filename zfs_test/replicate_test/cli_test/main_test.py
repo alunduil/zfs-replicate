@@ -15,11 +15,11 @@ def test_invokes_without_stacktrace() -> None:
 
     .. code:: bash
 
-        zfs-replicate -l alunduil -i mypy.ini example.com bogus bogus
+        zfs-replicate -l alunduil -i pyproject.toml example.com bogus bogus
     """
     runner = CliRunner()
-    result = runner.invoke(sut.main, ["-l", "alunduil", "-i", "mypy.ini", "example.com", "bogus", "bogus"])
-    assert isinstance(result.exception, SystemExit) or (  # nosec
+    result = runner.invoke(sut.main, ["-l", "alunduil", "-i", "pyproject.toml", "example.com", "bogus", "bogus"])
+    assert isinstance(result.exception, SystemExit) or (
         isinstance(result.exception, FileNotFoundError) and result.exception.filename == "/usr/bin/env"
     ), "Expected SystemExit or FileNotFoundError."
 
@@ -58,15 +58,15 @@ def test_send_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> None
             "-l",
             "alunduil",
             "-i",
-            "mypy.ini",
+            "pyproject.toml",
             "example.com",
             "bogus",
             "bogus",
         ],
     )
-    assert result.exit_code == 0, result.output  # nosec
+    assert result.exit_code == 0, result.output
 
-    assert captured.get("send_options") == send.Options(  # nosec
+    assert captured.get("send_options") == send.Options(
         large_block=True, raw=False, embed=True, compressed=True, props=True
     )
 
@@ -105,15 +105,15 @@ def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> N
             "-l",
             "alunduil",
             "-i",
-            "mypy.ini",
+            "pyproject.toml",
             "example.com",
             "bogus",
             "bogus",
         ],
     )
-    assert result.exit_code == 0, result.output  # nosec
+    assert result.exit_code == 0, result.output
 
-    assert captured.get("receive_options") == receive.Options(  # nosec
+    assert captured.get("receive_options") == receive.Options(
         force=False, no_mount=True, resume=True, properties={"readonly": "on"}
     )
 
@@ -123,7 +123,7 @@ def test_set_rejects_malformed_property() -> None:
 
     .. code:: bash
 
-        zfs-replicate --receive-set readonly -l alunduil -i mypy.ini example.com bogus bogus
+        zfs-replicate --receive-set readonly -l alunduil -i pyproject.toml example.com bogus bogus
     """
     runner = CliRunner()
     result = runner.invoke(
@@ -134,11 +134,11 @@ def test_set_rejects_malformed_property() -> None:
             "-l",
             "alunduil",
             "-i",
-            "mypy.ini",
+            "pyproject.toml",
             "example.com",
             "bogus",
             "bogus",
         ],
     )
-    assert result.exit_code != 0  # nosec
-    assert "KEY=VALUE" in result.output  # nosec
+    assert result.exit_code != 0
+    assert "KEY=VALUE" in result.output

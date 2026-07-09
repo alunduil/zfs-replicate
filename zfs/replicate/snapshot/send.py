@@ -14,7 +14,7 @@ from .type import Snapshot
 
 # Threads the whole replication surface to assemble the send pipeline, so the
 # parameter count crosses pylint's threshold.
-def send(  # pylint: disable=R0917,R0913
+def send(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     current: Snapshot,
     ssh_command: Command,

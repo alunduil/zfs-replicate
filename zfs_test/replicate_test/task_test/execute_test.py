@@ -42,4 +42,4 @@ def test_send_dispatch_logs(caplog: pytest.LogCaptureFixture, monkeypatch: pytes
     # Assert on the snapshot identity, not the exact phrasing, so rewording the
     # progress message doesn't fail this.
     dispatch = [r for r in caplog.records if r.levelno == logging.INFO]
-    assert any("tank/data@snap1" in r.getMessage() for r in dispatch)  # nosec
+    assert any("tank/data@snap1" in r.getMessage() for r in dispatch)

@@ -65,7 +65,7 @@ def send_group(command: Callable[..., None]) -> Callable[..., None]:
     # Forwards every command parameter plus the five send flags, so the
     # argument count is inherent to collapsing them into one kwarg.
     @functools.wraps(command)
-    def wrapper(  # pylint: disable=R0913
+    def wrapper(
         *args: object,
         send_large_block: bool,
         send_raw: bool,
@@ -136,7 +136,7 @@ def receive_group(command: Callable[..., None]) -> Callable[..., None]:
     # Forwards every command parameter plus the four receive flags, so the
     # argument count is inherent to collapsing them into one kwarg.
     @functools.wraps(command)
-    def wrapper(  # pylint: disable=R0913
+    def wrapper(
         *args: object,
         receive_force: bool,
         receive_mount: bool,

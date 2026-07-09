@@ -13,7 +13,7 @@ from .type import Action, Task
 logger = logging.getLogger(__name__)
 
 
-def execute(  # pylint: disable=R0917,R0913
+def execute(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     tasks: List[Tuple[FileSystem, List[Task]]],
     ssh_command: Command,
@@ -66,7 +66,7 @@ def _destroy(tasks: List[Task], ssh_command: Command) -> None:
             snapshot.destroy(task.snapshot, ssh_command=ssh_command)
 
 
-def _send(  # pylint: disable=R0917,R0913
+def _send(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     tasks: List[Task],
     ssh_command: Command,

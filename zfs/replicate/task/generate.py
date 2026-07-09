@@ -18,7 +18,7 @@ def generate(
     """Generate Tasks for replicating local snapshots to remote snapshots."""
     tasks = []
 
-    for filesystem in local_snapshots:
+    for filesystem, local_snaps in local_snapshots.items():
         remote_snapshots = {
             filesystem_t(
                 name=key.name.replace(remote.name + "/", ""),
@@ -35,14 +35,14 @@ def generate(
                     snapshot=None,
                 )
             )
-            tasks.extend([Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in local_snapshots[filesystem]])
+            tasks.extend([Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in local_snaps])
             continue
 
         lefts: List[Snapshot]
         middles: List[Snapshot]
         rights: List[Snapshot]
 
-        lefts, middles, rights = venn(local_snapshots[filesystem], remote_snapshots[filesystem])
+        lefts, middles, rights = venn(local_snaps, remote_snapshots[filesystem])
 
         if not middles:
             tasks.extend(
@@ -70,10 +70,10 @@ def generate(
                 ],
             )
 
-    for filesystem in remote_snapshots:
+    for remote_fs in remote_snapshots:
         filesystem = filesystem_t(
-            name=filesystem.name.replace(remote.name + "/", ""),
-            readonly=filesystem.readonly,
+            name=remote_fs.name.replace(remote.name + "/", ""),
+            readonly=remote_fs.readonly,
         )
 
         if filesystem not in local_snapshots:

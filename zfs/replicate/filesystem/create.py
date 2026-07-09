@@ -6,8 +6,8 @@ from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..list import inits
-from . import type  # pylint: disable=W0622
-from .list import list  # pylint: disable=W0622
+from . import type
+from .list import list
 from .type import FileSystem
 
 

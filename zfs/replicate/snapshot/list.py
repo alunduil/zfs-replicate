@@ -9,8 +9,8 @@ from ..filesystem import FileSystem, filesystem
 from .type import Snapshot
 
 
-def list(  # pylint: disable=W0622
-    filesystem: FileSystem,  # pylint: disable=W0621
+def list(
+    filesystem: FileSystem,
     recursive: bool,
     ssh_command: Optional[Command] = None,
 ) -> List[Snapshot]:
@@ -33,7 +33,7 @@ def list(  # pylint: disable=W0622
     return _snapshots(result.stdout)
 
 
-def _list(filesystem: FileSystem, recursive: bool) -> Command:  # pylint: disable=W0621
+def _list(filesystem: FileSystem, recursive: bool) -> Command:
     """ZFS List Snapshot command."""
     options = ["-H", "-t", "snapshot", "-p", "-o", "name,creation", "-r"]
 

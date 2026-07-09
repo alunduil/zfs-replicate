@@ -16,7 +16,7 @@ from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 def test_no_tasks() -> None:
     """generate(Any, {}, {}) == []."""
-    assert not generate(filesystem("pool/filesystem"), {}, {})  # nosec
+    assert not generate(filesystem("pool/filesystem"), {}, {})
 
 
 @given(lists(SNAPSHOTS))  # type: ignore[misc]
@@ -32,12 +32,8 @@ def test_empty_remotes(snapshots: List[Snapshot]) -> None:
 
     result = generate(filesystem(""), snapshots_by_fs, {})
 
-    assert len(  # nosec
-        [t for t in result if t.action == Action.CREATE and t.snapshot is None]
-    ) == len(snapshots_by_fs)
-    assert len(  # nosec
-        [t for t in result if t.action == Action.SEND and t.snapshot is not None]
-    ) == sum(
+    assert len([t for t in result if t.action == Action.CREATE and t.snapshot is None]) == len(snapshots_by_fs)
+    assert len([t for t in result if t.action == Action.SEND and t.snapshot is not None]) == sum(
         map(len, snapshots_by_fs.values()),
     )
 
@@ -55,9 +51,7 @@ def test_empty_locals(snapshots: List[Snapshot]) -> None:
 
     result = generate(filesystem(""), {}, snapshots_by_fs)
 
-    assert len([t for t in result if t.action == Action.DESTROY]) == len(  # nosec
-        snapshots_by_fs
-    ) + sum(
+    assert len([t for t in result if t.action == Action.DESTROY]) == len(snapshots_by_fs) + sum(
         map(len, snapshots_by_fs.values()),
     )
-    assert all(t.action == Action.DESTROY for t in result)  # nosec
+    assert all(t.action == Action.DESTROY for t in result)

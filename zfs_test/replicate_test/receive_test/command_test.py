@@ -9,7 +9,7 @@ def test_command_assembles_receive_invocation() -> None:
     """Wrap the flags and destination in a zfs receive argv."""
     result = sut.command(filesystem("remote/pool"), Options())
 
-    assert result.argv == [  # nosec
+    assert result.argv == [
         "/usr/bin/env",
         "-",
         "zfs",
@@ -31,12 +31,12 @@ def test_command_without_flags_abuts_destination() -> None:
         "receive",
         "-d",
         "remote/pool",
-    ]  # nosec
+    ]
 
 
 def test_command_keeps_hostile_destination_as_one_token() -> None:
     """A destination with shell metacharacters stays a single argv token."""
     result = sut.command(filesystem("remote/pool a$b"), Options())
 
-    assert result.argv[-1] == "remote/pool a$b"  # nosec
-    assert "'remote/pool a$b'" in result.render()  # nosec
+    assert result.argv[-1] == "remote/pool a$b"
+    assert "'remote/pool a$b'" in result.render()

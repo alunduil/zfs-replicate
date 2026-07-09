@@ -7,7 +7,7 @@ from ..filesystem import FileSystem
 
 
 @dataclass(frozen=True)
-class Snapshot:
+class Snapshot:  # noqa: PLW1641 -- frozen dataclass generates __hash__; ruff sees only the explicit __eq__
     """ZFS Snapshot Type."""
 
     filesystem: FileSystem

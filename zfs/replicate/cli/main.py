@@ -69,7 +69,7 @@ log.configure()
 @click.argument("host", required=True)  # type: ignore[misc]
 @click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
 @click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
-def main(  # pylint: disable=R0917,R0914,R0913
+def main(  # noqa: PLR0913 -- CLI entry point; each argument is a distinct command-line option
     dry_run: bool,
     follow_delete: bool,
     recursive: bool,

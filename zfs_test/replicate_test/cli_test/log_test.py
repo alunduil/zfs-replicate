@@ -19,8 +19,8 @@ def test_formatter_prefixes_priority_off_tty(monkeypatch: pytest.MonkeyPatch) ->
     """Off a terminal, each line carries its sd-daemon priority for journald."""
     monkeypatch.setattr(sut, "_stderr_is_tty", lambda: False)
 
-    assert Formatter().format(_record(logging.ERROR, "boom")) == "<3>boom"  # nosec
-    assert Formatter().format(_record(logging.INFO, "a\nb")) == "<6>a\n<6>b"  # nosec
+    assert Formatter().format(_record(logging.ERROR, "boom")) == "<3>boom"
+    assert Formatter().format(_record(logging.INFO, "a\nb")) == "<6>a\n<6>b"
 
 
 def test_formatter_colors_on_tty(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -29,5 +29,5 @@ def test_formatter_colors_on_tty(monkeypatch: pytest.MonkeyPatch) -> None:
 
     formatted = Formatter().format(_record(logging.ERROR, "boom"))
 
-    assert not formatted.startswith("<")  # nosec
-    assert "error: " in formatted  # nosec
+    assert not formatted.startswith("<")
+    assert "error: " in formatted
