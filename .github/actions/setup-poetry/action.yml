@@ -1,0 +1,25 @@
+name: Set up Poetry
+description: Install Poetry and the project's dependencies for a given Python version.
+
+# A local composite action cannot run actions/checkout: the caller must
+# check out the repository before this action's file exists on disk. Callers
+# run actions/checkout first, then invoke this action.
+inputs:
+  python-version:
+    description: Python version passed to actions/setup-python.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: install poetry
+      shell: bash
+      run: pipx install 'poetry<3'
+    - name: setup python-${{ inputs.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: poetry
+    - name: poetry install
+      shell: bash
+      run: poetry install
