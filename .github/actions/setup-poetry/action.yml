@@ -1,6 +1,9 @@
 name: Set up Poetry
-description: Install Poetry and the project's dependencies for a given Python version.
+description: Install Poetry and Python for a given version, with Poetry's download cache.
 
+# Sets up the toolchain only. Jobs that run project code run `poetry install`
+# themselves; jobs that only build or check (poetry build, poetry check) skip it.
+#
 # A local composite action cannot run actions/checkout: the caller must
 # check out the repository before this action's file exists on disk. Callers
 # run actions/checkout first, then invoke this action.
@@ -20,6 +23,3 @@ runs:
       with:
         python-version: ${{ inputs.python-version }}
         cache: poetry
-    - name: poetry install
-      shell: bash
-      run: poetry install

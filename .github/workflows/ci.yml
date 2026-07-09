@@ -39,6 +39,8 @@ jobs:
       - uses: ./.github/actions/setup-poetry
         with:
           python-version: ${{ matrix.python-version }}
+      - name: poetry install
+        run: poetry install
       - name: poetry run pytest
         run: poetry run pytest
       - name: poetry run coveralls
@@ -68,6 +70,8 @@ jobs:
       - uses: ./.github/actions/setup-poetry
         with:
           python-version: ${{ matrix.python-version }}
+      - name: poetry install
+        run: poetry install
       - name: zfs-replicate --help
         run: poetry run -- zfs-replicate --help
 
