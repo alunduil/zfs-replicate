@@ -19,21 +19,21 @@ def test_send_renders_enabled_flags() -> None:
     """_send embeds the -X flag for each enabled send option."""
     command = _send(_snapshot(), options=Options(large_block=True, props=True))
 
-    assert "-L" in command.args  # nosec
-    assert "-p" in command.args  # nosec
+    assert "-L" in command.args
+    assert "-p" in command.args
 
 
 def test_send_omits_disabled_flags() -> None:
     """_send leaves out the -X flag for each disabled send option."""
     command = _send(_snapshot(), options=Options(raw=False))
 
-    assert "-w" not in command.args  # nosec
-    assert "-L" not in command.args  # nosec
+    assert "-w" not in command.args
+    assert "-L" not in command.args
 
 
 def test_send_keeps_hostile_snapshot_as_one_token() -> None:
     """A snapshot name with shell metacharacters stays a single argv token."""
     command = _send(_snapshot("pool/data a$b"), options=Options())
 
-    assert command.args[-1] == "pool/data a$b@snap"  # nosec
-    assert "'pool/data a$b@snap'" in command.render()  # nosec
+    assert command.args[-1] == "pool/data a$b@snap"
+    assert "'pool/data a$b@snap'" in command.render()

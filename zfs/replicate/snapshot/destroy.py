@@ -19,6 +19,4 @@ def destroy(snapshot: Snapshot, ssh_command: Command) -> None:
 
 
 def _destroy(snapshot: Snapshot) -> Command:
-    return Command.with_empty_env(
-        "zfs", "destroy", f"{snapshot.filesystem.name}@{snapshot.name}"
-    )
+    return Command.with_empty_env("zfs", "destroy", f"{snapshot.filesystem.name}@{snapshot.name}")

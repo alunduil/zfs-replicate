@@ -6,17 +6,15 @@ from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..list import inits
-from . import type  # pylint: disable=W0622
-from .list import list  # pylint: disable=W0622
+from . import type
+from .list import list
 from .type import FileSystem
 
 
 def create(filesystem: FileSystem, ssh_command: Command) -> None:
     """Create a Remote FileSystem."""
     if filesystem.name is None:
-        raise ZFSReplicateError(
-            f"refusing to create dataset: '{filesystem.dataset}'", filesystem
-        )
+        raise ZFSReplicateError(f"refusing to create dataset: '{filesystem.dataset}'", filesystem)
 
     top_level = type.filesystem(name=filesystem.dataset, readonly=filesystem.readonly)
 
@@ -30,11 +28,7 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
 
         result = process.run(over_ssh(ssh_command, _create(path)))
 
-        error = (
-            result.stderr.strip(b"\n")
-            .strip(b"\r")
-            .replace(b"WARNING: ENABLED NONE CIPHER", b"")
-        )
+        error = result.stderr.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
 
         if result.returncode:
             if b"successfully created, but not mounted" in error:

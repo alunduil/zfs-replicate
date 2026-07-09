@@ -7,7 +7,7 @@ from ..filesystem import FileSystem
 
 
 @dataclass(frozen=True)
-class Snapshot:
+class Snapshot:  # noqa: PLW1641 -- frozen dataclass generates __hash__; ruff sees only the explicit __eq__
     """ZFS Snapshot Type."""
 
     filesystem: FileSystem
@@ -25,10 +25,6 @@ class Snapshot:
 
         left = self.filesystem.name
         right = other.filesystem.name
-        is_suffix = (
-            left == right or left.endswith("/" + right) or right.endswith("/" + left)
-        )
+        is_suffix = left == right or left.endswith("/" + right) or right.endswith("/" + left)
 
-        return (
-            is_suffix and self.name == other.name and self.timestamp == other.timestamp
-        )
+        return is_suffix and self.name == other.name and self.timestamp == other.timestamp

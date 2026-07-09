@@ -14,7 +14,7 @@ from .type import Snapshot
 
 # Threads the whole replication surface to assemble the send pipeline, so the
 # parameter count crosses pylint's threshold.
-def send(  # pylint: disable=R0917,R0913
+def send(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     current: Snapshot,
     ssh_command: Command,
@@ -29,9 +29,7 @@ def send(  # pylint: disable=R0917,R0913
     destination = filesystem.remote_dataset(remote, current.filesystem)
 
     remote_side: List[Command] = [
-        cmd
-        for cmd in (decompress_command, receive_command(destination, receive_options))
-        if cmd is not None
+        cmd for cmd in (decompress_command, receive_command(destination, receive_options)) if cmd is not None
     ]
 
     proc = _pipeline(
@@ -65,9 +63,7 @@ def _pipeline(
     parent's, so send/compress errors stay visible; the ssh stage's streams are
     captured for the caller's error handling.
     """
-    upstream = process.open(
-        send_command, stdin=process.DEVNULL, stdout=process.PIPE, stderr=None
-    )
+    upstream = process.open(send_command, stdin=process.DEVNULL, stdout=process.PIPE, stderr=None)
 
     if compress_command is not None:
         compressor = process.open(
@@ -107,6 +103,4 @@ def _send(
     if previous is not None:
         flags.extend(["-i", f"{previous.filesystem.name}@{previous.name}"])
 
-    return Command.with_empty_env(
-        "zfs", "send", *flags, f"{current.filesystem.name}@{current.name}"
-    )
+    return Command.with_empty_env("zfs", "send", *flags, f"{current.filesystem.name}@{current.name}")

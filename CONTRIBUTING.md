@@ -50,6 +50,7 @@ issue.
 1. Make the changes in your fork
 1. Test your changes with `pytest`, following the
    [testing conventions](docs/reference/testing.md)
+1. Lint and format your changes with `pre-commit run --all-files`
 1. Send your changes in a new pull request describing why you want to make that
    change
 

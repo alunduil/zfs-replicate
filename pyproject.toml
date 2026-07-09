@@ -24,8 +24,8 @@ repository = "https://github.com/alunduil/zfs-replicate"
 [tool.fawltydeps]
 ignore_unused = ["coveralls", "pytest-cov", "vale"]
 
-[tool.isort]
-profile = "black"
+[tool.mypy]
+strict = true
 
 [tool.poetry]
 classifiers = [
@@ -57,6 +57,29 @@ pytest-cov = ">=4,<6"
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --cov=zfs --cov-report=term-missing"
 testpaths = ["zfs_test"]
+
+[tool.ruff]
+# target-version is intentionally unset: ruff infers it from the project's
+# requires-python, so the Python floor has one source of truth.
+line-length = 120
+src = ["."]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint]
+# UP (pyupgrade) is intentionally omitted here: enabling it rewrites ~99 typing
+# annotations across the tree, deferred to keep this migration reviewable (#501).
+# PGH and RUF100 stand in for the removed pygrep-hooks and yesqa hooks; G010 for
+# python-no-log-warn; S (above) covers python-no-eval and the bandit rule set.
+select = ["E", "F", "I", "B", "SIM", "D", "N", "S", "G010", "PGH", "PL", "RUF100"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert (S101) and compare against literal expectations (PLR2004) by design.
+"zfs_test/**" = ["PLR2004", "S101"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
 
 [tool.vulture]
 paths = ["zfs", "zfs_test"]

@@ -13,11 +13,11 @@ def test_value_none() -> None:
         optional.value(None)
     except RuntimeError:
         pass
-    except:  # noqa: E722 # pylint: disable=W0702
-        assert False, "Expected RuntimeError"  # nosec
+    except:  # noqa: E722
+        raise AssertionError("Expected RuntimeError") from None
 
 
 @given(integers())  # type: ignore[misc]
 def test_value_not_none(value: int) -> None:
     """optional.value(value) == value."""
-    assert optional.value(value) == value  # nosec
+    assert optional.value(value) == value

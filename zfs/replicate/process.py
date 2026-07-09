@@ -3,10 +3,10 @@
 Wraps stdlib ``subprocess`` so a command is exec'd from its argv list with
 ``shell=False`` -- arguments reach the program verbatim, never re-parsed by a
 local shell. This is the one place the project spawns a process, so the
-shell-free guarantee (and its bandit suppression) lives here and nowhere else.
+shell-free guarantee lives here and nowhere else.
 """
 
-import subprocess  # nosec B404 -- the sole audited process boundary; see the Popen note below
+import subprocess
 from typing import IO, Optional, Union
 
 from .command import Command
@@ -21,16 +21,16 @@ Popen = subprocess.Popen
 Stream = Optional[Union[IO[bytes], int]]
 
 
-def open(  # pylint: disable=W0622
+def open(
     command: Command,
     stdin: Stream = subprocess.PIPE,
     stdout: Stream = subprocess.PIPE,
     stderr: Stream = subprocess.PIPE,
 ) -> "subprocess.Popen[bytes]":
     """Start ``command`` as a process, for streaming or pipeline wiring."""
-    # nosec B603 -- argv list with shell=False; program names are literals and
-    # untrusted data only ever rides as argv tokens, so no shell can interpret it.
-    return subprocess.Popen(  # nosec B603
+    # argv list with shell=False; program names are literals and untrusted data
+    # only ever rides as argv tokens, so no shell can interpret it.
+    return subprocess.Popen(  # noqa: S603
         command.argv,
         env=command.env,
         stdin=stdin,
