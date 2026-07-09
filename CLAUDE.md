@@ -27,13 +27,13 @@ what's already wired into the project, not reinventing it.
   tree lives under `zfs_test/`. `Hypothesis` is available as
   a development dependency.
 - **Lint and format:** `ruff` (both `ruff check` and `ruff
-  format`), configured under `[tool.ruff]` in `pyproject.toml`;
-  the canonical command is `poetry run ruff`. It covers what
-  `black`, `isort`, `flake8`, `pydocstyle`, and `bandit` used
-  to. `mypy` (`[tool.mypy]`) covers types, `Vale` (`.vale.ini`,
-  `styles/`) prose, and `FawltyDeps` unused dependencies.
-  `pre-commit` orchestrates all of them from
-  `.pre-commit-config.yaml`.
+  format`), configured under `[tool.ruff]` in `pyproject.toml`.
+  It covers what `black`, `isort`, `flake8`, `pydocstyle`, and
+  `bandit` used to. `mypy` (`[tool.mypy]`) covers types, `Vale`
+  (`.vale.ini`, `styles/`) prose, `vulture` dead code, and
+  `FawltyDeps` unused dependencies. `pre-commit` runs all of
+  them from `.pre-commit-config.yaml`; `pre-commit run
+  --all-files` is the canonical local check.
 - **Entry point:** the command-line tool installs as
   `zfs-replicate = "zfs.replicate.cli.main:main"` (see
   `[tool.poetry.scripts]` in `pyproject.toml`).
