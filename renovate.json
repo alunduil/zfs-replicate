@@ -1,0 +1,18 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices", "schedule:weekly"],
+  "baseBranchPatterns": ["master"],
+  "reviewers": ["alunduil"],
+  "pre-commit": {"enabled": true},
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "vulnerabilityAlerts": {"minimumReleaseAge": "0 days"},
+  "osvVulnerabilityAlerts": true,
+  "packageRules": [
+    {
+      "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
+      "matchUpdateTypes": ["pin", "pinDigest", "digest", "lockFileMaintenance"],
+      "minimumReleaseAge": "0 days"
+    }
+  ]
+}
