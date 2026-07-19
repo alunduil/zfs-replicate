@@ -6,14 +6,19 @@ Accepted
 
 ## Context and Problem Statement
 
-`task/execute.py` replicates filesystems one at a time. For an operator
-with many independent data sets, a run takes the sum of the times for
-every data set rather than the time of the slowest one (issue
-[#394](https://github.com/alunduil/zfs-replicate/issues/394), and the
-original request in
-[#3](https://github.com/alunduil/zfs-replicate/issues/3)). The data sets
-are independent: their send
-and receive pipes share no ordering constraint.
+`task/execute.py` replicates filesystems one at a time, so a run's total
+time is the sum of the times for every data set. The data sets are
+independent: their send and receive pipes share no ordering constraint,
+and running them concurrently trims that time. The gain stays bounded
+rather than unlimited: `--jobs N` caps concurrency at N workers,
+and a single data set stays serial, since its create precedes its sends
+and its incremental sends run in order. By Amdahl's law the speedup
+tracks the parallel fraction and the worker count. The floor is the
+longest single data set plus the serial work every run shares -- listing
+snapshots, creating the destination root, and planning the tasks. Issue
+[#394](https://github.com/alunduil/zfs-replicate/issues/394) targets
+this, drawing on the original request in
+[#3](https://github.com/alunduil/zfs-replicate/issues/3).
 
 The tasks reaching `execute()` still carry ordering constraints, but the
 current code encodes them by accident. `generate.py` emits a `CREATE`
