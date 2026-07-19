@@ -7,29 +7,22 @@ Accepted
 ## Context and Problem Statement
 
 `task/execute.py` replicates filesystems one at a time, so a run's total
-time is the sum of the times for every data set. The data sets are
-independent: their send and receive pipes share no ordering constraint,
-and running them concurrently trims that time. The gain stays bounded
-rather than unlimited: `--jobs N` caps concurrency at N workers,
-and a single data set stays serial, since its create precedes its sends
-and its incremental sends run in order. By Amdahl's law the speedup
-tracks the parallel fraction and the worker count. The floor is the
-longest single data set plus the serial work every run shares -- listing
-snapshots, creating the destination root, and planning the tasks. Issue
+time is the sum across every data set. Independent data sets could run
+concurrently -- their send and receive pipes share no ordering
+constraint -- bounded by `--jobs N` and by the longest single data set,
+since each stays serial internally (create before sends, sends in
+order). Issue
 [#394](https://github.com/alunduil/zfs-replicate/issues/394) targets
-this, drawing on the original request in
+this, from the original request in
 [#3](https://github.com/alunduil/zfs-replicate/issues/3).
 
 The tasks reaching `execute()` still carry ordering constraints, but the
-current code encodes them by accident. `generate.py` emits a `CREATE`
-task keyed by the destination filesystem and a run of `SEND` tasks keyed
-by the remote root, so the create for a single data set and its sends
-land in separate groups. A sort by name depth then happens to order
-create before send. That accidental ordering is what breaks under
-unguarded parallelism: a `SEND` can start before its `CREATE` finishes.
-
-The question is how to run independent data sets concurrently while
-honoring the ordering that the depth sort now hides.
+current code encodes them incidentally: `generate.py` keys a `CREATE` by
+its destination filesystem and the following `SEND`s by the remote root,
+so the create for a data set and its sends land in separate groups, and
+only a sort by name depth places create before send. Unguarded
+parallelism breaks that: a `SEND` can start before its `CREATE`
+finishes.
 
 ## Decision Drivers
 
@@ -39,8 +32,7 @@ honoring the ordering that the depth sort now hides.
 * `--jobs 1` reproduces today's sequential behavior.
 * One failed data set leaves the others running, and the run exits
   nonzero at the end.
-* The smallest amount of custom concurrency code that stays correct, so
-  the sequential and parallel paths stay testable.
+* Least custom concurrency code that stays correct and testable.
 * A ready task starts as soon as its own dependencies finish, not at a
   batch boundary.
 
@@ -80,9 +72,6 @@ valid topological order that reproduces the sequential path.
   sort key, so a reader sees why each task waits.
 * Good: independent data sets run as soon as they're ready, up to the
   job limit, with no batch barrier.
-* Good: all graph bookkeeping stays on the main thread, so no lock
-  guards the shared state, and the loop ends when the last future
-  drains, without poison pills.
 * Bad: the edge builder and dispatcher add code and test surface that
   the sequential loop never needed.
 * Neutral: the depth sort that ordered tasks before goes away, replaced
@@ -105,8 +94,8 @@ dependencies have finished, runs it when they have, and pushes it back
 when they haven't.
 
 * Good: one queue, little structure.
-* Bad: a not-ready task cycles through the queue again and again, which
-  burns cycles and needs a delay to avoid a busy spin.
+* Bad: a not-ready task cycles back repeatedly until a delay throttles
+  the spin.
 * Bad: workers share the completion state, so a lock guards it.
 * Bad: ordering emerges from the churn rather than from a stated rule,
   which is hard to reason about.
@@ -129,9 +118,7 @@ reaches the same behavior without the extra thread or the queues.
 
 ### C -- Main-thread dispatcher over a bounded `ThreadPoolExecutor`
 
-The chosen option. The executor's internal queue serves as the ready
-holding area, and `futures.wait(FIRST_COMPLETED)` serves as the waiter,
-so the dispatcher stays a single main-thread loop.
+The chosen option.
 
 * Good: no coordinator thread, no hand-built queue, no poison pills.
 * Good: graph mutation stays on the main thread, so no lock.
@@ -151,8 +138,8 @@ waiting for the whole level before the next starts.
 
 ## More Information
 
-Issue [#394](https://github.com/alunduil/zfs-replicate/issues/394)
-carries the acceptance criteria and the `--jobs` flag. The dependency on
-operational output flowing through the logging module (issue
+Issue [#394](https://github.com/alunduil/zfs-replicate/issues/394) has
+the acceptance criteria. The dependency on operational output flowing
+through the logging module (issue
 [#434](https://github.com/alunduil/zfs-replicate/issues/434)) landed
 first, so log records stay one line under concurrency.
