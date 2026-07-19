@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Context
 
@@ -28,9 +28,10 @@ form. A record whose weight lies in comparing options uses
 and their trade-offs stand as their own sections rather than dissolving
 into prose.
 
-Every record starts at `Proposed`. It moves to `Accepted` after the team
-commits to the decision, or to `Superseded by NNNN` or `Deprecated` when
-a later record replaces it.
+A record merges into the default branch as `Accepted`: reaching the
+default branch is the decision, and review and dissent happen on the
+pull request beforehand. A later record moves an earlier one to
+`Superseded by NNNN` or `Deprecated`.
 
 ## Consequences
 
