@@ -1,5 +1,7 @@
 argparse
 docstring
+MADR
+Nygard
 release-please
 semver
 subprocess
