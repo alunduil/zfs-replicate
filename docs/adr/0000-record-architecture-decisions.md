@@ -36,7 +36,6 @@ pull request beforehand. A later record moves an earlier one to
 ## Consequences
 
 The rationale behind a hard choice survives next to the code it governs,
-and a new contributor reads the collection in sequence to see how the
-current design took shape. The cost is discipline: writing a record when
-a decision warrants one, and the judgment to skip the rest. A collection
-padded with tactical notes is worth less than a spare one.
+and a new contributor reads the collection to see how the current design
+took shape. The cost is discipline: writing a record when a decision
+warrants one, and the judgment to skip the rest.
