@@ -8,8 +8,11 @@ Accepted
 
 `task/execute.py` replicates filesystems one at a time. For an operator
 with many independent data sets, a run takes the sum of the times for
-every data set rather than the time of the slowest one (issue #394, and
-the original request in #3). The data sets are independent: their send
+every data set rather than the time of the slowest one (issue
+[#394](https://github.com/alunduil/zfs-replicate/issues/394), and the
+original request in
+[#3](https://github.com/alunduil/zfs-replicate/issues/3)). The data sets
+are independent: their send
 and receive pipes share no ordering constraint.
 
 The tasks reaching `execute()` still carry ordering constraints, but the
@@ -84,8 +87,9 @@ valid topological order that reproduces the sequential path.
 
 Tests cover the sequential path (`--jobs 1`) and the parallel path
 (`--jobs 4`) reaching the same final state, and a failing data set that
-leaves the others to finish while the run exits nonzero (the issue #394
-acceptance criteria).
+leaves the others to finish while the run exits nonzero (the
+[#394](https://github.com/alunduil/zfs-replicate/issues/394) acceptance
+criteria).
 
 ## Pros and Cons of the Options
 
@@ -142,7 +146,8 @@ waiting for the whole level before the next starts.
 
 ## More Information
 
-Issue #394 carries the acceptance criteria and the `--jobs` flag. The
-dependency on operational output flowing through the logging module
-(issue #434) landed first, so log records stay one line under
-concurrency.
+Issue [#394](https://github.com/alunduil/zfs-replicate/issues/394)
+carries the acceptance criteria and the `--jobs` flag. The dependency on
+operational output flowing through the logging module (issue
+[#434](https://github.com/alunduil/zfs-replicate/issues/434)) landed
+first, so log records stay one line under concurrency.
