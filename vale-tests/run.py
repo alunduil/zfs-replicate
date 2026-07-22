@@ -9,14 +9,11 @@ import json
 import re
 import sys
 from pathlib import Path
-from collections import Counter
 
 ROOT = Path(__file__).resolve().parent.parent
 STYLES_DIR = ROOT / "styles" / "Custom-Agent"
 FIXTURES_JSON = Path(__file__).resolve().parent / "fixtures.json"
 SENTENCE_CHAR_LIMIT = 180
-REPETITION_ALPHA = 4
-REPETITION_MAX = 2
 
 
 def validate_rule_yaml(path: Path) -> bool:
@@ -66,39 +63,12 @@ def run_sentence_length_check(text: str) -> list[tuple[int, str]]:
     sentences = re.split(r"(?<=[.!?])\s+", text)
     col = 0
     for s in sentences:
-        idx = len(text[:col])
-        line = text[:idx].count("\n") + 1
+        line = text[:col].count("\n") + 1
         actual_char_count = len(s)
         if actual_char_count > SENTENCE_CHAR_LIMIT:
             snippet = s[:60].replace("\n", " ") + "..."
             findings.append((line, snippet))
         col += len(s) + 1
-    return findings
-
-
-def run_repetition_check(text: str) -> list[tuple[int, str, int]]:
-    findings = []
-    paragraphs = text.split("\n\n")
-    para_start = 0
-    for para in paragraphs:
-        para_lines = text[:para_start].count("\n") + 1
-
-        in_code_block = False
-        clean_lines = []
-        for line in para.split("\n"):
-            if line.strip().startswith("```"):
-                in_code_block = not in_code_block
-                continue
-            if not in_code_block:
-                clean_lines.append(line)
-
-        clean_text = " ".join(clean_lines)
-        tokens = re.findall(r"[a-zA-Z]{%d,}" % REPETITION_ALPHA, clean_text.lower())
-        counts = Counter(tokens)
-        for token, count in counts.items():
-            if count > REPETITION_MAX:
-                findings.append((para_lines, token, count))
-        para_start += len(para) + 2
     return findings
 
 
@@ -111,18 +81,11 @@ def load_fixtures() -> dict:
     return data.get("fixtures", {})
 
 
-def test_fixture_content(name: str, text: str, expect_length: bool, expect_repeat: bool) -> tuple[str, bool, int, int]:
+def test_fixture_content(name: str, text: str, expect_length: bool) -> tuple[str, bool, int]:
     length_findings = run_sentence_length_check(text)
-    repeat_findings = run_repetition_check(text)
-
     nl = len(length_findings)
-    nr = len(repeat_findings)
-
     length_ok = (nl > 0) == expect_length
-    repeat_ok = (nr > 0) == expect_repeat
-    passed = length_ok and repeat_ok
-
-    return (name, passed, nl, nr)
+    return (name, length_ok, nl)
 
 
 def main() -> int:
@@ -134,9 +97,7 @@ def main() -> int:
     if check_only:
         return rule_errors
 
-    print("\n=== VALE FIXTURE TESTS ===")
-    print(f"  Sentence limit: {SENTENCE_CHAR_LIMIT} chars")
-    print(f"  Repetition alpha: {REPETITION_ALPHA}, max repeats: {REPETITION_MAX}")
+    print(f"\n=== VALE FIXTURE TESTS (sentence limit: {SENTENCE_CHAR_LIMIT} chars) ===")
 
     fixtures = load_fixtures()
     if not fixtures:
@@ -146,17 +107,15 @@ def main() -> int:
     total = 0
     passed = 0
     for name, fixture in fixtures.items():
-        result = test_fixture_content(name, fixture["content"], fixture["expect_length"], fixture["expect_repeat"])
-        _, ok, nl, nr = result
+        result = test_fixture_content(name, fixture["content"], fixture["expect_length"])
+        _, ok, nl = result
         total += 1
         desc = fixture.get("description", name)
         if ok:
             passed += 1
             print(f"  PASS: {name} ({desc})")
         else:
-            print(
-                f"  FAIL: {name} ({desc}) - len={nl} exp={fixture['expect_length']}, rep={nr} exp={fixture['expect_repeat']}"
-            )
+            print(f"  FAIL: {name} ({desc}) - len_findings={nl} exp={fixture['expect_length']}")
             print(f"         NOTE: fixture-based rule simulation; full vale CLI test requires vale v3.13.0")
 
     print(f"\n  Result: {passed}/{total} passed, {rule_errors} rule errors")

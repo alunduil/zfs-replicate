@@ -1,6 +1,0 @@
-extends: repetition
-message: "'%s' is repeated in this paragraph — remove duplicate phrasing to save agent-context tokens."
-level: warning
-alpha: 4
-ignorecase: true
-scope: paragraph

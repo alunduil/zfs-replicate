@@ -12,12 +12,6 @@
       "expect_repeat": false,
       "description": "long sentences - flagged"
     },
-    "repeated-instruction": {
-      "content": "# Repetition Test\n\nThe agent must always consult the state registry before modifying\nfiles in the workspace directory. The agent shall verify that all\nstate registry artifacts are current and consistent with remote\nsources before proceeding. The agent also synchronizes the state\nregistry snapshot at the start of each task execution cycle.\n\n## Another Section\n\nClean paragraph here.\nNo repeated words.",
-      "expect_length": false,
-      "expect_repeat": true,
-      "description": "repeated words - flagged"
-    },
     "human-doc-control": {
       "content": "# Getting Started\n\nWelcome to the project. This document helps you set up your\ndevelopment environment. Follow these steps to get started\nquickly and efficiently.\n\n## Prerequisites\n\nMake sure you have Python 3.10 or later installed on your\nsystem. We recommend using Nix for reproducible development\nenvironments, but Poetry also works well for most use cases.\n\n## Installation Steps\n\nRun `poetry install` to set up the project dependencies and\nconfigure your local development environment.",
       "expect_length": false,
