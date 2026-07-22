@@ -1,0 +1,6 @@
+extends: existence
+message: "This sentence is very long — split into shorter instructions for token efficiency and AI clarity."
+level: warning
+scope: sentence
+raw:
+  - '.{181,}'
