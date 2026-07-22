@@ -5,6 +5,7 @@ Usage:
     python vale-tests/run.py --check  # rules-only, no fixtures
 """
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -12,10 +13,10 @@ from collections import Counter
 
 ROOT = Path(__file__).resolve().parent.parent
 STYLES_DIR = ROOT / "styles" / "Custom-Agent"
-FIXTURES_DIR = ROOT / "vale-tests" / "fixtures"
+FIXTURES_JSON = Path(__file__).resolve().parent / "fixtures.json"
 SENTENCE_CHAR_LIMIT = 180
 REPETITION_ALPHA = 4
-REPETITION_MAX = 2  # flag when a token appears >2 times in a paragraph
+REPETITION_MAX = 2
 
 
 def validate_rule_yaml(path: Path) -> bool:
@@ -82,7 +83,6 @@ def run_repetition_check(text: str) -> list[tuple[int, str, int]]:
     for para in paragraphs:
         para_lines = text[:para_start].count("\n") + 1
 
-        # Skip code blocks
         in_code_block = False
         clean_lines = []
         for line in para.split("\n"):
@@ -102,11 +102,16 @@ def run_repetition_check(text: str) -> list[tuple[int, str, int]]:
     return findings
 
 
-def test_fixture(name: str, expect_length: bool, expect_repeat: bool) -> tuple[str, bool, int, int, int, int]:
-    fixture_path = FIXTURES_DIR / name
-    if not fixture_path.exists():
-        return (name, False, 0, 0, 0, 0)
-    text = fixture_path.read_text(encoding="utf-8")
+def load_fixtures() -> dict:
+    if not FIXTURES_JSON.exists():
+        print(f"  ERROR: {FIXTURES_JSON} not found", file=sys.stderr)
+        return {}
+    with open(FIXTURES_JSON, encoding="utf-8") as f:
+        data = json.load(f)
+    return data.get("fixtures", {})
+
+
+def test_fixture_content(name: str, text: str, expect_length: bool, expect_repeat: bool) -> tuple[str, bool, int, int]:
     length_findings = run_sentence_length_check(text)
     repeat_findings = run_repetition_check(text)
 
@@ -117,7 +122,7 @@ def test_fixture(name: str, expect_length: bool, expect_repeat: bool) -> tuple[s
     repeat_ok = (nr > 0) == expect_repeat
     passed = length_ok and repeat_ok
 
-    return (name, passed, nl, nr, 0, 0)
+    return (name, passed, nl, nr)
 
 
 def main() -> int:
@@ -133,26 +138,25 @@ def main() -> int:
     print(f"  Sentence limit: {SENTENCE_CHAR_LIMIT} chars")
     print(f"  Repetition alpha: {REPETITION_ALPHA}, max repeats: {REPETITION_MAX}")
 
-    fixtures = [
-        ("good-agent-instructions.md", False, False, "clean agent instructions - no findings"),
-        ("too-long-instruction.md", True, False, "long sentences - flagged"),
-        ("repeated-instruction.md", False, True, "repeated words - flagged"),
-        ("human-doc-control.md", False, False, "human doc - agent rules don't apply*"),
-        ("code-fence-control.md", False, False, "code blocks - not flagged as content repetition"),
-        ("placeholder-control.md", False, False, "placeholders - not false-flagged*"),
-    ]
+    fixtures = load_fixtures()
+    if not fixtures:
+        print("  ERROR: no fixtures loaded")
+        return 1
 
     total = 0
     passed = 0
-    for name, exp_len, exp_rep, desc in fixtures:
-        result = test_fixture(name, exp_len, exp_rep)
-        _, ok, nl, nr, _, _ = result
+    for name, fixture in fixtures.items():
+        result = test_fixture_content(name, fixture["content"], fixture["expect_length"], fixture["expect_repeat"])
+        _, ok, nl, nr = result
         total += 1
+        desc = fixture.get("description", name)
         if ok:
             passed += 1
             print(f"  PASS: {name} ({desc})")
         else:
-            print(f"  FAIL: {name} ({desc}) - len={nl} exp={exp_len}, rep={nr} exp={exp_rep}")
+            print(
+                f"  FAIL: {name} ({desc}) - len={nl} exp={fixture['expect_length']}, rep={nr} exp={fixture['expect_repeat']}"
+            )
             print(f"         NOTE: fixture-based rule simulation; full vale CLI test requires vale v3.13.0")
 
     print(f"\n  Result: {passed}/{total} passed, {rule_errors} rule errors")
