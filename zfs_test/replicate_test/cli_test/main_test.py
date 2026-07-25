@@ -118,6 +118,38 @@ def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> N
     )
 
 
+def test_jobs_threads_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`--jobs` reaches task.execute as the bound on concurrent data sets.
+
+    .. code:: bash
+
+        zfs-replicate -j 4 -l alunduil -i pyproject.toml example.com bogus bogus
+    """
+    captured: Dict[str, Any] = {}
+
+    def fake_list(*_args: Any, **_kwargs: Any) -> List[Snapshot]:
+        return []
+
+    def fake_create(*_args: Any, **_kwargs: Any) -> None:
+        return None
+
+    def fake_execute(*_args: Any, **kwargs: Any) -> None:
+        captured.update(kwargs)
+
+    monkeypatch.setattr("zfs.replicate.cli.main.snapshot.list", fake_list)
+    monkeypatch.setattr("zfs.replicate.cli.main.filesystem.create", fake_create)
+    monkeypatch.setattr("zfs.replicate.cli.main.task.execute", fake_execute)
+
+    runner = CliRunner()
+    result = runner.invoke(
+        sut.main,
+        ["-j", "4", "-l", "alunduil", "-i", "pyproject.toml", "example.com", "bogus", "bogus"],
+    )
+    assert result.exit_code == 0, result.output
+
+    assert captured.get("jobs") == 4
+
+
 def test_set_rejects_malformed_property() -> None:
     """`--receive-set` without an equals sign is rejected before execution.
 
