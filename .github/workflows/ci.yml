@@ -16,9 +16,9 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v3
-      - uses: pre-commit/action@v3.0.0
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+      - uses: actions/setup-python@3542bca2639a428e1796aaa6a2ffef0c0f575566 # v3
+      - uses: pre-commit/action@646c83fcd040023954eafda54b4db0192ce70507 # v3.0.0
 
   pytest:
     runs-on: ubuntu-latest
@@ -35,7 +35,7 @@ jobs:
           - python-version: 3.x
             experimental: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
       - uses: ./.github/actions/setup-poetry
         with:
           python-version: ${{ matrix.python-version }}
@@ -66,7 +66,7 @@ jobs:
           - python-version: 3.x
             experimental: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
       - uses: ./.github/actions/setup-poetry
         with:
           python-version: ${{ matrix.python-version }}
@@ -78,7 +78,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
       - uses: ./.github/actions/setup-poetry
         with:
           python-version: "3.12"
@@ -94,5 +94,5 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/dependency-review-action@v2
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
+      - uses: actions/dependency-review-action@0efb1d1d84fc9633afcdaad14c485cbbc90ef46c # v2
