@@ -63,6 +63,25 @@ Small change examples:
 * Typographical error corrections, space, and formatting changes
 * Comment clean ups
 
+## Supported Python versions
+
+zfs-replicate supports the CPython releases that upstream still supports. A
+release counts as supported until its end-of-life date in the
+[Python release cycle]. After that date passes, the release leaves the
+supported set.
+
+Three places have to agree on that set:
+
+1. `requires-python` in `pyproject.toml` names the floor.
+1. `python` under `[tool.poetry.dependencies]` names the same floor.
+1. Each `python-version` list in `.github/workflows/ci.yml` names every
+   supported release, annotated with its end-of-life month.
+
+Adding a newly released version is a `ci` change. Raising the floor drops
+support for users still on the old version, so a floor raise is a breaking
+change: mark it with `!` and a `BREAKING CHANGE:` footer, and record it under
+`Removed` in the changelog.
+
 ## How to report a bug
 
 When creating an issue for a bug or unexpected behaviour, make sure you include
@@ -184,3 +203,4 @@ release on their own.
 [good first issues]: https://github.com/alunduil/zfs-replicate/issues?q=is%3Aissue+label%3A%22good+first+issue%22+is%3Aopen
 [How to Contribute to an Open Source Project on GitHub]: https://app.egghead.io/playlists/how-to-contribute-to-an-open-source-project-on-github
 [Make a Pull Request]: https://makeapullrequest.com/
+[Python release cycle]: https://devguide.python.org/versions/

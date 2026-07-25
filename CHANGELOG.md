@@ -12,6 +12,10 @@
 - Renamed `--raw / --no-raw` (4.1.0) to `--send-raw / --send-no-raw` so every send flag shares the `--send-` prefix; the default still sends `zfs send -w` for encrypted data sets (#392).
 - `--follow-delete` no longer implies `zfs send -p`. Send properties are now controlled solely by `--send-props`; pass it alongside `--follow-delete` to keep the earlier behaviour (#392).
 
+### Removed
+
+- Support for Python 3.9 and 3.10. The minimum supported version is now Python 3.11. Python 3.9 reached upstream end-of-life on 2025-10-31 and 3.10 reaches it on 2026-10-31; the supported set now tracks the CPython releases upstream still supports, and the test matrix covers 3.11 through 3.14 (#398, #461).
+
 ## 4.1.0 -- 2026-05-09
 
 ### Added
