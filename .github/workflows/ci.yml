@@ -26,10 +26,10 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.9"  # EOL 2025-10
-          - "3.10"  # EOL 2026-10
           - "3.11"  # EOL 2027-10
           - "3.12"  # EOL 2028-10
+          - "3.13"  # EOL 2029-10
+          - "3.14"  # EOL 2030-10
         experimental: [false]
         include:
           - python-version: 3.x
@@ -57,10 +57,10 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - "3.9"  # EOL 2025-10
-          - "3.10"  # EOL 2026-10
           - "3.11"  # EOL 2027-10
           - "3.12"  # EOL 2028-10
+          - "3.13"  # EOL 2029-10
+          - "3.14"  # EOL 2030-10
         experimental: [false]
         include:
           - python-version: 3.x
