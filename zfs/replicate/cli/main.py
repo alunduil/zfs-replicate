@@ -15,20 +15,20 @@ from .click import EnumChoice
 log.configure()
 
 
-@click.command()  # type: ignore[misc]
-@log.option  # type: ignore[misc]
-@click.option(  # type: ignore[misc]
+@click.command()
+@log.option
+@click.option(
     "--dry-run",
     is_flag=True,
     help="Generate replication tasks but do not execute them.",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--follow-delete",
     is_flag=True,
     help="Delete snapshots on REMOTE_FS that have been deleted from LOCAL_FS.",
 )
-@click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")  # type: ignore[misc]
-@click.option(  # type: ignore[misc]
+@click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")
+@click.option(
     "--port",
     "-p",
     type=click.IntRange(1, 65535),
@@ -36,7 +36,7 @@ log.configure()
     default=22,
     help="Connect to SSH on PORT.",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--login",
     "-l",
     "--user",
@@ -45,20 +45,20 @@ log.configure()
     metavar="USER",
     help="Connect to SSH as USER.",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "-i",
     "--identity-file",
     type=click.Path(exists=True, dir_okay=False),
     required=True,
     help="SSH identity file to use.",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--cipher",
     type=EnumChoice(Cipher),
     default=Cipher.STANDARD,
     help="One of: disable (no ciphers), fast (only fast ciphers), or standard (default ciphers).",
 )
-@click.option(  # type: ignore[misc]
+@click.option(
     "--compression",
     type=EnumChoice(Compression),
     default=Compression.LZ4,
@@ -66,9 +66,9 @@ log.configure()
 )
 @options.send_group
 @options.receive_group
-@click.argument("host", required=True)  # type: ignore[misc]
-@click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")  # type: ignore[misc]
-@click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")  # type: ignore[misc]
+@click.argument("host", required=True)
+@click.argument("remote_fs", type=filesystem_t, required=True, metavar="REMOTE_FS")
+@click.argument("local_fs", type=filesystem_t, required=True, metavar="LOCAL_FS")
 def main(  # noqa: PLR0913 -- CLI entry point; each argument is a distinct command-line option
     dry_run: bool,
     follow_delete: bool,
