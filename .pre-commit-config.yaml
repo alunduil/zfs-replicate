@@ -54,7 +54,7 @@ repos:
         args: [--autofix]
         exclude: poetry\.lock
   - repo: https://github.com/tweag/FawltyDeps
-    rev: v0.13.1
+    rev: v0.20.0
     hooks:
       - id: check
         args:
