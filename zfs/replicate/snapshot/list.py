@@ -51,7 +51,9 @@ def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:
 
     snapshots[0] = _add_previous(snapshots[0], None)
 
-    return [snapshots[0]] + [_add_previous(s, p) for s, p in zip(snapshots[1:], snapshots)]
+    # strict=False is deliberate: the offset slice is one element shorter, and stopping there is
+    # what pairs each snapshot with its predecessor.
+    return [snapshots[0]] + [_add_previous(s, p) for s, p in zip(snapshots[1:], snapshots, strict=False)]
 
 
 def _snapshot(zfs_list_line: bytes) -> Snapshot:
