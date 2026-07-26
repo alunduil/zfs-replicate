@@ -14,7 +14,7 @@ def test_empty_tasks() -> None:
     assert report([]) == ""
 
 
-@given(tasks=lists(builds(Task), min_size=1))  # type: ignore[misc]
+@given(tasks=lists(builds(Task), min_size=1))
 def test_nonempty_tasks(tasks: List[Task]) -> None:
     """Ensure nonempty report from nonempty actions."""
     result = report(tasks)

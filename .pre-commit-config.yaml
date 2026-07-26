@@ -34,10 +34,15 @@ repos:
     rev: v1.18.2
     hooks:
       - id: mypy
+        # click and hypothesis ship py.typed. Without them in the hook's
+        # environment --ignore-missing-imports degrades every decorator they
+        # export to Any, which strict mode then reports as an untyped
+        # decorator at each of the ~25 call sites.
         additional_dependencies:
-          - types-requests
-          - types-retry
-          - types-toml
+          - click
+          - click-log
+          - hypothesis
+          - pytest
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.16
     hooks:

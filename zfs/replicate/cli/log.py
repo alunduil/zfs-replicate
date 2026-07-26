@@ -11,8 +11,11 @@ module owns how that output is presented, which is the command line's concern.
 
 import logging
 import sys
+from typing import Any, Callable, TypeVar
 
 import click_log
+
+_F = TypeVar("_F", bound=Callable[..., Any])
 
 logger = logging.getLogger("zfs.replicate")
 
@@ -50,8 +53,10 @@ class _Formatter(click_log.ColorFormatter):  # type: ignore[misc]
 
 # The --verbosity/-v option, wired to the zfs.replicate logger. Default WARNING
 # keeps a plain run quiet; click-log's own default is INFO. Read qualified as
-# ``log.option``.
-option = click_log.simple_verbosity_option(logger, default="WARNING")
+# ``log.option``. The annotation is load-bearing: click-log is untyped, so the
+# call returns Any and strict mode would report every use as an untyped
+# decorator.
+option: Callable[[_F], _F] = click_log.simple_verbosity_option(logger, default="WARNING")
 
 
 def configure() -> None:
