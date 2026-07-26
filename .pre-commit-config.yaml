@@ -59,7 +59,7 @@ repos:
       - id: check-undeclared
       - id: check-unused
   - repo: https://github.com/errata-ai/vale
-    rev: v3.15.1
+    rev: v3.15.2
     hooks:
       - id: vale
         exclude: '^(styles/|LICENSE$|\.envrc$)'
