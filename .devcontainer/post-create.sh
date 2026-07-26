@@ -10,8 +10,9 @@ poetry install
 # 2) Install the pre-commit hook into the local clone.
 pre-commit install
 
-# 3) Vale linter. Pinned to a recent stable; bump when CI starts using
-#    a newer rule pack.
+# 3) Vale linter. The release tarball names carry a bare version while the
+#    upstream tags are v-prefixed, hence extractVersion.
+# renovate: datasource=github-releases depName=errata-ai/vale extractVersion=^v(?<version>.+)$
 VALE_VERSION="3.10.1"
 VALE_ARCH="64-bit"
 VALE_TARBALL="vale_${VALE_VERSION}_Linux_${VALE_ARCH}.tar.gz"

@@ -1,18 +1,39 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices", "schedule:weekly"],
-  "baseBranchPatterns": ["master"],
+  "extends": [
+    "config:best-practices",
+    "security:openssf-scorecard",
+    "customManagers:githubActionsVersions"
+  ],
+  "timezone": "Europe/London",
   "reviewers": ["alunduil"],
   "pre-commit": {"enabled": true},
   "minimumReleaseAge": "3 days",
-  "internalChecksFilter": "strict",
-  "vulnerabilityAlerts": {"minimumReleaseAge": "0 days"},
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
       "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
-      "matchUpdateTypes": ["pin", "pinDigest", "digest", "lockFileMaintenance"],
-      "minimumReleaseAge": "0 days"
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest",
+        "digest",
+        "lockFileMaintenance",
+        "lockfileUpdate",
+        "rollback",
+        "bump",
+        "replacement"
+      ],
+      "minimumReleaseAge": null
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Read `# renovate:` annotations above *_VERSION pins in dev container setup scripts",
+      "managerFilePatterns": [".devcontainer/*"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: packageName=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+[A-Za-z0-9_]+?_VERSION=\"(?<currentValue>.+?)\""
+      ]
     }
   ]
 }
