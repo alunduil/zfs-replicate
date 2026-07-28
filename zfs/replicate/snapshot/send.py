@@ -17,6 +17,7 @@ from .type import Snapshot
 def send(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     current: Snapshot,
+    *,
     ssh_command: Command,
     compression: Compression,
     send_options: SendOptions,
