@@ -106,9 +106,10 @@ jobs:
   # hook.
   #
   # A title corrected after the fact revalidates on the next push, or on a
-  # manual re-run. Catching the edit itself needs the `edited` activity type,
-  # and naming any type replaces the default set rather than extending it, so
-  # the price is restating the three defaults here.
+  # manual re-run. Catching the edit itself would need the `edited` activity
+  # type, but naming any type replaces the default set rather than extending it,
+  # so `edited` cannot be added without restating the three defaults alongside
+  # it. The bare trigger is worth more than that.
   pr-title:
     name: Validate PR title
     if: github.event_name == 'pull_request'
