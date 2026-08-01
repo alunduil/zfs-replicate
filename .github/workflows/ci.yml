@@ -14,16 +14,23 @@ concurrency:
 
 jobs:
   pre-commit:
-    runs-on: ubuntu-latest
+    name: Run pre-commit hooks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
       - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
-  pytest:
-    runs-on: ubuntu-latest
+  python-tests:
+    # Matrix jobs take the explicit name verbatim, so interpolate the version
+    # or all four legs collide on one check name.
+    name: Test python ${{ matrix.python-version }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: false
       matrix:
         python-version:
           - "3.10"  # EOL 2026-10
@@ -50,10 +57,13 @@ jobs:
           poetry run pytest
           poetry run coveralls --service=github || poetry run coveralls --service=github-actions
 
-  scripts:
-    runs-on: ubuntu-latest
+  cli-entry-point:
+    name: Check CLI entry point ${{ matrix.python-version }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: false
       matrix:
         python-version:
           - "3.10"  # EOL 2026-10
@@ -74,7 +84,9 @@ jobs:
         run: poetry run -- zfs-replicate --help
 
   build:
-    runs-on: ubuntu-latest
+    name: Build the distribution
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
@@ -88,9 +100,41 @@ jobs:
       - name: poetry check
         run: poetry check
 
-  dependency-review:
+  # Squash-merge lands the PR title as the commit message, so the title, not the
+  # individual commits, is what release-please parses for version bumps. Keep
+  # the type list in sync with CONTRIBUTING and the conventional-pre-commit hook.
+  #
+  # A corrected title revalidates on the next push or a manual re-run, not on
+  # the edit itself.
+  pr-title:
+    name: Validate PR title
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            perf
+            refactor
+            docs
+            test
+            build
+            ci
+            chore
+            revert
+
+  dependency-review:
+    name: Review dependencies
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
