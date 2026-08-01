@@ -1,8 +1,11 @@
-name: Scheduled
+name: Daily
 
 on:
+  # GitHub cron takes no timezone and always runs UTC, so this lands at 07:47
+  # through BST and 06:47 through GMT. The offset from the hour is deliberate:
+  # schedules on the hour queue behind the platform's peak load.
   schedule:
-    - cron: '18 10 * * *'
+    - cron: '47 6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -26,7 +29,7 @@ jobs:
       # Issues are out of scope on both legs (#453). The previous bot re-closed
       # #359 after it had been deliberately reopened, and four open issues still
       # carry `no-issue-activity` from it. Excluding them from staling alone
-      # would leave those four eligible for closing on the first armed run.
+      # would leave those four eligible for closing on the next run.
       - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
         with:
           days-before-issue-stale: -1
@@ -36,16 +39,15 @@ jobs:
           stale-pr-label: no-pr-activity
           # Closing a Renovate pull request tells Renovate the update is
           # unwanted and it will not offer that version again, so `dependencies`
-          # is a correctness exemption rather than a courtesy one.
+          # is a correctness exemption rather than a courtesy one. `no stale` is
+          # the manual opt-out and stays inert until that label is declared in
+          # alunduil/alunduil-infrastructure#330.
           exempt-pr-labels: blocked,dependencies,no stale
           stale-pr-message: >-
-            No activity here for 30 days, so this is now marked stale. A comment
-            or a push clears the label and restarts the clock. Without one, this
-            closes in 14 days.
+            This has been quiet for 30 days, so it's picked up a stale label. A
+            comment or a push clears the label and restarts the clock. Otherwise
+            this closes in another 14 days.
           close-pr-message: >-
-            Closed after 44 days without activity. That is queue cleaning rather
-            than a verdict on the change: the branch is untouched, and a comment
-            here is enough to get this reopened.
-          # Reporting only until the `no stale` label exists, since it is the
-          # sole opt-out for work in progress that should outlive the timer.
-          debug-only: true
+            Closing this after 44 quiet days. That isn't a call on the change
+            itself, and nothing is lost: the branch stays where it is, so
+            comment here if you want to pick it back up and I'll reopen it.
