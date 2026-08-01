@@ -3,11 +3,12 @@ name: CI
 on:
   push:
     branches: [master]
-  # `edited` covers title, body, and base-branch changes. The title check wants
-  # it so a corrected title revalidates; the others opt out, since description
-  # edits are common on long-lived Renovate branches and would otherwise rerun
-  # the whole matrix. A base change is different: it moves the merge base out
-  # from under every result, so they opt back in.
+  # `edited` is here so a corrected PR title revalidates. It reruns every job in
+  # the file, body-only edits included, which costs a couple of minutes on free
+  # runners and is not worth the per-job conditions it would take to avoid.
+  # Those conditions are also a trap: `edited` covers base-branch changes, which
+  # move the merge base and genuinely need a rerun, and `synchronize` misses
+  # them.
   pull_request:
     types: [opened, synchronize, reopened, edited]
 
@@ -21,7 +22,6 @@ concurrency:
 jobs:
   pre-commit:
     name: Run pre-commit hooks
-    if: github.event.action != 'edited' || github.event.changes.base.ref.from != null
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -32,7 +32,6 @@ jobs:
     # Matrix jobs take the explicit name verbatim, so interpolate the version
     # or all four legs collide on one check name.
     name: Test python ${{ matrix.python-version }}
-    if: github.event.action != 'edited' || github.event.changes.base.ref.from != null
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -64,7 +63,6 @@ jobs:
 
   cli-entry-point:
     name: Check CLI entry point ${{ matrix.python-version }}
-    if: github.event.action != 'edited' || github.event.changes.base.ref.from != null
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -89,7 +87,6 @@ jobs:
 
   build:
     name: Build the distribution
-    if: github.event.action != 'edited' || github.event.changes.base.ref.from != null
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -133,9 +130,7 @@ jobs:
 
   dependency-review:
     name: Review dependencies
-    if: >-
-      github.event_name == 'pull_request'
-      && (github.event.action != 'edited' || github.event.changes.base.ref.from != null)
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
