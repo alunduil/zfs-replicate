@@ -7,6 +7,7 @@
   ],
   "timezone": "Europe/London",
   "reviewers": ["alunduil"],
+  "labels": ["dependencies"],
   "pre-commit": {"enabled": true},
   "minimumReleaseAge": "3 days",
   "osvVulnerabilityAlerts": true,

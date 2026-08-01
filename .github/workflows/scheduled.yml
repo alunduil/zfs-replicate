@@ -1,0 +1,51 @@
+name: Scheduled
+
+on:
+  schedule:
+    - cron: '18 10 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  stale-pull-requests:
+    name: Prune stale pull requests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      # The action's README also asks for `actions: write`, which covers only
+      # its operations-per-run resume cache. Without that scope a truncated run
+      # warns and restarts from the first pull request instead of failing.
+      issues: write
+      pull-requests: write
+    steps:
+      # Issues are out of scope on both legs (#453). The previous bot re-closed
+      # #359 after it had been deliberately reopened, and four open issues still
+      # carry `no-issue-activity` from it. Excluding them from staling alone
+      # would leave those four eligible for closing on the first armed run.
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
+        with:
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          stale-pr-label: no-pr-activity
+          # Closing a Renovate pull request tells Renovate the update is
+          # unwanted and it will not offer that version again, so `dependencies`
+          # is a correctness exemption rather than a courtesy one.
+          exempt-pr-labels: blocked,dependencies,no stale
+          stale-pr-message: >-
+            No activity here for 30 days, so this is now marked stale. A comment
+            or a push clears the label and restarts the clock. Without one, this
+            closes in 14 days.
+          close-pr-message: >-
+            Closed after 44 days without activity. That is queue cleaning rather
+            than a verdict on the change: the branch is untouched, and a comment
+            here is enough to get this reopened.
+          # Reporting only until the `no stale` label exists, since it is the
+          # sole opt-out for work in progress that should outlive the timer.
+          debug-only: true
