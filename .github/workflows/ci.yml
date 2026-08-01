@@ -3,7 +3,11 @@ name: CI
 on:
   push:
     branches: [master]
+  # `edited` fires on every title or body change, so a corrected title
+  # revalidates. Only the title check wants it; the rest opt out rather than
+  # rerun the whole matrix on a description tweak.
   pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
@@ -14,6 +18,7 @@ concurrency:
 
 jobs:
   pre-commit:
+    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -21,6 +26,7 @@ jobs:
       - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
   pytest:
+    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -51,6 +57,7 @@ jobs:
           poetry run coveralls --service=github || poetry run coveralls --service=github-actions
 
   scripts:
+    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
     strategy:
@@ -74,6 +81,7 @@ jobs:
         run: poetry run -- zfs-replicate --help
 
   build:
+    if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -88,8 +96,35 @@ jobs:
       - name: poetry check
         run: poetry check
 
-  dependency-review:
+  # Squash-merge lands the PR title as the commit on main, so the title, not the
+  # individual commits, is what release-please parses for version bumps.
+  # Keep the type list in sync with CONTRIBUTING and the conventional-pre-commit
+  # hook.
+  pr-title:
+    name: Validate PR title
     if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            perf
+            refactor
+            docs
+            test
+            build
+            ci
+            chore
+            revert
+
+  dependency-review:
+    if: github.event_name == 'pull_request' && github.event.action != 'edited'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
