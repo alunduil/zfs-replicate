@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   pre-commit:
+    name: Run pre-commit hooks
     if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     steps:
@@ -25,7 +26,10 @@ jobs:
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
       - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
-  pytest:
+  python-tests:
+    # Matrix jobs take the explicit name verbatim, so interpolate the version
+    # or all four legs collide on one check name.
+    name: Test python ${{ matrix.python-version }}
     if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
@@ -56,7 +60,8 @@ jobs:
           poetry run pytest
           poetry run coveralls --service=github || poetry run coveralls --service=github-actions
 
-  scripts:
+  cli-entry-point:
+    name: Check CLI entry point ${{ matrix.python-version }}
     if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental }}
@@ -81,6 +86,7 @@ jobs:
         run: poetry run -- zfs-replicate --help
 
   build:
+    name: Build the distribution
     if: github.event.action != 'edited'
     runs-on: ubuntu-latest
     steps:
@@ -124,6 +130,7 @@ jobs:
             revert
 
   dependency-review:
+    name: Review dependencies
     if: github.event_name == 'pull_request' && github.event.action != 'edited'
     runs-on: ubuntu-latest
     steps:
