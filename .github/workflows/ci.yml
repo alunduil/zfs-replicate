@@ -3,14 +3,7 @@ name: CI
 on:
   push:
     branches: [master]
-  # `edited` is here so a corrected PR title revalidates. It reruns every job in
-  # the file, body-only edits included, which costs a couple of minutes on free
-  # runners and is not worth the per-job conditions it would take to avoid.
-  # Those conditions are also a trap: `edited` covers base-branch changes, which
-  # move the merge base and genuinely need a rerun, and `synchronize` misses
-  # them.
   pull_request:
-    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
@@ -111,6 +104,11 @@ jobs:
   # individual commits, is what release-please parses for version bumps.
   # Keep the type list in sync with CONTRIBUTING and the conventional-pre-commit
   # hook.
+  #
+  # A title corrected after the fact revalidates on the next push, or on a
+  # manual re-run. Catching the edit itself needs the `edited` activity type,
+  # and naming any type replaces the default set rather than extending it, so
+  # the price is restating the three defaults here.
   pr-title:
     name: Validate PR title
     if: github.event_name == 'pull_request'
