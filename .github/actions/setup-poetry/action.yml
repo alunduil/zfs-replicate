@@ -1,8 +1,8 @@
 name: Set up Poetry
 description: Install Poetry and Python for a given version, with Poetry's download cache.
 
-# No `poetry install`: only jobs that run project code (python-tests,
-# cli-entry-point) need the environment, so they install it; build skips it.
+# No `poetry install`: callers that run project code install the environment
+# themselves, so callers that only build or inspect skip the cost.
 #
 # A local composite action can't check out the repo it lives in, so
 # callers run actions/checkout before invoking it.

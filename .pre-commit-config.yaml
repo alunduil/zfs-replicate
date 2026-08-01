@@ -79,10 +79,10 @@ repos:
         args:
           - --strict
           - --no-global
-  # Advisory local mirror of the pr-title job in ci.yml: catches a bad type at
-  # commit time. commit-msg stage keeps it out of `pre-commit run`, so it never
-  # becomes a CI gate and stays bypassable (--no-verify). Keep the type list in
-  # sync with that job and CONTRIBUTING.
+  # Advisory local mirror of the pr-title job in ci.yml, catching a bad type at
+  # commit time. The commit-msg stage keeps it out of `pre-commit run`, so it
+  # stays bypassable and never becomes a second gate. Keep the type list in sync
+  # with that job and CONTRIBUTING.
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.4.0
     hooks:

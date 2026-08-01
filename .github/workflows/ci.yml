@@ -100,16 +100,12 @@ jobs:
       - name: poetry check
         run: poetry check
 
-  # Squash-merge lands the PR title as the commit on main, so the title, not the
-  # individual commits, is what release-please parses for version bumps.
-  # Keep the type list in sync with CONTRIBUTING and the conventional-pre-commit
-  # hook.
+  # Squash-merge lands the PR title as the commit message, so the title, not the
+  # individual commits, is what release-please parses for version bumps. Keep
+  # the type list in sync with CONTRIBUTING and the conventional-pre-commit hook.
   #
-  # A title corrected after the fact revalidates on the next push, or on a
-  # manual re-run. Catching the edit itself would need the `edited` activity
-  # type, but naming any type replaces the default set rather than extending it,
-  # so `edited` cannot be added without restating the three defaults alongside
-  # it. The bare trigger is worth more than that.
+  # A corrected title revalidates on the next push or a manual re-run, not on
+  # the edit itself.
   pr-title:
     name: Validate PR title
     if: github.event_name == 'pull_request'
