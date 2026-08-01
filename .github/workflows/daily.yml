@@ -1,11 +1,11 @@
 name: Daily
 
 on:
-  # GitHub cron takes no timezone and always runs UTC, so this lands at 07:47
-  # through BST and 06:47 through GMT. The offset from the hour is deliberate:
-  # schedules on the hour queue behind the platform's peak load.
+  # Offset from the hour deliberately: schedules landing on the hour queue
+  # behind the platform's peak load.
   schedule:
     - cron: '47 6 * * *'
+      timezone: 'Europe/London'
   workflow_dispatch:
 
 permissions:
