@@ -106,12 +106,14 @@ See `zfs-replicate --help` for the full set of `--send-` flags.
 ## Getting support
 
 * [GitHub issues]: Report any problems or features requests to GitHub issues.
+* [Security policy]: Report a security vulnerability privately.
 
 [autorepl.py]: https://github.com/freenas/freenas/blob/master/gui/tools/autorepl.py
 [FreeBSD]: https://www.freebsd.org/
 [`FreeNAS`]: http://www.freenas.org/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
 [LICENSE]: ./LICENSE
+[Security policy]: ./SECURITY.md
 [sanoid]: https://github.com/jimsalterjrs/sanoid
 [survey]: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 [Working With Oracle Solaris ZFS Snapshots and Clones]: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc
