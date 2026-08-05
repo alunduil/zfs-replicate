@@ -44,8 +44,11 @@ packages = [{include = "zfs"}, {include = "zfs_test", format = "sdist"}]
 requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
-click = "^8.2"
-click-log = "^0.4.0"
+# click.Choice became subscriptable in 8.2, which EnumChoice requires. The
+# ceilings guard click-log, which declares no click bound of its own and is
+# dormant upstream, so a major bump on either side has no upstream fix.
+click = ">=8.2,<9"
+click-log = ">=0.4.0,<0.5"
 python = "^3.10"
 
 [tool.poetry.group.test.dependencies]
