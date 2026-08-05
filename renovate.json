@@ -27,7 +27,7 @@
       "minimumReleaseAge": null
     },
     {
-      "description": "Pin the test group so Poetry cannot resolve past the version Renovate targeted, which fails the artifact update whenever a newer release is still inside the bake. :pinDevDependencies from config:best-practices misses it: that preset matches only the devDependencies, dev-dependencies, and dev depTypes, and a Poetry group's depType is its name",
+      "description": "Poetry resolves the newest release in range rather than the version Renovate targeted, so an in-range update writes a lockfile Renovate then rejects. :pinDevDependencies does not reach this group: it matches the devDependencies, dev-dependencies, and dev depTypes, and a Poetry group's depType is its name",
       "matchDepTypes": ["test"],
       "rangeStrategy": "pin"
     }

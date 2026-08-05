@@ -44,15 +44,10 @@ packages = [{include = "zfs"}, {include = "zfs_test", format = "sdist"}]
 requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
-# Floor: EnumChoice subclasses click.Choice[str], and Choice became
-# subscriptable in 8.2, so older click fails at import rather than at
-# type-check time. Ceiling: CI only ever exercises the locked version, so this
-# bound is the sole protection for a consumer resolving newer click than
-# anything tested here.
+# click.Choice became subscriptable in 8.2, which EnumChoice requires. The
+# ceilings guard click-log, which declares no click bound of its own and is
+# dormant upstream, so a major bump on either side has no upstream fix.
 click = ">=8.2,<9"
-# 0.4.0 has stood since 2022-03 and click-log declares no click bound of its
-# own. A 0.5.0 would be a resurrection rather than an increment, so it does not
-# inherit the compatibility assumption.
 click-log = ">=0.4.0,<0.5"
 python = "^3.10"
 
