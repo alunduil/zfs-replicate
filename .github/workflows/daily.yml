@@ -1,17 +1,18 @@
 name: Daily
 
+# Offset from the hour: on-the-hour schedules queue behind platform peak load.
 on:
-  # Offset from the hour deliberately: schedules landing on the hour queue
-  # behind the platform's peak load.
   schedule:
     - cron: '47 6 * * *'
-      timezone: 'Europe/London'
+      timezone: Europe/London
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
+  # No cancel-in-progress: a truncated sweep loses the operations-per-run
+  # resume cache and restarts from the first pull request.
   group: ${{ github.workflow }}
 
 jobs:
@@ -20,16 +21,13 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
-      # The action's README also asks for `actions: write`, which covers only
-      # its operations-per-run resume cache. Without that scope a truncated run
-      # warns and restarts from the first pull request instead of failing.
+      # `actions: write` is omitted: it covers only the resume cache, so a
+      # truncated run warns and restarts rather than failing.
       issues: write
       pull-requests: write
     steps:
-      # Issues are out of scope on both legs (#453). The previous bot re-closed
-      # #359 after it had been deliberately reopened, and four open issues still
-      # carry `no-issue-activity` from it. Excluding them from staling alone
-      # would leave those four eligible for closing on the next run.
+      # Both issue legs are disabled, not just marking: an issue already
+      # carrying the label would otherwise stay eligible for closing.
       - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
         with:
           days-before-issue-stale: -1
@@ -37,12 +35,10 @@ jobs:
           days-before-pr-stale: 30
           days-before-pr-close: 14
           stale-pr-label: no-pr-activity
-          # Closing a Renovate pull request tells Renovate the update is
-          # unwanted and it will not offer that version again, so `dependencies`
-          # is a correctness exemption rather than a courtesy one. `no stale` is
-          # the manual opt-out and stays inert until that label is declared in
-          # alunduil/alunduil-infrastructure#330.
-          exempt-pr-labels: blocked,dependencies,no stale
+          # Closing a Renovate pull request tells Renovate the version is
+          # unwanted and it will not re-offer it. Renovate labels nothing by
+          # default, so this depends on renovate.json applying the label.
+          exempt-pr-labels: blocked,dependencies
           stale-pr-message: >-
             This has been quiet for 30 days, so it's picked up a stale label. A
             comment or a push clears the label and restarts the clock. Otherwise
