@@ -2,6 +2,8 @@
 # zfs-replicate
 <!-- vale RedHat.Headings = YES -->
 
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/alunduil/zfs-replicate/badge)](https://securityscorecards.dev/viewer/?uri=github.com/alunduil/zfs-replicate)
+
 <https://github.com/alunduil/zfs-replicate>
 
 By Alex Brandt <alunduil@gmail.com>
