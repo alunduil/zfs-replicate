@@ -1,6 +1,6 @@
 name: Daily
 
-# Offset from the hour: on-the-hour schedules queue behind platform peak load.
+# On-the-hour schedules queue behind platform peak load.
 on:
   schedule:
     - cron: '47 6 * * *'
@@ -26,8 +26,8 @@ jobs:
       issues: write
       pull-requests: write
     steps:
-      # Both issue legs are disabled, not just marking: an issue already
-      # carrying the label would otherwise stay eligible for closing.
+      # An issue already carrying the label would otherwise stay eligible for
+      # closing.
       - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
         with:
           days-before-issue-stale: -1
