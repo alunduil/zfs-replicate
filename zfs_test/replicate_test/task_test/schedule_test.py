@@ -2,6 +2,7 @@
 
 import logging
 import threading
+from graphlib import CycleError
 from typing import Callable, Dict, List, Optional, Set, Tuple
 
 import pytest
@@ -104,6 +105,14 @@ def test_a_failure_is_reported_before_the_skips_it_explains() -> None:
     # rewording either message doesn't fail this.
     assert "create backup/tank/a" in records[0].getMessage()
     assert "send tank/a@s0" in records[1].getMessage()
+
+
+def test_dispatch_surfaces_a_cyclic_graph() -> None:
+    """A cycle surfaces instead of quietly replicating nothing, as it once did."""
+    tasks = [_create("tank/a"), _create("tank/b")]
+
+    with pytest.raises(CycleError):
+        sut.dispatch(tasks, {0: {1}, 1: {0}}, lambda _task: None, jobs=1)
 
 
 def test_dispatch_rejects_a_graph_that_skips_a_task() -> None:

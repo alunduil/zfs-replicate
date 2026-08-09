@@ -34,6 +34,7 @@ start as their own dependencies finish rather than at a batch boundary.
 import itertools
 import logging
 from concurrent import futures
+from graphlib import TopologicalSorter
 from typing import Callable, Dict, Iterator, List, Optional, Set, Tuple
 
 from .. import optional
@@ -79,65 +80,64 @@ class _Dispatcher:
     """A single run of a task graph, tracking what has finished and what may start."""
 
     def __init__(self, tasks: List[Task], edges: Dict[int, Set[int]], run: Callable[[Task], None]) -> None:
-        # Indices are all that tie the two arguments together, so a graph that
-        # doesn't name every task would leave data sets silently unreplicated.
+        # Indices are all that tie the two arguments together, and a task absent
+        # from edges never reaches the sorter at all, so a graph that doesn't
+        # name every task would leave data sets silently unreplicated.
         if set(edges) != set(range(len(tasks))):
             raise ValueError("edges needs one entry per task, keyed by position in tasks")
 
         self._tasks = tasks
         self._run = run
-        self._blockers = {index: set(blocking) for index, blocking in edges.items()}
+        # TopologicalSorter reads a mapping of node to predecessors, which is
+        # what edges already is.
+        self._sorter: TopologicalSorter[int] = TopologicalSorter(edges)
         self._dependents = _reverse(edges)
         self._pending: Dict["futures.Future[None]", int] = {}
         self._failures: List[Tuple[Task, BaseException]] = []
 
     def run(self, *, jobs: int) -> List[Tuple[Task, BaseException]]:
         """Drain the graph over a pool of ``jobs`` threads and return the failures."""
+        self._sorter.prepare()
+
         with futures.ThreadPoolExecutor(max_workers=jobs) as executor:
-            self._submit(executor, {index for index, blocking in self._blockers.items() if not blocking})
+            self._submit(executor, self._sorter.get_ready())
 
             while self._pending:
                 done, _ = futures.wait(self._pending, return_when=futures.FIRST_COMPLETED)
 
-                ready: Set[int] = set()
-
                 for future in done:
-                    ready |= self._settle(future)
+                    self._settle(future)
 
-                self._submit(executor, ready)
+                # A failed task is never marked done, so its dependents stay out
+                # of get_ready() and the pool draining is what ends the run.
+                # is_active() would stay true for the rest of the process.
+                self._submit(executor, self._sorter.get_ready())
 
         return self._failures
 
-    def _submit(self, executor: futures.ThreadPoolExecutor, indices: Set[int]) -> None:
+    def _submit(self, executor: futures.ThreadPoolExecutor, indices: Tuple[int, ...]) -> None:
         # Submitting in index order means --jobs 1 replays generate's order
-        # wherever the graph leaves the choice open.
+        # wherever the graph leaves the choice open. get_ready() promises no
+        # order of its own.
         for index in sorted(indices):
             self._pending[executor.submit(self._run, self._tasks[index])] = index
 
-    def _settle(self, future: "futures.Future[None]") -> Set[int]:
-        """Retire a finished task and return the indices it leaves ready to start."""
+    def _settle(self, future: "futures.Future[None]") -> None:
+        """Retire a finished task, releasing its dependents or abandoning them."""
         index = self._pending.pop(future)
         error = future.exception()
 
-        if error is not None:
-            # Reported here rather than by the caller so the cause reaches the
-            # operator ahead of the skips it explains, instead of after every
-            # other data set has drained.
-            logger.error("%s failed: %s", _label(self._tasks[index]), error)
-            self._failures.append((self._tasks[index], error))
-            self._abandon(index)
+        if error is None:
+            self._sorter.done(index)
 
-            return set()
+            return
 
-        ready = set()
-
-        for dependent in self._dependents[index]:
-            self._blockers[dependent].discard(index)
-
-            if not self._blockers[dependent]:
-                ready.add(dependent)
-
-        return ready
+        # Reported here rather than by the caller so the cause reaches the
+        # operator ahead of the skips it explains, instead of after every other
+        # data set has drained.
+        logger.error("%s failed: %s", _label(self._tasks[index]), error)
+        self._failures.append((self._tasks[index], error))
+        self._abandon(index)
 
     def _abandon(self, index: int) -> None:
         # Nothing to unschedule: a failed task never clears itself from its
