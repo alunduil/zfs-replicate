@@ -44,9 +44,6 @@ def execute(  # noqa: PLR0913 -- carries the full replication call surface
     failures = schedule.dispatch(tasks, schedule.dependencies(remote, tasks), run, jobs=jobs)
 
     if failures:
-        for _, error in failures:
-            logger.error("%s", error)
-
         raise ZFSReplicateError(f"{len(failures)} of {len(tasks)} replication tasks failed")
 
 

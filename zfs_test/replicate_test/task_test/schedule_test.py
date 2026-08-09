@@ -1,7 +1,8 @@
 """zfs.replicate.task.schedule tests."""
 
+import logging
 import threading
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Callable, Dict, List, Optional, Set, Tuple
 
 import pytest
 from hypothesis import assume, given
@@ -92,6 +93,19 @@ def test_dependents_of_a_failure_do_not_run() -> None:
     assert len(failures) == 1
 
 
+def test_a_failure_is_reported_before_the_skips_it_explains() -> None:
+    """The cause reaches the operator ahead of its consequences, not after the run drains."""
+    tasks = [_create("tank/a"), _send("tank/a", "s0")]
+
+    records = _captured(lambda: _record(tasks, jobs=1, failing=tasks[0]))
+
+    assert [record.levelno for record in records] == [logging.ERROR, logging.WARNING]
+    # Assert on the task each record names rather than its phrasing, so
+    # rewording either message doesn't fail this.
+    assert "create backup/tank/a" in records[0].getMessage()
+    assert "send tank/a@s0" in records[1].getMessage()
+
+
 def test_dispatch_rejects_a_graph_that_skips_a_task() -> None:
     """A short graph is a bug rather than a smaller run, so it raises instead of replicating less."""
     tasks = [_send("tank/a", "s0"), _send("tank/b", "s0")]
@@ -119,6 +133,35 @@ def test_jobs_change_neither_the_work_nor_its_order(counts: Dict[str, Tuple[int,
     assert sorted(parallel) == list(range(len(tasks)))
     assert _respects(sequential, edges)
     assert _respects(parallel, edges)
+
+
+def _captured(during: Callable[[], object]) -> List[logging.LogRecord]:
+    """Return the records the scheduler logged while ``during`` ran, in order.
+
+    Reading the module's own logger rather than ``caplog`` keeps the assertion
+    on emission order clear of whatever handlers and levels the rest of the
+    suite has left on the root logger.
+    """
+    records: List[logging.LogRecord] = []
+
+    class _Recorder(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            records.append(record)
+
+    logger = logging.getLogger(sut.__name__)
+    handler = _Recorder()
+    level = logger.level
+
+    logger.addHandler(handler)
+    logger.setLevel(logging.WARNING)
+
+    try:
+        during()
+    finally:
+        logger.setLevel(level)
+        logger.removeHandler(handler)
+
+    return records
 
 
 def _record(

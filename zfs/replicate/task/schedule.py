@@ -120,6 +120,10 @@ class _Dispatcher:
         error = future.exception()
 
         if error is not None:
+            # Reported here rather than by the caller so the cause reaches the
+            # operator ahead of the skips it explains, instead of after every
+            # other data set has drained.
+            logger.error("%s failed: %s", _label(self._tasks[index]), error)
             self._failures.append((self._tasks[index], error))
             self._abandon(index)
 
