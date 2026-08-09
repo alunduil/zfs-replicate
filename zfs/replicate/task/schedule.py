@@ -84,8 +84,6 @@ class _Dispatcher:
 
         self._tasks = tasks
         self._run = run
-        # TopologicalSorter reads a mapping of node to predecessors, which is
-        # what edges already is.
         self._sorter: TopologicalSorter[int] = TopologicalSorter(edges)
         self._dependents = _reverse(edges)
         self._pending: Dict["futures.Future[None]", int] = {}
@@ -104,17 +102,15 @@ class _Dispatcher:
                 for future in done:
                     self._settle(future)
 
-                # A failed task is never marked done, so its dependents stay out
-                # of get_ready() and the pool draining is what ends the run.
-                # is_active() would stay true for the rest of the process.
+                # The pool emptying ends the run, not is_active(), which a
+                # failed task leaves true for good.
                 self._submit(executor, self._sorter.get_ready())
 
         return self._failures
 
     def _submit(self, executor: futures.ThreadPoolExecutor, indices: Tuple[int, ...]) -> None:
-        # Submitting in index order means --jobs 1 replays generate's order
-        # wherever the graph leaves the choice open. get_ready() promises no
-        # order of its own.
+        # get_ready() promises no order, and sorting means --jobs 1 replays
+        # generate's order wherever the graph leaves the choice open.
         for index in sorted(indices):
             self._pending[executor.submit(self._run, self._tasks[index])] = index
 
@@ -129,16 +125,14 @@ class _Dispatcher:
             return
 
         # Reported here rather than by the caller so the cause reaches the
-        # operator ahead of the skips it explains, instead of after every other
-        # data set has drained.
+        # operator ahead of the skips it explains.
         logger.error("%s failed: %s", _label(self._tasks[index]), error)
         self._failures.append((self._tasks[index], error))
         self._abandon(index)
 
     def _abandon(self, index: int) -> None:
-        # Nothing to unschedule: a failed task is never marked done, so the
-        # sorter never offers its dependents. This only tells the operator which
-        # data sets the failure took with it.
+        # A failed task is never marked done, so the sorter never offers its
+        # dependents: they are already unreachable, and this only names them.
         for skipped in sorted(self._downstream(index)):
             logger.warning("skipping %s: a task it depends on failed", _label(self._tasks[skipped]))
 
@@ -216,9 +210,8 @@ def _index_by_data_set(
 def _require_edge_per_task(tasks: List[Task], edges: Dict[int, Set[int]]) -> None:
     """Reject a graph that doesn't key every task by its position in ``tasks``.
 
-    Indices are all that tie the two together, and a task absent from ``edges``
-    never reaches the sorter at all, so a short graph would leave data sets
-    silently unreplicated.
+    Indices are all that tie the two together, so a task missing from ``edges``
+    would go unreplicated with nothing in the output to say so.
     """
     if set(edges) != set(range(len(tasks))):
         raise ValueError("edges needs one entry per task, keyed by position in tasks")

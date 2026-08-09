@@ -108,7 +108,7 @@ def test_a_failure_is_reported_before_the_skips_it_explains() -> None:
 
 
 def test_dispatch_surfaces_a_cyclic_graph() -> None:
-    """A cycle surfaces instead of quietly replicating nothing, as it once did."""
+    """A cycle surfaces instead of quietly replicating nothing."""
     tasks = [_create("tank/a"), _create("tank/b")]
 
     with pytest.raises(CycleError):
@@ -147,9 +147,8 @@ def test_jobs_change_neither_the_work_nor_its_order(counts: Dict[str, Tuple[int,
 def _captured(during: Callable[[], object]) -> List[logging.LogRecord]:
     """Return the records the scheduler logged while ``during`` ran, in order.
 
-    Reading the module's own logger rather than ``caplog`` keeps the assertion
-    on emission order clear of whatever handlers and levels the rest of the
-    suite has left on the root logger.
+    Reads the module's own logger, since ``caplog`` captures through the root
+    and sees each record twice once the rest of the suite has run.
     """
     logger = logging.getLogger(sut.__name__)
     handler = _Recorder()
