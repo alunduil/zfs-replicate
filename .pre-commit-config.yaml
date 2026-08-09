@@ -24,38 +24,42 @@ repos:
       - id: check-vcs-permalinks
       - id: check-toml
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.20
+    rev: v0.16.1
     hooks:
       - id: ruff-check
         args:
           - --fix
       - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v2.3.0
     hooks:
       - id: mypy
+        # click and hypothesis ship py.typed. Without them in the hook's
+        # environment --ignore-missing-imports degrades every decorator they
+        # export to Any, which strict mode then reports as an untyped
+        # decorator at each of the ~25 call sites.
         additional_dependencies:
-          - types-requests
-          - types-retry
-          - types-toml
+          - click
+          - click-log
+          - hypothesis
+          - pytest
   - repo: https://github.com/jendrikseipp/vulture
-    rev: v2.14
+    rev: v2.16
     hooks:
       - id: vulture
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.15.0
+    rev: v2.16.0
     hooks:
       - id: pretty-format-toml
         args: [--autofix]
         exclude: poetry\.lock
   - repo: https://github.com/tweag/FawltyDeps
-    rev: v0.13.1
+    rev: v0.20.0
     hooks:
-      - id: check
-        args:
-          - --detailed
+      - id: check-undeclared
+      - id: check-unused
   - repo: https://github.com/errata-ai/vale
-    rev: v3.13.0
+    rev: v3.17.1
     hooks:
       - id: vale
         exclude: '^(styles/|LICENSE$|\.envrc$)'
@@ -69,16 +73,16 @@ repos:
           - toml
           - yaml
   - repo: https://github.com/renovatebot/pre-commit-hooks
-    rev: 43.270.0
+    rev: 44.14.1
     hooks:
       - id: renovate-config-validator
         args:
           - --strict
           - --no-global
-  # Advisory local mirror of the Semantic Pull Request workflow: catches a bad
-  # type at commit time. commit-msg stage keeps it out of `pre-commit run`, so
-  # it never becomes a CI gate and stays bypassable (--no-verify). Keep the
-  # type list in sync with that workflow and CONTRIBUTING.
+  # Advisory local mirror of the pr-title job in ci.yml, catching a bad type at
+  # commit time. The commit-msg stage keeps it out of `pre-commit run`, so it
+  # stays bypassable and never becomes a second gate. Keep the type list in sync
+  # with that job and CONTRIBUTING.
   - repo: https://github.com/compilerla/conventional-pre-commit
     rev: v4.4.0
     hooks:

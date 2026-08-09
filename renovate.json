@@ -1,18 +1,45 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:best-practices", "schedule:weekly"],
-  "baseBranchPatterns": ["master"],
+  "extends": [
+    "config:best-practices",
+    "security:openssf-scorecard",
+    "customManagers:githubActionsVersions"
+  ],
+  "timezone": "Europe/London",
   "reviewers": ["alunduil"],
+  "labels": ["dependencies"],
   "pre-commit": {"enabled": true},
   "minimumReleaseAge": "3 days",
-  "internalChecksFilter": "strict",
-  "vulnerabilityAlerts": {"minimumReleaseAge": "0 days"},
   "osvVulnerabilityAlerts": true,
   "packageRules": [
     {
       "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
-      "matchUpdateTypes": ["pin", "pinDigest", "digest", "lockFileMaintenance"],
-      "minimumReleaseAge": "0 days"
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest",
+        "digest",
+        "lockFileMaintenance",
+        "lockfileUpdate",
+        "rollback",
+        "bump",
+        "replacement"
+      ],
+      "minimumReleaseAge": null
+    },
+    {
+      "description": "Poetry resolves the newest release in range rather than the version Renovate targeted, so an in-range update writes a lockfile Renovate then rejects. :pinDevDependencies does not reach this group: it matches the devDependencies, dev-dependencies, and dev depTypes, and a Poetry group's depType is its name",
+      "matchDepTypes": ["test"],
+      "rangeStrategy": "pin"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Read `# renovate:` annotations above *_VERSION pins in dev container setup scripts",
+      "managerFilePatterns": [".devcontainer/*"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: packageName=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+[A-Za-z0-9_]+?_VERSION=\"(?<currentValue>.+?)\""
+      ]
     }
   ]
 }

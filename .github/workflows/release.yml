@@ -1,7 +1,4 @@
-# This workflow runs poetry against the repository.
-#
-# You can adjust the behavior by modifying this file.
-name: Publish to PyPi
+name: Release
 
 on:
   release:
@@ -16,14 +13,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  poetry:
-    runs-on: ubuntu-latest
+  pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: install poetry
         run: pipx install 'poetry<3'
       - name: setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.x"
           cache: poetry

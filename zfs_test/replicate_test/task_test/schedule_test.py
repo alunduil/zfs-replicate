@@ -86,7 +86,7 @@ def test_dependents_of_a_failure_do_not_run() -> None:
     assert len(failures) == 1
 
 
-@given(  # type: ignore[misc]
+@given(
     fixed_dictionaries({name: tuples(integers(0, 3), integers(0, 3)) for name in DATA_SETS}),
     booleans(),
 )

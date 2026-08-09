@@ -12,6 +12,11 @@
 
 - Renamed `--raw / --no-raw` (4.1.0) to `--send-raw / --send-no-raw` so every send flag shares the `--send-` prefix; the default still sends `zfs send -w` for encrypted data sets (#392).
 - `--follow-delete` no longer implies `zfs send -p`. Send properties are now controlled solely by `--send-props`; pass it alongside `--follow-delete` to keep the earlier behaviour (#392).
+- Raised the minimum Click to 8.2, which made `click.Choice` generic. `EnumChoice` now subscripts it, so 8.1 fails at import. Click 8.2 requires Python 3.10, which the current floor already sets (#456).
+
+### Removed
+
+- Support for Python 3.9, which reached upstream end of life in October 2025. The floor is now Python 3.10, which the patched releases of `urllib3`, `requests`, and `pytest` all require (#398).
 
 ## 4.1.0 -- 2026-05-09
 

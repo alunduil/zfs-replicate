@@ -1,8 +1,8 @@
 name: Set up Poetry
 description: Install Poetry and Python for a given version, with Poetry's download cache.
 
-# No `poetry install`: only jobs that run project code (pytest, scripts)
-# need the environment, so they install it; build and check skip it.
+# No `poetry install`: callers that run project code install the environment
+# themselves, so callers that only build or inspect skip the cost.
 #
 # A local composite action can't check out the repo it lives in, so
 # callers run actions/checkout before invoking it.
@@ -18,7 +18,7 @@ runs:
       shell: bash
       run: pipx install 'poetry<3'
     - name: setup python-${{ inputs.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
       with:
         python-version: ${{ inputs.python-version }}
         cache: poetry

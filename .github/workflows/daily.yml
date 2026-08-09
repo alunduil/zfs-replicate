@@ -1,0 +1,49 @@
+name: Daily
+
+# On-the-hour schedules queue behind platform peak load.
+on:
+  schedule:
+    - cron: '47 6 * * *'
+      timezone: Europe/London
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # No cancel-in-progress: a truncated sweep loses the operations-per-run
+  # resume cache and restarts from the first pull request.
+  group: ${{ github.workflow }}
+
+jobs:
+  stale-pull-requests:
+    name: Prune stale pull requests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      # `actions: write` is omitted: it covers only the resume cache, so a
+      # truncated run warns and restarts rather than failing.
+      issues: write
+      pull-requests: write
+    steps:
+      # An issue already carrying the label would otherwise stay eligible for
+      # closing.
+      - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
+        with:
+          days-before-issue-stale: -1
+          days-before-issue-close: -1
+          days-before-pr-stale: 30
+          days-before-pr-close: 14
+          stale-pr-label: no-pr-activity
+          # Closing a Renovate pull request tells Renovate the version is
+          # unwanted and it will not re-offer it. Renovate labels nothing by
+          # default, so this depends on renovate.json applying the label.
+          exempt-pr-labels: blocked,dependencies
+          stale-pr-message: >-
+            This has been quiet for 30 days, so it's picked up a stale label. A
+            comment or a push clears the label and restarts the clock. Otherwise
+            this closes in another 14 days.
+          close-pr-message: >-
+            Closing this after 44 quiet days. That isn't a call on the change
+            itself, and nothing is lost: the branch stays where it is, so
+            comment here if you want to pick it back up and I'll reopen it.

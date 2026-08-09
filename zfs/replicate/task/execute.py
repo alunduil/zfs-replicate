@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 def execute(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     tasks: List[Task],
+    *,
     ssh_command: Command,
     compression: Compression,
     send_options: send.Options,
@@ -52,6 +53,7 @@ def execute(  # noqa: PLR0913 -- carries the full replication call surface
 def _run(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     task: Task,
+    *,
     ssh_command: Command,
     compression: Compression,
     send_options: send.Options,
@@ -93,6 +95,7 @@ def _destroy(task: Task, ssh_command: Command) -> None:
 def _send(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     task: Task,
+    *,
     ssh_command: Command,
     compression: Compression,
     send_options: send.Options,

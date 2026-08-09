@@ -36,6 +36,7 @@ across all of them, bounded by the job limit and by whatever share of the work
 sits in one data set.
 """
 
+import itertools
 import logging
 from concurrent import futures
 from typing import Callable, Dict, List, Optional, Set, Tuple
@@ -57,7 +58,7 @@ def dependencies(remote: FileSystem, tasks: List[Task]) -> Dict[int, Set[int]]:
     edges: Dict[int, Set[int]] = {index: set() for index in range(len(tasks))}
 
     for indices in groups.values():
-        for earlier, later in zip(indices, indices[1:]):
+        for earlier, later in itertools.pairwise(indices):
             edges[later].add(earlier)
 
     _link_creates(tasks, groups, edges)
