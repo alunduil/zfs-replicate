@@ -39,7 +39,7 @@ sits in one data set.
 import itertools
 import logging
 from concurrent import futures
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from typing import Callable, Dict, Iterator, List, Optional, Set, Tuple
 
 from .. import optional
 from ..filesystem import FileSystem, remote_filesystem
@@ -50,19 +50,15 @@ logger = logging.getLogger(__name__)
 
 def dependencies(remote: FileSystem, tasks: List[Task]) -> Dict[int, Set[int]]:
     """Map each task's index to the indices of the tasks it must follow."""
-    groups: Dict[str, List[int]] = {}
-
-    for index, task in enumerate(tasks):
-        groups.setdefault(_data_set(remote, task), []).append(index)
-
+    groups = _group_by_data_set(remote, tasks)
     edges: Dict[int, Set[int]] = {index: set() for index in range(len(tasks))}
 
-    for indices in groups.values():
-        for earlier, later in itertools.pairwise(indices):
-            edges[later].add(earlier)
-
-    _link_creates(tasks, groups, edges)
-    _link_destroys(tasks, groups, edges)
+    for earlier, later in itertools.chain(
+        _chain_edges(groups),
+        _create_edges(tasks, groups),
+        _destroy_edges(tasks, groups),
+    ):
+        edges[later].add(earlier)
 
     return edges
 
@@ -80,49 +76,152 @@ def dispatch(
     unreachable data set costs the others nothing; the caller decides what a
     non-empty return means for the exit status.
     """
-    blockers = {index: set(edges[index]) for index in range(len(tasks))}
-    dependents: Dict[int, Set[int]] = {index: set() for index in range(len(tasks))}
+    return _Dispatcher(tasks, edges, run).run(jobs=jobs)
 
-    for index, blocking in blockers.items():
+
+class _Dispatcher:
+    """A single run of a task graph, tracking what has finished and what may start.
+
+    The bookkeeping outlives no single call: a task finishing unblocks others,
+    and a task failing strands everything downstream of it. Holding that state
+    on an instance keeps :meth:`run` to the pool's lifecycle.
+    """
+
+    def __init__(self, tasks: List[Task], edges: Dict[int, Set[int]], run: Callable[[Task], None]) -> None:
+        self._tasks = tasks
+        self._run = run
+        self._blockers = {index: set(blocking) for index, blocking in edges.items()}
+        self._dependents = _reverse(edges)
+        self._pending: Dict["futures.Future[None]", int] = {}
+        self._failures: List[Tuple[Task, BaseException]] = []
+
+    def run(self, *, jobs: int) -> List[Tuple[Task, BaseException]]:
+        """Drain the graph over a pool of ``jobs`` threads and return the failures."""
+        with futures.ThreadPoolExecutor(max_workers=jobs) as executor:
+            self._submit(executor, {index for index, blocking in self._blockers.items() if not blocking})
+
+            while self._pending:
+                done, _ = futures.wait(self._pending, return_when=futures.FIRST_COMPLETED)
+
+                ready: Set[int] = set()
+
+                for future in done:
+                    ready |= self._settle(future)
+
+                self._submit(executor, ready)
+
+        return self._failures
+
+    def _submit(self, executor: futures.ThreadPoolExecutor, indices: Set[int]) -> None:
+        # Submitting in index order means --jobs 1 replays generate's order
+        # wherever the graph leaves the choice open.
+        for index in sorted(indices):
+            self._pending[executor.submit(self._run, self._tasks[index])] = index
+
+    def _settle(self, future: "futures.Future[None]") -> Set[int]:
+        """Retire a finished task and return the indices it leaves ready to start."""
+        index = self._pending.pop(future)
+        error = future.exception()
+
+        if error is not None:
+            self._failures.append((self._tasks[index], error))
+            self._abandon(index)
+
+            return set()
+
+        ready = set()
+
+        for dependent in self._dependents[index]:
+            self._blockers[dependent].discard(index)
+
+            if not self._blockers[dependent]:
+                ready.add(dependent)
+
+        return ready
+
+    def _abandon(self, index: int) -> None:
+        # Nothing to unschedule: a failed task never clears itself from its
+        # dependents' blockers, so they are already unreachable. This only tells
+        # the operator which data sets the failure took with it.
+        abandoned: Set[int] = set()
+        frontier = set(self._dependents[index])
+
+        while frontier:
+            current = frontier.pop()
+
+            if current in abandoned:
+                continue
+
+            abandoned.add(current)
+            frontier |= self._dependents[current]
+
+        for skipped in sorted(abandoned):
+            logger.warning("skipping %s: a task it depends on failed", _label(self._tasks[skipped]))
+
+
+def _group_by_data_set(remote: FileSystem, tasks: List[Task]) -> Dict[str, List[int]]:
+    """Map each data set to its task indices, in the order generate emitted them."""
+    groups: Dict[str, List[int]] = {}
+
+    for index, task in enumerate(tasks):
+        groups.setdefault(_data_set(remote, task), []).append(index)
+
+    return groups
+
+
+def _chain_edges(groups: Dict[str, List[int]]) -> Iterator[Tuple[int, int]]:
+    """Yield an edge from each task in a data set to the one after it."""
+    for indices in groups.values():
+        yield from itertools.pairwise(indices)
+
+
+def _create_edges(tasks: List[Task], groups: Dict[str, List[int]]) -> Iterator[Tuple[int, int]]:
+    """Yield an edge from each parent's create to the create of every child."""
+    creates = _index_by_data_set(tasks, groups, lambda task: task.action is Action.CREATE)
+
+    for name, index in creates.items():
+        ancestor = _nearest(name, creates)
+
+        if ancestor is not None:
+            yield creates[ancestor], index
+
+
+def _destroy_edges(tasks: List[Task], groups: Dict[str, List[int]]) -> Iterator[Tuple[int, int]]:
+    """Yield an edge from each descendant's last destroy to the ancestor's filesystem destroy."""
+    # Only the filesystem destroy takes descendants with it, so a data set's
+    # snapshot destroys constrain nothing outside their own data set.
+    roots = _index_by_data_set(tasks, groups, lambda task: task.action is Action.DESTROY and task.snapshot is None)
+
+    for name, indices in groups.items():
+        destroys = [index for index in indices if tasks[index].action is Action.DESTROY]
+
+        if not destroys:
+            continue
+
+        ancestor = _nearest(name, roots)
+
+        if ancestor is not None:
+            yield destroys[-1], roots[ancestor]
+
+
+def _index_by_data_set(
+    tasks: List[Task],
+    groups: Dict[str, List[int]],
+    matches: Callable[[Task], bool],
+) -> Dict[str, int]:
+    """Map each data set to its last task satisfying ``matches``, skipping those with none."""
+    return {name: index for name, indices in groups.items() for index in indices if matches(tasks[index])}
+
+
+def _reverse(edges: Dict[int, Set[int]]) -> Dict[int, Set[int]]:
+    """Map each task's index to the indices of the tasks that follow it."""
+    dependents: Dict[int, Set[int]] = {index: set() for index in edges}
+
+    for index, blocking in edges.items():
         for blocker in blocking:
             dependents[blocker].add(index)
 
-    failures: List[Tuple[Task, BaseException]] = []
-
-    with futures.ThreadPoolExecutor(max_workers=jobs) as executor:
-        pending: Dict["futures.Future[None]", int] = {}
-
-        def submit(indices: Set[int]) -> None:
-            # Submitting in index order means --jobs 1 replays generate's order
-            # wherever the graph leaves the choice open.
-            for index in sorted(indices):
-                pending[executor.submit(run, tasks[index])] = index
-
-        submit({index for index, blocking in blockers.items() if not blocking})
-
-        while pending:
-            done, _ = futures.wait(pending, return_when=futures.FIRST_COMPLETED)
-
-            ready: Set[int] = set()
-
-            for future in done:
-                index = pending.pop(future)
-                error = future.exception()
-
-                if error is not None:
-                    failures.append((tasks[index], error))
-                    _abandon(index, tasks, dependents)
-                    continue
-
-                for dependent in dependents[index]:
-                    blockers[dependent].discard(index)
-
-                    if not blockers[dependent]:
-                        ready.add(dependent)
-
-            submit(ready)
-
-    return failures
+    return dependents
 
 
 def _data_set(remote: FileSystem, task: Task) -> str:
@@ -132,40 +231,6 @@ def _data_set(remote: FileSystem, task: Task) -> str:
         return remote_filesystem(remote, optional.value(task.snapshot).filesystem).name
 
     return task.filesystem.name
-
-
-def _link_creates(tasks: List[Task], groups: Dict[str, List[int]], edges: Dict[int, Set[int]]) -> None:
-    creates = {
-        name: index for name, indices in groups.items() for index in indices if tasks[index].action is Action.CREATE
-    }
-
-    for name, index in creates.items():
-        ancestor = _nearest(name, creates)
-
-        if ancestor is not None:
-            edges[index].add(creates[ancestor])
-
-
-def _link_destroys(tasks: List[Task], groups: Dict[str, List[int]], edges: Dict[int, Set[int]]) -> None:
-    def destroys(indices: List[int]) -> List[int]:
-        return [index for index in indices if tasks[index].action is Action.DESTROY]
-
-    # Only the filesystem destroy takes descendants with it, so a data set's
-    # snapshot destroys constrain nothing outside their own data set.
-    roots = {
-        name: index for name, indices in groups.items() for index in destroys(indices) if tasks[index].snapshot is None
-    }
-
-    for name, indices in groups.items():
-        last = destroys(indices)
-
-        if not last:
-            continue
-
-        ancestor = _nearest(name, roots)
-
-        if ancestor is not None:
-            edges[roots[ancestor]].add(last[-1])
 
 
 def _nearest(name: str, candidates: Dict[str, int]) -> Optional[str]:
@@ -178,26 +243,6 @@ def _nearest(name: str, candidates: Dict[str, int]) -> Optional[str]:
             return ancestor
 
     return None
-
-
-def _abandon(index: int, tasks: List[Task], dependents: Dict[int, Set[int]]) -> None:
-    # Nothing to unschedule: a failed task never clears itself from its
-    # dependents' blockers, so they are already unreachable. This only tells
-    # the operator which data sets the failure took with it.
-    abandoned: Set[int] = set()
-    frontier = set(dependents[index])
-
-    while frontier:
-        current = frontier.pop()
-
-        if current in abandoned:
-            continue
-
-        abandoned.add(current)
-        frontier |= dependents[current]
-
-    for skipped in sorted(abandoned):
-        logger.warning("skipping %s: a task it depends on failed", _label(tasks[skipped]))
 
 
 def _label(task: Task) -> str:
