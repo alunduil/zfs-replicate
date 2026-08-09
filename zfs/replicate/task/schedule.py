@@ -5,13 +5,11 @@ satisfies ZFS, but the order alone doesn't say which tasks may overlap. This
 module states the constraints as a dependency graph, then runs that graph on a
 bounded pool so independent data sets replicate at the same time.
 
-Two kinds of edge build the graph. Within a data set, every task follows the
-one before it, so a create precedes its sends, incremental sends stay in
-order, and destroys never race sends against a single receive target. A data
-set is serial internally; the parallelism is across data sets. Across data
-sets, a parent's create precedes its children's creates, and every destroy of
-a descendant precedes the destroy of the ancestor filesystem, which
-``zfs destroy -r`` would otherwise take with it.
+A data set is serial internally; the parallelism is across data sets. Two
+reasons for that sit outside any single rule: a data set's destroys must not
+race its sends against one receive target, and a filesystem destroy must wait
+for every descendant, since ``zfs destroy -r`` would otherwise take them with
+it.
 
 A run replicating ``tank/a``, its child ``tank/a/sub``, and ``tank/b`` to
 ``backup``, where ``tank/a`` and ``tank/a/sub`` are new to the destination and
@@ -30,10 +28,7 @@ A run replicating ``tank/a``, its child ``tank/a/sub``, and ``tank/b`` to
     DESTROY backup/tank/c@1 ----------> DESTROY backup/tank/c
 
 Every task with no incoming edge starts at once, up to the job limit; the rest
-start as their own dependencies finish rather than at a batch boundary. So a
-run takes about as long as its slowest single data set rather than the sum
-across all of them, bounded by the job limit and by whatever share of the work
-sits in one data set.
+start as their own dependencies finish rather than at a batch boundary.
 """
 
 import itertools
@@ -80,12 +75,7 @@ def dispatch(
 
 
 class _Dispatcher:
-    """A single run of a task graph, tracking what has finished and what may start.
-
-    The bookkeeping outlives no single call: a task finishing unblocks others,
-    and a task failing strands everything downstream of it. Holding that state
-    on an instance keeps :meth:`run` to the pool's lifecycle.
-    """
+    """A single run of a task graph, tracking what has finished and what may start."""
 
     def __init__(self, tasks: List[Task], edges: Dict[int, Set[int]], run: Callable[[Task], None]) -> None:
         self._tasks = tasks
@@ -209,7 +199,7 @@ def _index_by_data_set(
     groups: Dict[str, List[int]],
     matches: Callable[[Task], bool],
 ) -> Dict[str, int]:
-    """Map each data set to its last task satisfying ``matches``, skipping those with none."""
+    """Map each data set to the last of its tasks satisfying ``matches``."""
     return {name: index for name, indices in groups.items() for index in indices if matches(tasks[index])}
 
 
