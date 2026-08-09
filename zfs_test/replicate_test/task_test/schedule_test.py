@@ -142,8 +142,7 @@ def _record(
 def _blockers(tasks: List[Task]) -> Dict[str, Set[str]]:
     """Name what blocks each blocked task, so an expectation doesn't count positions.
 
-    Tasks nothing blocks are left out; the graph's entry-per-task contract is
-    asserted where it matters, on the run that has no edges at all.
+    Tasks nothing blocks are left out.
     """
     labels = [_task_label(task) for task in tasks]
     assert len(set(labels)) == len(labels), "labels key the expectation, so they have to be unique"
