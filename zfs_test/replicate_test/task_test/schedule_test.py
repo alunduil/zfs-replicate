@@ -23,20 +23,22 @@ def test_send_follows_its_data_sets_create() -> None:
     """A SEND waits for the CREATE of the data set its snapshot belongs to."""
     tasks = [_create("tank/a"), _send("tank/a", "s0")]
 
-    assert sut.dependencies(REMOTE, tasks) == {0: set(), 1: {0}}
+    assert _blockers(tasks) == {"send tank/a@s0": {"create backup/tank/a"}}
 
 
 def test_sends_chain_within_a_data_set() -> None:
     """Incremental sends for one data set stay in the order generate emitted them."""
     tasks = [_send("tank/a", "s0"), _send("tank/a", "s1")]
 
-    assert sut.dependencies(REMOTE, tasks) == {0: set(), 1: {0}}
+    assert _blockers(tasks) == {"send tank/a@s1": {"send tank/a@s0"}}
 
 
 def test_sends_to_different_data_sets_are_independent() -> None:
     """Sends keyed by the same remote root still separate by their snapshots."""
     tasks = [_send("tank/a", "s0"), _send("tank/b", "s0")]
 
+    # The raw graph rather than _blockers: dispatch seeds its first submission
+    # from the tasks whose entry is empty, so every task needs an entry.
     assert sut.dependencies(REMOTE, tasks) == {0: set(), 1: set()}
 
 
@@ -44,14 +46,14 @@ def test_child_create_follows_parent_create() -> None:
     """A child data set can't be created before its parent exists."""
     tasks = [_create("tank/a"), _create("tank/a/sub")]
 
-    assert sut.dependencies(REMOTE, tasks) == {0: set(), 1: {0}}
+    assert _blockers(tasks) == {"create backup/tank/a/sub": {"create backup/tank/a"}}
 
 
 def test_destroy_precedes_send_within_a_data_set() -> None:
     """A data set's destroys and sends never overlap against one receive target."""
     tasks = [_destroy("tank/a", "old"), _send("tank/a", "s0")]
 
-    assert sut.dependencies(REMOTE, tasks) == {0: set(), 1: {0}}
+    assert _blockers(tasks) == {"send tank/a@s0": {"destroy backup/tank/a@old"}}
 
 
 def test_filesystem_destroy_follows_every_descendant_destroy() -> None:
@@ -63,7 +65,10 @@ def test_filesystem_destroy_follows_every_descendant_destroy() -> None:
         _destroy("tank/a/sub"),
     ]
 
-    assert sut.dependencies(REMOTE, tasks) == {0: set(), 1: {0, 3}, 2: set(), 3: {2}}
+    assert _blockers(tasks) == {
+        "destroy backup/tank/a": {"destroy backup/tank/a@s0", "destroy backup/tank/a/sub"},
+        "destroy backup/tank/a/sub": {"destroy backup/tank/a/sub@s0"},
+    }
 
 
 def test_failure_leaves_independent_data_sets_running() -> None:
@@ -117,6 +122,7 @@ def _record(
     A task starts only once everything it depends on has finished, so start
     order is a topological order of the graph whatever ``jobs`` is.
     """
+    # Task is an unhashable dataclass, so identity keys the position map.
     positions = {id(task): index for index, task in enumerate(tasks)}
     started: List[int] = []
     lock = threading.Lock()
@@ -131,6 +137,34 @@ def _record(
     failures = sut.dispatch(tasks, sut.dependencies(REMOTE, tasks), run, jobs=jobs)
 
     return started, failures
+
+
+def _blockers(tasks: List[Task]) -> Dict[str, Set[str]]:
+    """Name what blocks each blocked task, so an expectation doesn't count positions.
+
+    Tasks nothing blocks are left out; the graph's entry-per-task contract is
+    asserted where it matters, on the run that has no edges at all.
+    """
+    labels = [_task_label(task) for task in tasks]
+    assert len(set(labels)) == len(labels), "labels key the expectation, so they have to be unique"
+
+    edges = sut.dependencies(REMOTE, tasks)
+
+    return {labels[index]: {labels[blocker] for blocker in blocking} for index, blocking in edges.items() if blocking}
+
+
+def _task_label(task: Task) -> str:
+    """Name a task the way the tests talk about it.
+
+    Deliberately its own formatter rather than schedule's, so rewording an
+    operator-facing message can't quietly rewrite what these tests assert.
+    """
+    action = task.action.name.lower()
+
+    if task.snapshot is None:
+        return f"{action} {task.filesystem.name}"
+
+    return f"{action} {task.snapshot.filesystem.name}@{task.snapshot.name}"
 
 
 def _respects(order: List[int], edges: Dict[int, Set[int]]) -> bool:
