@@ -80,11 +80,7 @@ class _Dispatcher:
     """A single run of a task graph, tracking what has finished and what may start."""
 
     def __init__(self, tasks: List[Task], edges: Dict[int, Set[int]], run: Callable[[Task], None]) -> None:
-        # Indices are all that tie the two arguments together, and a task absent
-        # from edges never reaches the sorter at all, so a graph that doesn't
-        # name every task would leave data sets silently unreplicated.
-        if set(edges) != set(range(len(tasks))):
-            raise ValueError("edges needs one entry per task, keyed by position in tasks")
+        _require_edge_per_task(tasks, edges)
 
         self._tasks = tasks
         self._run = run
@@ -140,23 +136,27 @@ class _Dispatcher:
         self._abandon(index)
 
     def _abandon(self, index: int) -> None:
-        # Nothing to unschedule: a failed task never clears itself from its
-        # dependents' blockers, so they are already unreachable. This only tells
-        # the operator which data sets the failure took with it.
-        abandoned: Set[int] = set()
+        # Nothing to unschedule: a failed task is never marked done, so the
+        # sorter never offers its dependents. This only tells the operator which
+        # data sets the failure took with it.
+        for skipped in sorted(self._downstream(index)):
+            logger.warning("skipping %s: a task it depends on failed", _label(self._tasks[skipped]))
+
+    def _downstream(self, index: int) -> Set[int]:
+        """Return every task that follows ``index``, directly or through another."""
+        reached: Set[int] = set()
         frontier = set(self._dependents[index])
 
         while frontier:
             current = frontier.pop()
 
-            if current in abandoned:
+            if current in reached:
                 continue
 
-            abandoned.add(current)
+            reached.add(current)
             frontier |= self._dependents[current]
 
-        for skipped in sorted(abandoned):
-            logger.warning("skipping %s: a task it depends on failed", _label(self._tasks[skipped]))
+        return reached
 
 
 def _group_by_data_set(remote: FileSystem, tasks: List[Task]) -> Dict[str, List[int]]:
@@ -211,6 +211,17 @@ def _index_by_data_set(
 ) -> Dict[str, int]:
     """Map each data set to the last of its tasks satisfying ``matches``."""
     return {name: index for name, indices in groups.items() for index in indices if matches(tasks[index])}
+
+
+def _require_edge_per_task(tasks: List[Task], edges: Dict[int, Set[int]]) -> None:
+    """Reject a graph that doesn't key every task by its position in ``tasks``.
+
+    Indices are all that tie the two together, and a task absent from ``edges``
+    never reaches the sorter at all, so a short graph would leave data sets
+    silently unreplicated.
+    """
+    if set(edges) != set(range(len(tasks))):
+        raise ValueError("edges needs one entry per task, keyed by position in tasks")
 
 
 def _reverse(edges: Dict[int, Set[int]]) -> Dict[int, Set[int]]:

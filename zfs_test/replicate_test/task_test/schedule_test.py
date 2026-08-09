@@ -151,12 +151,6 @@ def _captured(during: Callable[[], object]) -> List[logging.LogRecord]:
     on emission order clear of whatever handlers and levels the rest of the
     suite has left on the root logger.
     """
-    records: List[logging.LogRecord] = []
-
-    class _Recorder(logging.Handler):
-        def emit(self, record: logging.LogRecord) -> None:
-            records.append(record)
-
     logger = logging.getLogger(sut.__name__)
     handler = _Recorder()
     level = logger.level
@@ -170,7 +164,18 @@ def _captured(during: Callable[[], object]) -> List[logging.LogRecord]:
         logger.setLevel(level)
         logger.removeHandler(handler)
 
-    return records
+    return handler.records
+
+
+class _Recorder(logging.Handler):
+    """Keep every record it handles, in the order they arrived."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.records: List[logging.LogRecord] = []
+
+    def emit(self, record: logging.LogRecord) -> None:
+        self.records.append(record)
 
 
 def _record(
