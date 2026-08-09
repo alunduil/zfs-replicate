@@ -66,6 +66,7 @@ def dispatch(
 ) -> List[Tuple[Task, BaseException]]:
     """Run ``tasks`` on ``jobs`` threads in ``edges`` order and return the failures.
 
+    ``edges`` keys tasks by position, so it needs an entry for every task.
     A task starts once every task it depends on has finished. One that raises
     leaves the rest of the graph running and its own dependents unrun, so an
     unreachable data set costs the others nothing; the caller decides what a
@@ -78,6 +79,11 @@ class _Dispatcher:
     """A single run of a task graph, tracking what has finished and what may start."""
 
     def __init__(self, tasks: List[Task], edges: Dict[int, Set[int]], run: Callable[[Task], None]) -> None:
+        # Indices are all that tie the two arguments together, so a graph that
+        # doesn't name every task would leave data sets silently unreplicated.
+        if set(edges) != set(range(len(tasks))):
+            raise ValueError("edges needs one entry per task, keyed by position in tasks")
+
         self._tasks = tasks
         self._run = run
         self._blockers = {index: set(blocking) for index, blocking in edges.items()}

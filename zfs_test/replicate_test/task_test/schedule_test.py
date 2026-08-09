@@ -3,6 +3,7 @@
 import threading
 from typing import Dict, List, Optional, Set, Tuple
 
+import pytest
 from hypothesis import assume, given
 from hypothesis.strategies import booleans, fixed_dictionaries, integers, tuples
 
@@ -89,6 +90,14 @@ def test_dependents_of_a_failure_do_not_run() -> None:
 
     assert started == [0]
     assert len(failures) == 1
+
+
+def test_dispatch_rejects_a_graph_that_skips_a_task() -> None:
+    """A short graph is a bug rather than a smaller run, so it raises instead of replicating less."""
+    tasks = [_send("tank/a", "s0"), _send("tank/b", "s0")]
+
+    with pytest.raises(ValueError):
+        sut.dispatch(tasks, {0: set()}, lambda _task: None, jobs=1)
 
 
 @given(
