@@ -13,7 +13,7 @@ pre-commit install
 # 3) Vale linter. The release tarball names carry a bare version while the
 #    upstream tags are v-prefixed, hence extractVersion.
 # renovate: datasource=github-releases depName=errata-ai/vale extractVersion=^v(?<version>.+)$
-VALE_VERSION="3.17.0"
+VALE_VERSION="3.17.1"
 VALE_ARCH="64-bit"
 VALE_TARBALL="vale_${VALE_VERSION}_Linux_${VALE_ARCH}.tar.gz"
 VALE_URL="https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/${VALE_TARBALL}"
