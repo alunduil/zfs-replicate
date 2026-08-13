@@ -16,11 +16,12 @@ what's already wired into the project, not reinventing it.
 - **Package manager:** `Poetry`. `pyproject.toml` is the
   source of truth; `poetry.lock` pins the resolved versions;
   `poetry.toml` carries `Poetry` settings.
-- **Development shell:** `Nix` via `shell.nix` (which imports
-  `nix/shell.nix`). `.envrc` activates the shell through
-  `direnv` on directory change. `.devcontainer/` covers
-  Visual Studio Code and GitHub `Codespaces`;
-  `.devcontainer/post-create.sh` bootstraps the container.
+- **Development shell:** `.devcontainer/` covers Visual Studio
+  Code and GitHub `Codespaces`;
+  `.devcontainer/post-create.sh` bootstraps the container. This
+  project carries no `Nix` expressions: `nixpkgs` packages
+  `zfs-replicate` upstream, so a local derivation would be a
+  second definition to keep in sync (see #430).
 - **Tests:** `pytest` with `--doctest-modules --cov=zfs
   --cov-report=term-missing` (configured under
   `[tool.pytest.ini_options]` in `pyproject.toml`). The test

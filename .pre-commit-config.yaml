@@ -62,12 +62,11 @@ repos:
     rev: v3.17.1
     hooks:
       - id: vale
-        exclude: '^(styles/|LICENSE$|\.envrc$)'
+        exclude: '^(styles/|LICENSE$)'
         exclude_types:
           - gitignore
           - ini
           - json
-          - nix
           - python
           - shell
           - toml
