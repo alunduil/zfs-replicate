@@ -18,15 +18,11 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
-      # mypy and vulture infer their target from the interpreter running them,
-      # so hold the job at the newest supported version rather than whatever
-      # CPython uv resolves from requires-python.
+      # Unpinned, mypy and vulture would target the newest CPython that
+      # requires-python allows, which only the experimental matrix leg tests.
       UV_PYTHON: "3.12"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      # pre-commit/action reaches an unpinned actions/cache, which this repo's
-      # SHA-pinning policy rejects before the job starts. Upstream is
-      # maintenance-only; this replacement pins its transitive actions.
       - uses: tox-dev/action-pre-commit-uv@e09b8958484dfe71f4ac3bc7afb230ba506402ec # v1.0.5
 
   python-tests:
