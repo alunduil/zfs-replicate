@@ -2,6 +2,7 @@ Amdahl
 argparse
 docstring
 MADR
+nixpkgs
 Nygard
 release-please
 semver

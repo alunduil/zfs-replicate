@@ -62,6 +62,11 @@ _N.B., don't use the root user to access your remote system._
 1. `poetry install`
 1. `poetry run -- zfs-replicate --help`
 
+Nix and NixOS users install the `zfs-replicate` package from [nixpkgs] rather
+than building from this repository. NixOS also provides a
+`services.zfs.autoReplication` module that runs replication as a system
+service.
+
 ## Setting properties on the replica
 
 To match your destination's policy without a post-receive patch-up, set ZFS
@@ -112,6 +117,7 @@ See `zfs-replicate --help` for the full set of `--send-` flags.
 [`FreeNAS`]: http://www.freenas.org/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
 [LICENSE]: ./LICENSE
+[nixpkgs]: https://search.nixos.org/packages?show=zfs-replicate
 [sanoid]: https://github.com/jimsalterjrs/sanoid
 [survey]: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 [Working With Oracle Solaris ZFS Snapshots and Clones]: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc
