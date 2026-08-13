@@ -17,10 +17,17 @@ jobs:
     name: Run pre-commit hooks
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    env:
+      # mypy and vulture infer their target from the interpreter running them,
+      # so hold the job at the newest supported version rather than whatever
+      # CPython uv resolves from requires-python.
+      UV_PYTHON: "3.12"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
-      - uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+      # pre-commit/action reaches an unpinned actions/cache, which this repo's
+      # SHA-pinning policy rejects before the job starts. Upstream is
+      # maintenance-only; this replacement pins its transitive actions.
+      - uses: tox-dev/action-pre-commit-uv@e09b8958484dfe71f4ac3bc7afb230ba506402ec # v1.0.5
 
   python-tests:
     # Matrix jobs take the explicit name verbatim, so interpolate the version
