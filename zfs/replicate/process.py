@@ -43,9 +43,7 @@ def pipeline(first: Command, *rest: Command) -> "subprocess.Popen[bytes]":
     """Chain ``first`` into each of ``rest``, returning the last stage.
 
     The "Replacing shell pipeline" recipe from the ``subprocess`` documentation,
-    generalised over any number of stages: each stage's stdout becomes the next
-    one's stdin, and the parent drops its own copy of that stream so a stage
-    sees SIGPIPE when its reader exits first.
+    generalised over any number of stages.
 
     Every stage but the last keeps the parent's stderr, so its failures stay
     visible; the last stage captures both streams for the caller to read.

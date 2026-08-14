@@ -31,7 +31,7 @@ def test_pipeline_feeds_each_stage_into_the_next() -> None:
 
 
 def test_pipeline_captures_both_streams_of_a_lone_stage() -> None:
-    """A one-stage pipeline is its own last stage, so the caller reads its streams."""
+    """A lone stage is also the last one, so its streams reach the caller."""
     proc = sut.pipeline(Command("printf", ["%s", "solo"]))
 
     output, error = proc.communicate()

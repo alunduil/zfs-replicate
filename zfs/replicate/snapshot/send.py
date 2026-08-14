@@ -29,7 +29,7 @@ class Pipeline:
 
     @property
     def stages(self) -> List[Command]:
-        """The commands to run, in pipeline order, without the absent compressor."""
+        """The commands to run, in pipeline order."""
         return optional.values(self.send, self.compress, self.receive)
 
 
