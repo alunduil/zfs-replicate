@@ -39,6 +39,28 @@ def open(
     )
 
 
+def pipeline(first: Command, *rest: Command) -> "subprocess.Popen[bytes]":
+    """Chain ``first`` into each of ``rest``, returning the last stage.
+
+    The "Replacing shell pipeline" recipe from the ``subprocess`` documentation,
+    generalised over any number of stages.
+
+    Every stage but the last keeps the parent's stderr, so its failures stay
+    visible; the last stage captures both streams for the caller to read.
+    """
+    proc = open(first, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=None if rest else subprocess.PIPE)
+
+    for index, command in enumerate(rest):
+        upstream = proc
+        stderr = subprocess.PIPE if index == len(rest) - 1 else None
+
+        proc = open(command, stdin=upstream.stdout, stdout=subprocess.PIPE, stderr=stderr)
+
+        _detach(upstream.stdout)
+
+    return proc
+
+
 def run(
     command: Command,
     stdin: Stream = subprocess.PIPE,
@@ -50,3 +72,9 @@ def run(
         output, error = proc.communicate()
 
     return subprocess.CompletedProcess(command.argv, proc.returncode, output, error)
+
+
+def _detach(stream: Optional[IO[bytes]]) -> None:
+    """Drop the parent's copy of a piped stream so its reader sees EOF/SIGPIPE."""
+    if stream is not None:
+        stream.close()
