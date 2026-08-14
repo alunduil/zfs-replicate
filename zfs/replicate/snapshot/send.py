@@ -1,6 +1,7 @@
 """ZFS Snapshot Send."""
 
-from typing import IO, List, Optional, Tuple
+from dataclasses import dataclass
+from typing import IO, List, Optional
 
 from .. import compress, filesystem, process, receive
 from ..command import Command, over_ssh
@@ -11,9 +12,24 @@ from ..receive.command import command as receive_command
 from ..send import Options as SendOptions
 from .type import Snapshot
 
+_MOUNTPOINT_FAILURE = b"failed to create mountpoint"
 
-# Threads the whole replication surface to assemble the send pipeline, so the
-# parameter count crosses pylint's threshold.
+
+@dataclass(frozen=True)
+class Pipeline:
+    """The stages of ``send [ | compress ] | ssh "[decompress | ] receive"``.
+
+    Sits between assembling the replication pipeline and running it:
+    :func:`_pipeline` builds one out of commands and :func:`_spawn` turns it
+    into processes. ``receive`` is the remote side, already wrapped in ssh;
+    ``compress`` is ``None`` when compression is off.
+    """
+
+    send: Command
+    compress: Optional[Command]
+    receive: Command
+
+
 def send(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     current: Snapshot,
@@ -25,32 +41,24 @@ def send(  # noqa: PLR0913 -- carries the full replication call surface
     previous: Optional[Snapshot] = None,
 ) -> None:
     """Send ZFS Snapshot."""
-    send_command, compress_command, remote_command = _commands(
-        remote,
-        current,
-        ssh_command=ssh_command,
-        compression=compression,
-        send_options=send_options,
-        receive_options=receive_options,
-        previous=previous,
+    proc = _spawn(
+        _pipeline(
+            remote,
+            current,
+            ssh_command=ssh_command,
+            compression=compression,
+            send_options=send_options,
+            receive_options=receive_options,
+            previous=previous,
+        )
     )
-
-    proc = _pipeline(send_command, compress_command, remote_command)
 
     _, error = proc.communicate()
 
-    if proc.returncode:
-        if b"failed to create mountpoint" in error:
-            return  # Ignore this error.
-
-        raise ZFSReplicateError(
-            f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error!r}",
-            current,
-            error,
-        )
+    _raise_for_failure(current, proc.returncode, error)
 
 
-def _commands(  # noqa: PLR0913 -- carries the full replication call surface
+def _pipeline(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
     current: Snapshot,
     *,
@@ -59,12 +67,11 @@ def _commands(  # noqa: PLR0913 -- carries the full replication call surface
     send_options: SendOptions,
     receive_options: receive.Options,
     previous: Optional[Snapshot] = None,
-) -> Tuple[Command, Optional[Command], Command]:
-    """Assemble the stages of ``send [ | compress ] | ssh "[decompress | ] receive"``.
+) -> Pipeline:
+    """Assemble the pipeline that replicates ``current`` onto ``remote``.
 
-    Returns the local send, the optional local compressor, and the remote side
-    already wrapped in ssh, in the order :func:`_pipeline` wires them. Spawns
-    nothing, so the shape of the pipeline can be asserted on its own.
+    Spawns nothing: the stages come back as commands, so the shape of the
+    pipeline stands on its own.
     """
     compress_command, decompress_command = compress.command(compression)
 
@@ -74,30 +81,26 @@ def _commands(  # noqa: PLR0913 -- carries the full replication call surface
         cmd for cmd in (decompress_command, receive_command(destination, receive_options)) if cmd is not None
     ]
 
-    return (
-        _send(current, previous, options=send_options),
-        compress_command,
-        over_ssh(ssh_command, *remote_side),
+    return Pipeline(
+        send=_send(current, previous, options=send_options),
+        compress=compress_command,
+        receive=over_ssh(ssh_command, *remote_side),
     )
 
 
-def _pipeline(
-    send_command: Command,
-    compress_command: Optional[Command],
-    remote_command: Command,
-) -> "process.Popen[bytes]":
-    """Wire ``send [ | compress ] | ssh`` as local processes without a shell.
+def _spawn(pipeline: Pipeline) -> "process.Popen[bytes]":
+    """Run a :class:`Pipeline` as local processes without a shell.
 
     Only the receive side (over ssh) runs through a shell -- the remote one,
     which ssh cannot avoid. Each upstream stage keeps its own stderr on the
     parent's, so send/compress errors stay visible; the ssh stage's streams are
     captured for the caller's error handling.
     """
-    upstream = process.open(send_command, stdin=process.DEVNULL, stdout=process.PIPE, stderr=None)
+    upstream = process.open(pipeline.send, stdin=process.DEVNULL, stdout=process.PIPE, stderr=None)
 
-    if compress_command is not None:
+    if pipeline.compress is not None:
         compressor = process.open(
-            compress_command,
+            pipeline.compress,
             stdin=upstream.stdout,
             stdout=process.PIPE,
             stderr=None,
@@ -106,7 +109,7 @@ def _pipeline(
         upstream = compressor
 
     proc = process.open(
-        remote_command,
+        pipeline.receive,
         stdin=upstream.stdout,
         stdout=process.PIPE,
         stderr=process.PIPE,
@@ -114,6 +117,18 @@ def _pipeline(
     _detach(upstream.stdout)
 
     return proc
+
+
+def _raise_for_failure(current: Snapshot, returncode: int, error: bytes) -> None:
+    """Raise unless the pipeline succeeded or failed only to create the mountpoint."""
+    if not returncode or _MOUNTPOINT_FAILURE in error:
+        return
+
+    raise ZFSReplicateError(
+        f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error!r}",
+        current,
+        error,
+    )
 
 
 def _detach(stream: Optional[IO[bytes]]) -> None:

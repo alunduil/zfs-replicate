@@ -11,11 +11,12 @@ from zfs.replicate.error import ZFSReplicateError
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.receive.type import Options as ReceiveOptions
 from zfs.replicate.send.type import Options
-from zfs.replicate.snapshot.send import _commands, _send, send
+from zfs.replicate.snapshot.send import Pipeline, _pipeline, _send, send
 from zfs.replicate.snapshot.type import Snapshot
 
 REMOTE = filesystem("backup")
 SSH = Command.with_empty_env("ssh", "host")
+RECEIVE_DEFAULTS = ReceiveOptions()
 
 
 def _snapshot(name: str = "pool/data", snapshot: str = "snap") -> Snapshot:
@@ -30,16 +31,16 @@ def _snapshot(name: str = "pool/data", snapshot: str = "snap") -> Snapshot:
 def _assemble(
     *,
     compression: Compression = Compression.OFF,
-    receive_options: Optional[ReceiveOptions] = None,
+    receive_options: ReceiveOptions = RECEIVE_DEFAULTS,
     previous: Optional[Snapshot] = None,
-) -> Tuple[Command, Optional[Command], Command]:
-    return _commands(
+) -> Pipeline:
+    return _pipeline(
         REMOTE,
         _snapshot(),
         ssh_command=SSH,
         compression=compression,
         send_options=Options(),
-        receive_options=receive_options if receive_options is not None else ReceiveOptions(),
+        receive_options=receive_options,
         previous=previous,
     )
 
@@ -56,7 +57,7 @@ class _FakeStream:
 
 
 class _FakeProcess:
-    """Stand-in for the processes ``_pipeline`` wires together."""
+    """Stand-in for the processes ``_spawn`` wires together."""
 
     def __init__(self, command: Command, returncode: int, error: bytes) -> None:
         self.command = command
@@ -90,7 +91,7 @@ def _replicate(compression: Compression = Compression.OFF) -> None:
         ssh_command=SSH,
         compression=compression,
         send_options=Options(),
-        receive_options=ReceiveOptions(),
+        receive_options=RECEIVE_DEFAULTS,
     )
 
 
@@ -118,53 +119,53 @@ def test_send_keeps_hostile_snapshot_as_one_token() -> None:
     assert "'pool/data a$b@snap'" in command.render()
 
 
-def test_commands_drops_both_compression_stages_when_off() -> None:
+def test_pipeline_drops_both_compression_stages_when_off() -> None:
     """OFF leaves no local compressor and no remote decompress prefix."""
-    send_command, compress_command, remote_command = _assemble(compression=Compression.OFF)
+    pipeline = _assemble(compression=Compression.OFF)
 
-    assert send_command.args[-1] == "pool/data@snap"
-    assert compress_command is None
-    assert remote_command.args[-1] == "/usr/bin/env - zfs receive -F -d backup/pool"
+    assert pipeline.send.args[-1] == "pool/data@snap"
+    assert pipeline.compress is None
+    assert pipeline.receive.args[-1] == "/usr/bin/env - zfs receive -F -d backup/pool"
 
 
-def test_commands_pairs_the_compressor_with_a_remote_decompress() -> None:
+def test_pipeline_pairs_the_compressor_with_a_remote_decompress() -> None:
     """lz4 compresses locally and decompresses ahead of the remote receive."""
-    _, compress_command, remote_command = _assemble(compression=Compression.LZ4)
+    pipeline = _assemble(compression=Compression.LZ4)
 
-    assert compress_command is not None
-    assert compress_command.argv == ["/usr/bin/env", "-", "lz4"]
-    assert remote_command.args[-1] == "/usr/bin/env - lz4 -d | /usr/bin/env - zfs receive -F -d backup/pool"
+    assert pipeline.compress is not None
+    assert pipeline.compress.argv == ["/usr/bin/env", "-", "lz4"]
+    assert pipeline.receive.args[-1] == "/usr/bin/env - lz4 -d | /usr/bin/env - zfs receive -F -d backup/pool"
 
 
-def test_commands_hands_the_remote_side_to_ssh() -> None:
+def test_pipeline_hands_the_remote_side_to_ssh() -> None:
     """The remote pipeline rides as a single argument to the configured ssh command."""
-    _, _, remote_command = _assemble()
+    pipeline = _assemble()
 
-    assert remote_command.argv[:4] == ["/usr/bin/env", "-", "ssh", "host"]
-    assert len(remote_command.argv) == 5
+    assert pipeline.receive.argv[:4] == ["/usr/bin/env", "-", "ssh", "host"]
+    assert len(pipeline.receive.argv) == 5
 
 
-def test_commands_marks_an_incremental_send_with_its_previous_snapshot() -> None:
+def test_pipeline_marks_an_incremental_send_with_its_previous_snapshot() -> None:
     """A previous snapshot becomes the -i source of the send stage."""
-    send_command, _, _ = _assemble(previous=_snapshot(snapshot="older"))
+    pipeline = _assemble(previous=_snapshot(snapshot="older"))
 
-    assert send_command.args[-3:] == ["-i", "pool/data@older", "pool/data@snap"]
+    assert pipeline.send.args[-3:] == ["-i", "pool/data@older", "pool/data@snap"]
 
 
-def test_commands_omits_the_incremental_flag_for_a_full_send() -> None:
+def test_pipeline_omits_the_incremental_flag_for_a_full_send() -> None:
     """Without a previous snapshot the send stage carries no -i source."""
-    send_command, _, _ = _assemble()
+    pipeline = _assemble()
 
-    assert "-i" not in send_command.args
+    assert "-i" not in pipeline.send.args
 
 
-def test_commands_threads_receive_options_into_the_remote_side() -> None:
+def test_pipeline_threads_receive_options_into_the_remote_side() -> None:
     """Non-default receive settings reach the remote zfs receive invocation."""
-    _, _, remote_command = _assemble(
+    pipeline = _assemble(
         receive_options=ReceiveOptions(force=False, no_mount=True, resume=True, properties={"readonly": "on"}),
     )
 
-    assert remote_command.args[-1] == "/usr/bin/env - zfs receive -u -s -o readonly=on -d backup/pool"
+    assert pipeline.receive.args[-1] == "/usr/bin/env - zfs receive -u -s -o readonly=on -d backup/pool"
 
 
 def test_send_spawns_each_assembled_stage(monkeypatch: pytest.MonkeyPatch) -> None:
