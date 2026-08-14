@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
-from .. import compress, filesystem, process, receive
+from .. import compress, filesystem, optional, process, receive
 from ..command import Command, over_ssh
 from ..compress import Compression
 from ..error import ZFSReplicateError
@@ -30,7 +30,7 @@ class Pipeline:
     @property
     def stages(self) -> List[Command]:
         """The commands to run, in pipeline order, without the absent compressor."""
-        return [command for command in (self.send, self.compress, self.receive) if command is not None]
+        return optional.values(self.send, self.compress, self.receive)
 
 
 def send(  # noqa: PLR0913 -- carries the full replication call surface
@@ -76,9 +76,7 @@ def _pipeline(  # noqa: PLR0913 -- carries the full replication call surface
 
     destination = filesystem.remote_dataset(remote, current.filesystem)
 
-    remote_side: List[Command] = [
-        cmd for cmd in (decompress_command, receive_command(destination, receive_options)) if cmd is not None
-    ]
+    remote_side = optional.values(decompress_command, receive_command(destination, receive_options))
 
     return Pipeline(
         send=_send(current, previous, options=send_options),
