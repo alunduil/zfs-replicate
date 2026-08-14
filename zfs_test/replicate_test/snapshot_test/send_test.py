@@ -46,18 +46,18 @@ def _assemble(
 
 
 class _FakeStream:
-    """Stand-in for a piped stdout, recording the close ``_detach`` performs."""
+    """Stand-in for a piped stdout, recording whether the parent closed it."""
 
     def __init__(self) -> None:
         self.closed = False
 
     def close(self) -> None:
-        """Record that the parent dropped its copy of this stream."""
+        """Close the stream, as the real ``IO[bytes]`` would."""
         self.closed = True
 
 
 class _FakeProcess:
-    """Stand-in for the processes ``_spawn`` wires together."""
+    """Stand-in for the processes the replication pipeline spawns."""
 
     def __init__(self, command: Command, returncode: int, error: bytes) -> None:
         self.command = command
@@ -169,7 +169,7 @@ def test_pipeline_threads_receive_options_into_the_remote_side() -> None:
 
 
 def test_send_spawns_each_assembled_stage(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Send runs the assembled stages, in pipeline order."""
+    """Each assembled stage runs as a process, in pipeline order."""
     spawned = _capture_spawns(monkeypatch)
 
     _replicate(compression=Compression.LZ4)
@@ -178,7 +178,7 @@ def test_send_spawns_each_assembled_stage(monkeypatch: pytest.MonkeyPatch) -> No
 
 
 def test_send_detaches_the_parent_from_every_upstream_stage(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Each piped stdout is closed but the last, whose output the caller reads."""
+    """The parent closes every piped stdout but the last, whose output it reads."""
     spawned = _capture_spawns(monkeypatch)
 
     _replicate(compression=Compression.LZ4)
@@ -187,14 +187,14 @@ def test_send_detaches_the_parent_from_every_upstream_stage(monkeypatch: pytest.
 
 
 def test_send_ignores_a_missing_mountpoint(monkeypatch: pytest.MonkeyPatch) -> None:
-    """A failure to create the destination mountpoint is not an error."""
+    """Replication tolerates a failure to create the destination mountpoint."""
     _capture_spawns(monkeypatch, returncode=1, error=b"cannot mount 'backup/pool': failed to create mountpoint")
 
     _replicate()
 
 
 def test_send_raises_on_any_other_failure(monkeypatch: pytest.MonkeyPatch) -> None:
-    """A non-zero pipeline surfaces its stderr as a ZFSReplicateError."""
+    """A failed pipeline surfaces its stderr as a ZFSReplicateError."""
     _capture_spawns(monkeypatch, returncode=1, error=b"cannot receive: dataset does not exist")
 
     with pytest.raises(ZFSReplicateError, match="pool/data@snap"):

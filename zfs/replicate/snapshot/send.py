@@ -19,10 +19,8 @@ _MOUNTPOINT_FAILURE = b"failed to create mountpoint"
 class Pipeline:
     """The stages of ``send [ | compress ] | ssh "[decompress | ] receive"``.
 
-    Sits between assembling the replication pipeline and running it:
-    :func:`_pipeline` builds one out of commands and :func:`_spawn` turns it
-    into processes. ``receive`` is the remote side, already wrapped in ssh;
-    ``compress`` is ``None`` when compression is off.
+    ``receive`` covers the whole remote side, ssh included; ``compress`` is
+    ``None`` when compression is off.
     """
 
     send: Command
@@ -68,11 +66,7 @@ def _pipeline(  # noqa: PLR0913 -- carries the full replication call surface
     receive_options: receive.Options,
     previous: Optional[Snapshot] = None,
 ) -> Pipeline:
-    """Assemble the pipeline that replicates ``current`` onto ``remote``.
-
-    Spawns nothing: the stages come back as commands, so the shape of the
-    pipeline stands on its own.
-    """
+    """Assemble the pipeline that replicates ``current`` onto ``remote``, spawning nothing."""
     compress_command, decompress_command = compress.command(compression)
 
     destination = filesystem.remote_dataset(remote, current.filesystem)
