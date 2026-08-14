@@ -1,6 +1,6 @@
 """ZFS Snapshot Send."""
 
-from typing import IO, List, Optional
+from typing import IO, List, Optional, Tuple
 
 from .. import compress, filesystem, process, receive
 from ..command import Command, over_ssh
@@ -25,19 +25,17 @@ def send(  # noqa: PLR0913 -- carries the full replication call surface
     previous: Optional[Snapshot] = None,
 ) -> None:
     """Send ZFS Snapshot."""
-    compress_command, decompress_command = compress.command(compression)
-
-    destination = filesystem.remote_dataset(remote, current.filesystem)
-
-    remote_side: List[Command] = [
-        cmd for cmd in (decompress_command, receive_command(destination, receive_options)) if cmd is not None
-    ]
-
-    proc = _pipeline(
-        _send(current, previous, options=send_options),
-        compress_command,
-        over_ssh(ssh_command, *remote_side),
+    send_command, compress_command, remote_command = _commands(
+        remote,
+        current,
+        ssh_command=ssh_command,
+        compression=compression,
+        send_options=send_options,
+        receive_options=receive_options,
+        previous=previous,
     )
+
+    proc = _pipeline(send_command, compress_command, remote_command)
 
     _, error = proc.communicate()
 
@@ -50,6 +48,37 @@ def send(  # noqa: PLR0913 -- carries the full replication call surface
             current,
             error,
         )
+
+
+def _commands(  # noqa: PLR0913 -- carries the full replication call surface
+    remote: FileSystem,
+    current: Snapshot,
+    *,
+    ssh_command: Command,
+    compression: Compression,
+    send_options: SendOptions,
+    receive_options: receive.Options,
+    previous: Optional[Snapshot] = None,
+) -> Tuple[Command, Optional[Command], Command]:
+    """Assemble the stages of ``send [ | compress ] | ssh "[decompress | ] receive"``.
+
+    Returns the local send, the optional local compressor, and the remote side
+    already wrapped in ssh, in the order :func:`_pipeline` wires them. Spawns
+    nothing, so the shape of the pipeline can be asserted on its own.
+    """
+    compress_command, decompress_command = compress.command(compression)
+
+    destination = filesystem.remote_dataset(remote, current.filesystem)
+
+    remote_side: List[Command] = [
+        cmd for cmd in (decompress_command, receive_command(destination, receive_options)) if cmd is not None
+    ]
+
+    return (
+        _send(current, previous, options=send_options),
+        compress_command,
+        over_ssh(ssh_command, *remote_side),
+    )
 
 
 def _pipeline(
