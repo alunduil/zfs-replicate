@@ -55,15 +55,17 @@ def test_snapshots(snapshots: list[Snapshot]) -> None:
 ## The process boundary
 
 [`zfs/replicate/process.py`](../../zfs/replicate/process.py) is the sole place
-the project spawns a process: `process.open` for streaming and pipeline wiring,
-`process.run` for run-to-completion. Tests never spawn real `zfs` or `ssh`.
+the project spawns a process: `process.open` for streaming, `process.pipeline`
+for chaining one command's output into the next, and `process.run` for
+run-to-completion. Tests never spawn real `zfs` or `ssh`.
 
 - Command *builders* (`*/command.py`) construct a `Command` and spawn nothing.
   Their tests assert on `Command.argv` and `Command.render()` directly.
 - Code that *runs* a command patches the boundary. A test replaces
   `zfs.replicate.process.run` (or `process.open`) with `monkeypatch.setattr`,
   returning a fake `subprocess.CompletedProcess` or `Popen`, so no external
-  binary runs.
+  binary runs. Patching `process.open` also covers `process.pipeline`, which
+  spawns each of its stages through it.
 
 ## Command-line tests
 

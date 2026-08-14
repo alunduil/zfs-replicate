@@ -1,7 +1,7 @@
 """ZFS Snapshot Send."""
 
 from dataclasses import dataclass
-from typing import IO, List, Optional
+from typing import List, Optional
 
 from .. import compress, filesystem, process, receive
 from ..command import Command, over_ssh
@@ -27,6 +27,11 @@ class Pipeline:
     compress: Optional[Command]
     receive: Command
 
+    @property
+    def stages(self) -> List[Command]:
+        """The commands to run, in pipeline order, without the absent compressor."""
+        return [command for command in (self.send, self.compress, self.receive) if command is not None]
+
 
 def send(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
@@ -39,17 +44,17 @@ def send(  # noqa: PLR0913 -- carries the full replication call surface
     previous: Optional[Snapshot] = None,
 ) -> None:
     """Send ZFS Snapshot."""
-    proc = _spawn(
-        _pipeline(
-            remote,
-            current,
-            ssh_command=ssh_command,
-            compression=compression,
-            send_options=send_options,
-            receive_options=receive_options,
-            previous=previous,
-        )
+    pipeline = _pipeline(
+        remote,
+        current,
+        ssh_command=ssh_command,
+        compression=compression,
+        send_options=send_options,
+        receive_options=receive_options,
+        previous=previous,
     )
+
+    proc = process.pipeline(*pipeline.stages)
 
     _, error = proc.communicate()
 
@@ -82,37 +87,6 @@ def _pipeline(  # noqa: PLR0913 -- carries the full replication call surface
     )
 
 
-def _spawn(pipeline: Pipeline) -> "process.Popen[bytes]":
-    """Run a :class:`Pipeline` as local processes without a shell.
-
-    Only the receive side (over ssh) runs through a shell -- the remote one,
-    which ssh cannot avoid. Each upstream stage keeps its own stderr on the
-    parent's, so send/compress errors stay visible; the ssh stage's streams are
-    captured for the caller's error handling.
-    """
-    upstream = process.open(pipeline.send, stdin=process.DEVNULL, stdout=process.PIPE, stderr=None)
-
-    if pipeline.compress is not None:
-        compressor = process.open(
-            pipeline.compress,
-            stdin=upstream.stdout,
-            stdout=process.PIPE,
-            stderr=None,
-        )
-        _detach(upstream.stdout)
-        upstream = compressor
-
-    proc = process.open(
-        pipeline.receive,
-        stdin=upstream.stdout,
-        stdout=process.PIPE,
-        stderr=process.PIPE,
-    )
-    _detach(upstream.stdout)
-
-    return proc
-
-
 def _raise_for_failure(current: Snapshot, returncode: int, error: bytes) -> None:
     """Raise unless the pipeline succeeded or failed only to create the mountpoint."""
     if not returncode or _MOUNTPOINT_FAILURE in error:
@@ -123,12 +97,6 @@ def _raise_for_failure(current: Snapshot, returncode: int, error: bytes) -> None
         current,
         error,
     )
-
-
-def _detach(stream: Optional[IO[bytes]]) -> None:
-    """Drop the parent's copy of a piped stream so its reader sees EOF/SIGPIPE."""
-    if stream is not None:
-        stream.close()
 
 
 def _send(
