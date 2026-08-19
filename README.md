@@ -94,42 +94,12 @@ zfs-replicate --send-large-block --send-compressed \
 
 See `zfs-replicate --help` for the full set of `--send-` flags.
 
-## Replicating encrypted data sets
-
-`zfs send -w` sends blocks as they sit on disk, so an encrypted data set arrives
-on the destination still encrypted and the backup host holds no key to read it.
-The replica carries the same encryption keys as its source, and the source
-doesn't need those keys loaded to run the replication. Without `-w`, `zfs send`
-decrypts on the way out and the destination holds plain text.
-
-zfs-replicate passes `-w` by default, so replicating an encrypted data set to a
-less-trusted host takes no extra send flags. A raw receive does leave the
-replica's `keylocation` at `prompt`, so pair the send with `--receive-set` to
-point the destination at a key file:
-
-```bash
-zfs-replicate --receive-set keylocation=file:///etc/zfs/keys/secrets.key \
-  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/secrets
-```
-
-Two situations call for `--send-no-raw` instead:
-
-1. The destination needs readable data, either to mount the replica or to
-   re-encrypt it under a key of its own. `zfs receive` takes a raw stream as is
-   and can't decrypt, re-encrypt, or recompress it.
-1. The destination pool lacks the `large_blocks` or `embedded_data` features.
-   On a data set with no encryption, `-w` behaves the same as `-L -e -c`, so
-   the default send needs both features.
-
-Choose one mode per destination data set and stay with it. ZFS refuses a raw
-incremental receive that follows a non-raw one. A non-raw receive on top of a
-raw-received data set also replaces the initialization vector set, so every
-later raw incremental receive fails with an `IV set guid mismatch` error.
-
 ## Documentation
 
 * `zfs-replicate --help`: Help for zfs-replicate.
 * [LICENSE]: Licence file explaining usage of zfs-replicate.
+* [Replicate an encrypted data set][encrypted replication]: How to replicate an
+  encrypted data set without decrypting it on the way.
 * [Survey of ZFS Replication Tools][survey]: Overview of various ZFS replication
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
@@ -145,6 +115,7 @@ later raw incremental receive fails with an `IV set guid mismatch` error.
 * [GitHub issues]: Report any problems or features requests to GitHub issues.
 
 [autorepl.py]: https://github.com/freenas/freenas/blob/master/gui/tools/autorepl.py
+[encrypted replication]: ./docs/how-to/replicate-an-encrypted-data-set.md
 [FreeBSD]: https://www.freebsd.org/
 [`FreeNAS`]: http://www.freenas.org/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
