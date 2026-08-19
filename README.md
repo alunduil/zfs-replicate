@@ -98,6 +98,8 @@ See `zfs-replicate --help` for the full set of `--send-` flags.
 
 * `zfs-replicate --help`: Help for zfs-replicate.
 * [LICENSE]: Licence file explaining usage of zfs-replicate.
+* [How to replicate an encrypted data set][encrypted replication]: Replicate
+  without decrypting, then load the replica's key on the destination.
 * [Survey of ZFS Replication Tools][survey]: Overview of various ZFS replication
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
@@ -113,6 +115,7 @@ See `zfs-replicate --help` for the full set of `--send-` flags.
 * [GitHub issues]: Report any problems or features requests to GitHub issues.
 
 [autorepl.py]: https://github.com/freenas/freenas/blob/master/gui/tools/autorepl.py
+[encrypted replication]: ./docs/how-to/replicate-an-encrypted-data-set.md
 [FreeBSD]: https://www.freebsd.org/
 [`FreeNAS`]: http://www.freenas.org/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues

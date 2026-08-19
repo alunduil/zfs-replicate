@@ -10,8 +10,8 @@ class Options:
 
     The CLI's ``--send-*`` group builds this and ``snapshot._send`` reads it
     via :meth:`to_flags` to assemble the send command; construct one directly
-    only in tests. Defaults reproduce zfs-replicate's long-standing
-    ``zfs send -w`` behaviour, so a bare ``Options()`` changes nothing.
+    only in tests. ``raw`` defaults on because the usual destination is a
+    backup host, which stores the data without needing to read it.
 
     Each field enables a single ``zfs send`` flag:
 
