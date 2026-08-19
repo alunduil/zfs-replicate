@@ -17,8 +17,9 @@ zfs-replicate -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tan
 
 ## Point the replica at its key
 
-A raw receive leaves the replica's `keylocation` at `prompt`. To read the key
-from a file on the destination instead, set the property during the receive:
+A raw receive leaves the replica's `keylocation` at `prompt` (see
+[`zfs-recv(8)`]). To read the key from a file on the destination instead, set
+the property during the receive:
 
 ```bash
 zfs-replicate --receive-set keylocation=file:///etc/zfs/keys/secrets.key \
@@ -36,3 +37,5 @@ zfs-replicate --send-no-raw -l backup -i ~/.ssh/id_ed25519 backup.example.com ta
 
 Keep the same choice for every replication of a given destination data set.
 Switching modes breaks later incremental sends.
+
+[`zfs-recv(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-recv.8.html

@@ -1,37 +1,22 @@
 # Raw sends
 
-`zfs send -w` sends blocks as they sit on disk. For an encrypted data set the
-stream stays encrypted the whole way. The destination stores what the source
-stored, and the host running the receive holds no key to read it. The source
-doesn't need its keys loaded either, so replication works on a data set nobody
-has unlocked. Without `-w`, `zfs send` decrypts on the way out, and protecting
-the copy becomes the destination's problem rather than the source's. The
-commands are in [Replicate an encrypted data
-set](../how-to/replicate-an-encrypted-data-set.md).
+zfs-replicate passes `-w` to `zfs send` by default. Its usual job is pushing
+snapshots to a backup host, which holds the data without needing to read it and
+which the same people might not administer. A raw send keeps the stream
+encrypted the whole way, so that host stores a copy it has no key for.
 
-That property is why zfs-replicate defaults to `-w`. The tool's usual job is
-pushing snapshots to a backup host. That host holds the data, the same people
-might not administer it, and it has no reason to need the readable copy.
+Two consequences belong to the default rather than to the flag.
 
-## What raw costs
+A data set with no encryption still gets `-Lec` behaviour, so a destination pool
+without the `large_blocks` and `embedded_data` features can't receive a stream
+that carries nothing encrypted at all.
 
-A raw stream arrives as is. `zfs receive` can't decrypt it, re-encrypt it under
-a key of the destination's own, or recompress it. The replica also carries the
-same encryption keys as its source. That makes a raw send a poor fit when the
-copy is meant for someone who shouldn't hold those keys.
+The mode is permanent per destination data set. ZFS refuses to mix raw and
+non-raw receives, so switching means replicating that destination from scratch.
 
-The flag also does more than its name suggests on a data set with no encryption,
-where it behaves the same as `-L -e -c`. A destination pool lacking the
-`large_blocks` or `embedded_data` features can't receive such a stream, so the
-default can fail on an old pool that holds nothing encrypted at all.
+[`zfs-send(8)`] and [`zfs-recv(8)`] describe what raw sending and receiving do,
+including the exact error when the modes are mixed. The commands are in
+[Replicate an encrypted data set](../how-to/replicate-an-encrypted-data-set.md).
 
-## Raw and non-raw don't mix
-
-ZFS tracks the initialization vector set of a received data set, and the two
-receive modes disagree about it. ZFS refuses a raw incremental receive that
-follows a non-raw one. It permits a non-raw receive on top of a raw-received
-data set, but that replaces the initialization vector set. Every later raw
-incremental receive then fails with `IV set guid mismatch`.
-
-Each destination data set therefore takes its mode at the first replication, and
-changing it later means starting that destination over.
+[`zfs-recv(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-recv.8.html
+[`zfs-send(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-send.8.html
