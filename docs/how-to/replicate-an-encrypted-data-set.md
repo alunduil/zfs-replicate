@@ -32,6 +32,8 @@ ssh backup@backup.example.com zfs load-key tank/backups/tank/secrets
 ```
 
 [`zfs-send(8)`] and [`zfs-recv(8)`] describe what raw sending and receiving do.
+[`zfs-load-key(8)`] covers key formats and locations.
 
+[`zfs-load-key(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-load-key.8.html
 [`zfs-recv(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-recv.8.html
 [`zfs-send(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-send.8.html
