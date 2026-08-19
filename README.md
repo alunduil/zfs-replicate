@@ -96,18 +96,16 @@ See `zfs-replicate --help` for the full set of `--send-` flags.
 
 ## Replicating encrypted data sets
 
-`zfs send -w` sends blocks as they sit on disk, so an encrypted data set stays
-encrypted at rest on the destination. The backup host holds no key to read what
-it stores, and the replica carries the same encryption keys as its source. The
-source doesn't need its keys loaded to run the replication. Without `-w`,
-`zfs send` decrypts on the way out and the destination holds plain text.
+`zfs send -w` sends blocks as they sit on disk, so an encrypted data set arrives
+on the destination still encrypted and the backup host holds no key to read it.
+The replica carries the same encryption keys as its source, and the source
+doesn't need those keys loaded to run the replication. Without `-w`, `zfs send`
+decrypts on the way out and the destination holds plain text.
 
 zfs-replicate passes `-w` by default, so replicating an encrypted data set to a
-less-trusted host takes no extra send flags. The receive side needs one
-decision: a raw receive leaves the replica's `keylocation` at `prompt`, so pair
-the send with `--receive-set` to point the destination at a key file instead.
-`zfs receive` rejects `keylocation=prompt` as an override, because the receive
-already reads the stream from standard input.
+less-trusted host takes no extra send flags. A raw receive does leave the
+replica's `keylocation` at `prompt`, so pair the send with `--receive-set` to
+point the destination at a key file:
 
 ```bash
 zfs-replicate --receive-set keylocation=file:///etc/zfs/keys/secrets.key \
@@ -121,12 +119,12 @@ Two situations call for `--send-no-raw` instead:
    and can't decrypt, re-encrypt, or recompress it.
 1. The destination pool lacks the `large_blocks` or `embedded_data` features.
    On a data set with no encryption, `-w` behaves the same as `-L -e -c`, so
-   the default send needs those two features on the receiving pool regardless.
+   the default send needs both features.
 
 Choose one mode per destination data set and stay with it. ZFS refuses a raw
 incremental receive that follows a non-raw one. A non-raw receive on top of a
-raw-received data set also replaces the initialization vector set, which makes
-every later raw incremental receive fail with an `IV set guid mismatch` error.
+raw-received data set also replaces the initialization vector set, so every
+later raw incremental receive fails with an `IV set guid mismatch` error.
 
 ## Documentation
 
