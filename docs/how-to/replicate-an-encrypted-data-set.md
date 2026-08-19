@@ -1,43 +1,37 @@
-# Replicate an encrypted data set
+# How to replicate an encrypted data set
 
-zfs-replicate replicates an encrypted data set without decrypting it, provided
-you already replicate plain data sets and the source data set carries
-encryption. Creating encrypted data sets and managing their keys are out of
-scope. [`zfs-send(8)`] and [`zfs-recv(8)`] describe what raw sending and
-receiving do.
+Replicate an encrypted data set to a remote host without decrypting it, and
+leave the replica able to load its own key. This assumes you already replicate
+plain data sets with zfs-replicate.
 
-## Replicate with the default raw send
+## Replicate the data set
 
-An encrypted data set needs no extra send flag, because zfs-replicate passes
-`-w` to `zfs send` by default:
-
-```bash
-zfs-replicate -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/secrets
-```
-
-## Point the replica at its key
-
-A raw receive leaves the replica's `keylocation` at `prompt`. To read the key
-from a file on the destination instead, set the property during the receive:
+Set the replica's key location during the receive, so that it doesn't fall back
+to `prompt`:
 
 ```bash
 zfs-replicate --receive-set keylocation=file:///etc/zfs/keys/secrets.key \
   -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/secrets
 ```
 
-## Send decrypted data instead
+## Confirm the replica arrived encrypted
 
-Pass `--send-no-raw` when the destination needs readable data, or when its pool
-lacks the `large_blocks` or `embedded_data` features. The second case catches
-data sets with no encryption at all, because `-w` implies `-Lec`:
+Check the replica on the destination. zfs-replicate nests it as
+`REMOTE_FS/POOL/DATA_SET`, so `tank/secrets` lands at
+`tank/backups/tank/secrets`:
 
 ```bash
-zfs-replicate --send-no-raw -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
+ssh backup@backup.example.com \
+  zfs get encryption,keylocation tank/backups/tank/secrets
 ```
 
-Keep the same choice for every replication of a given destination data set. ZFS
-refuses to mix raw and non-raw receives, so switching means replicating that
-destination from scratch.
+## Load the key on the destination
+
+```bash
+ssh backup@backup.example.com zfs load-key tank/backups/tank/secrets
+```
+
+[`zfs-send(8)`] and [`zfs-recv(8)`] describe what raw sending and receiving do.
 
 [`zfs-recv(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-recv.8.html
 [`zfs-send(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-send.8.html

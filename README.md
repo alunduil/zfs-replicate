@@ -98,8 +98,8 @@ See `zfs-replicate --help` for the full set of `--send-` flags.
 
 * `zfs-replicate --help`: Help for zfs-replicate.
 * [LICENSE]: Licence file explaining usage of zfs-replicate.
-* [Replicate an encrypted data set][encrypted replication]: Raw sends, setting
-  the replica's key location, and when to send decrypted data instead.
+* [How to replicate an encrypted data set][encrypted replication]: Replicate
+  without decrypting, then load the replica's key on the destination.
 * [Survey of ZFS Replication Tools][survey]: Overview of various ZFS replication
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
