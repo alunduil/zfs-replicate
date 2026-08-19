@@ -1,16 +1,15 @@
 # Replicate an encrypted data set
 
-This guide replicates an encrypted data set to a remote host without decrypting
-it on the way, and points the replica at its key on the destination. It assumes
-you already replicate plain data sets with zfs-replicate and that the source
-data set carries encryption. Creating encrypted data sets and managing
-their keys are out of scope. For why raw sends behave this way and what they
-cost, see [Raw sends](../explanation/raw-sends.md).
+zfs-replicate replicates an encrypted data set without decrypting it, provided
+you already replicate plain data sets and the source data set carries
+encryption. Creating encrypted data sets and managing their keys are out of
+scope. For why raw sends work this way and what they cost, see
+[Raw sends](../explanation/raw-sends.md).
 
 ## Replicate with the default raw send
 
-zfs-replicate passes `-w` to `zfs send` by default, so an encrypted data set
-needs no extra send flag:
+An encrypted data set needs no extra send flag, because zfs-replicate passes
+`-w` to `zfs send` by default:
 
 ```bash
 zfs-replicate -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/secrets
@@ -36,5 +35,4 @@ zfs-replicate --send-no-raw -l backup -i ~/.ssh/id_ed25519 backup.example.com ta
 ```
 
 Keep the same choice for every replication of a given destination data set.
-Switching modes breaks later incremental sends, and recovering means replicating
-the destination from scratch.
+Switching modes breaks later incremental sends.
