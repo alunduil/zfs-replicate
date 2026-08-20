@@ -62,8 +62,8 @@ _N.B., don't use the root user to access your remote system._
 1. `poetry install`
 1. `poetry run -- zfs-replicate --help`
 
-To change what `zfs send` puts on the wire or what `zfs receive` does with it,
-see [How to tune the send and receive streams][stream tuning].
+To tune the send stream or set properties on the replica, see
+[How to tune the send and receive streams][stream tuning].
 
 Nix and NixOS users install the `zfs-replicate` package from [nixpkgs] rather
 than building from this repository. NixOS also provides a

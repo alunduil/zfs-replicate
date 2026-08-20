@@ -1,7 +1,7 @@
 # How to tune the send and receive streams
 
-Change what `zfs send` puts on the wire, and what `zfs receive` does with the
-stream on the destination. This assumes you already replicate a data set with
+Change what `zfs send` includes in the stream, and what `zfs receive` does with
+it on the destination. This assumes you already replicate a data set with
 zfs-replicate.
 
 Run `zfs-replicate --help` for the full set of `--send-` and `--receive-` flags.
@@ -10,22 +10,22 @@ Run `zfs-replicate --help` for the full set of `--send-` and `--receive-` flags.
 ## Send large, already-compressed blocks unchanged
 
 Replicate a large-block, compressed data set without re-reading or
-recompressing it on the way out:
+recompressing it:
 
 ```bash
 zfs-replicate --send-large-block --send-compressed \
   -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
 ```
 
-`--send-large-block` requires the `large_blocks` feature on the destination
-pool. [How to replicate an encrypted data set][encrypted replication] covers
+The destination pool must have the `large_blocks` feature enabled.
+
+[How to replicate an encrypted data set][encrypted replication] covers
 `--send-raw`, which zfs-replicate passes by default.
 
 ## Set properties on the replica
 
-Apply the destination's policy during the receive, so the replica never exists
-in the wrong state. `--receive-set KEY=VALUE` repeats, and `--receive-no-mount`
-keeps the replica from mounting:
+Set the properties and mount behaviour as the stream lands, rather than fixing
+them afterwards:
 
 ```bash
 zfs-replicate --receive-no-mount --receive-set readonly=on --receive-set canmount=noauto \
