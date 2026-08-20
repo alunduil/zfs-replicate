@@ -47,3 +47,97 @@ jobs:
             Closing this after 44 quiet days. That isn't a call on the change
             itself, and nothing is lost: the branch stays where it is, so
             comment here if you want to pick it back up and I'll reopen it.
+
+  python-matrix:
+    name: Check Python matrix drift
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      # A job-level block replaces the workflow-level one rather than
+      # merging, so the checkout needs `contents` named again here.
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Detect drift
+        id: check
+        run: |
+          set -euo pipefail
+
+          # The v1 endpoint computes `isEol` server-side. The v0 endpoint
+          # reports Python's `eol` as a date rather than the `false` that
+          # collection-json.hs keys on for GHC, so v1 avoids doing date
+          # arithmetic against the runner clock.
+          expected=$(curl -fsSL https://endoflife.date/api/v1/products/python \
+            | jq -r '.result.releases
+                     | map(select(.isEol == false))
+                     | .[].name' \
+            | sort -V)
+
+          # An empty set on any side means an upstream schema change or a
+          # moved field. Abort rather than file drift against nothing.
+          if [ -z "$expected" ]; then
+            echo "endoflife.date returned no live Python releases; aborting" >&2
+            exit 1
+          fi
+
+          # The `3.x` leg lives under `include:`, so it stays out of the
+          # comparison: it tracks whatever ships next by design.
+          tests=$(yq '.jobs.python-tests.strategy.matrix.python-version[]' \
+            .github/workflows/ci.yml | sort -V)
+          cli=$(yq '.jobs.cli-entry-point.strategy.matrix.python-version[]' \
+            .github/workflows/ci.yml | sort -V)
+
+          # requires-python is PEP 621, so this survives the uv migration in
+          # #619 in a way that reading a [tool.poetry] key would not.
+          floor=$(grep -oE '^requires-python = ">=[0-9]+\.[0-9]+' pyproject.toml \
+            | grep -oE '[0-9]+\.[0-9]+$')
+
+          if [ -z "$tests" ] || [ -z "$cli" ] || [ -z "$floor" ]; then
+            echo "could not parse the CI matrices or requires-python; aborting" >&2
+            exit 1
+          fi
+
+          # The floor is reported but never triggers: raising it drops users
+          # and is breaking, so it belongs to #398 rather than to a `ci` fix.
+          drift=false
+          [ "$expected" = "$tests" ] || drift=true
+          [ "$expected" = "$cli" ] || drift=true
+          echo "drift=$drift" >> "$GITHUB_OUTPUT"
+
+          join() { printf '%s' "$1" | paste -sd, -; }
+          # create-an-issue reads the title and labels from front matter.
+          {
+            echo "---"
+            echo "title: Python version matrix out of date"
+            echo "labels:"
+            echo "  - python"
+            echo "---"
+            echo "The CI matrices should name every CPython release upstream"
+            echo "still supports, per the comment above the matrix in"
+            echo "\`.github/workflows/ci.yml\`."
+            echo
+            echo "| Source | Versions |"
+            echo "| --- | --- |"
+            echo "| Expected (endoflife.date, not end-of-life) | $(join "$expected") |"
+            echo "| \`python-tests\` matrix | $(join "$tests") |"
+            echo "| \`cli-entry-point\` matrix | $(join "$cli") |"
+            echo
+            echo "Update both matrices in the same \`ci\` change."
+            echo
+            echo "\`requires-python\` currently floors at $floor. Raising it drops"
+            echo "users still on that release, so it is breaking and belongs to"
+            echo "#398, not here."
+          } > python-drift-issue.md
+
+      # update_existing overwrites the open issue with the same title rather
+      # than filing a duplicate, so the table always shows the current
+      # mismatch. Title and labels come from the front matter above.
+      - name: File or refresh drift issue
+        if: steps.check.outputs.drift == 'true'
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          filename: python-drift-issue.md
+          update_existing: true
