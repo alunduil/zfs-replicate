@@ -27,7 +27,7 @@ jobs:
 
   python-tests:
     # Matrix jobs take the explicit name verbatim, so interpolate the version
-    # or all four legs collide on one check name.
+    # or every leg collides on one check name.
     name: Test python ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -35,10 +35,16 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Every non-EOL CPython release, per
+        # https://devguide.python.org/versions/. Removing an aged-out entry
+        # leaves the pyproject.toml floor alone. Raising that floor drops
+        # users and is breaking.
         python-version:
           - "3.10"  # EOL 2026-10
           - "3.11"  # EOL 2027-10
           - "3.12"  # EOL 2028-10
+          - "3.13"  # EOL 2029-10
+          - "3.14"  # EOL 2030-10
         experimental: [false]
         include:
           - python-version: 3.x
@@ -72,6 +78,8 @@ jobs:
           - "3.10"  # EOL 2026-10
           - "3.11"  # EOL 2027-10
           - "3.12"  # EOL 2028-10
+          - "3.13"  # EOL 2029-10
+          - "3.14"  # EOL 2030-10
         experimental: [false]
         include:
           - python-version: 3.x

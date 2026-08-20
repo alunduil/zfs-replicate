@@ -47,3 +47,30 @@ jobs:
             Closing this after 44 quiet days. That isn't a call on the change
             itself, and nothing is lost: the branch stays where it is, so
             comment here if you want to pick it back up and I'll reopen it.
+
+  python-matrix:
+    name: Check Python matrix drift
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      # A job-level block replaces the workflow-level one rather than
+      # merging, so the checkout needs `contents` named again here.
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Detect drift
+        id: check
+        run: .github/scripts/check-python-matrix.sh
+
+      # Title and labels come from the file's front matter, not from `with`.
+      # Updating one issue keeps its table current instead of accruing one
+      # issue per run.
+      - name: File or refresh drift issue
+        if: steps.check.outputs.drift == 'true'
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          filename: python-drift-issue.md
+          update_existing: true
