@@ -63,10 +63,9 @@ jobs:
         id: check
         run: .github/scripts/check-python-matrix.sh
 
-      # update_existing overwrites the open issue with the same title rather
-      # than filing a duplicate, so the table always shows the current
-      # mismatch. Title and labels come from the front matter the script
-      # writes, and `filename` matches its ISSUE_FILE default.
+      # Title and labels come from the file's front matter, not from `with`.
+      # Updating one issue keeps its table current instead of accruing one
+      # issue per run.
       - name: File or refresh drift issue
         if: steps.check.outputs.drift == 'true'
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2

@@ -1,21 +1,18 @@
 #!/usr/bin/env bash
 # Report whether ci.yml still tests every CPython release upstream supports.
 #
-# Writes `drift=<bool>` to $GITHUB_OUTPUT and, when they disagree, a
-# create-an-issue body to $ISSUE_FILE. Run from the repository root.
+# Writes `drift=<bool>` to $GITHUB_OUTPUT and a create-an-issue body to
+# $ISSUE_FILE. Run from the repository root.
 #
-# Aborts instead of reporting drift when a source will not parse, so a
-# renamed field can never read as "no versions tested" and file a bogus
-# issue against an empty set.
+# Aborts rather than reporting drift when a source will not parse, so a
+# renamed field cannot read as "nothing tested".
 set -euo pipefail
 
-# v1 computes `isEol` server-side. v0 reports Python's `eol` as a date
-# rather than the `false` that collection-json.hs keys on for GHC, so v1
-# avoids doing date arithmetic against the runner clock.
+# v1 exposes a computed `isEol`. v0 gives Python a date in `eol`, which
+# would mean date arithmetic against the runner clock.
 readonly ENDOFLIFE_API="https://endoflife.date/api/v1/products/python"
 
-# Each job carries its own copy of the matrix until #616 collapses them, so
-# every copy is checked and every copy appears in the issue.
+# ci.yml duplicates the matrix across these jobs (#616).
 readonly MATRIX_JOBS=(python-tests cli-entry-point)
 
 readonly CI_WORKFLOW=".github/workflows/ci.yml"
@@ -40,14 +37,15 @@ supported_releases() {
     | sort -V
 }
 
-# The `3.x` leg sits under `include:`, so yq leaves it out. That leg tracks
+# The `3.x` leg sits under `include:`, so yq leaves it out. It tracks
 # whatever ships next by design and would always read as drift.
 matrix_versions() {
   yq ".jobs.\"$1\".strategy.matrix.python-version[]" "$CI_WORKFLOW" | sort -V
 }
 
-# requires-python is PEP 621, so this survives #619's uv migration in a way
-# that reading a [tool.poetry] key would not.
+# The floor is reported for context, never compared: raising it drops users,
+# so it cannot be part of the `ci` fix this check asks for. requires-python
+# is PEP 621, so reading it survives a change of packaging tool.
 python_floor() {
   grep -oE '^requires-python = ">=[0-9]+\.[0-9]+' "$PYPROJECT" \
     | grep -oE '[0-9]+\.[0-9]+$'
@@ -63,9 +61,6 @@ require_versions "endoflife.date" "$supported"
 floor=$(python_floor)
 [ -n "$floor" ] || die "could not read requires-python from $PYPROJECT"
 
-# The floor is reported but never triggers: raising it drops users and is
-# breaking, so it belongs to #398 rather than to a `ci` fix that would
-# close this issue.
 declare -A tested
 drift=false
 for job in "${MATRIX_JOBS[@]}"; do
