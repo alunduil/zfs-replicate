@@ -5,6 +5,21 @@ stream on the destination. This assumes you already replicate a data set with
 zfs-replicate.
 
 Run `zfs-replicate --help` for the full set of `--send-` and `--receive-` flags.
+[`zfs-send(8)`] and [`zfs-recv(8)`] describe what each underlying flag does.
+
+## Send large, already-compressed blocks unchanged
+
+Replicate a large-block, compressed data set without re-reading or
+recompressing it on the way out:
+
+```bash
+zfs-replicate --send-large-block --send-compressed \
+  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
+```
+
+`--send-large-block` requires the `large_blocks` feature on the destination
+pool. [How to replicate an encrypted data set][encrypted replication] covers
+`--send-raw`, which zfs-replicate passes by default.
 
 ## Set properties on the replica
 
@@ -23,24 +38,6 @@ lands at `tank/backups/tank/data`. Check the properties there:
 ```bash
 ssh backup@backup.example.com zfs get readonly,canmount tank/backups/tank/data
 ```
-
-## Send large, already-compressed blocks unchanged
-
-Replicate a large-block, compressed data set without re-reading or
-recompressing it on the way out:
-
-```bash
-zfs-replicate --send-large-block --send-compressed \
-  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
-```
-
-`--send-large-block` requires the `large_blocks` feature on the destination
-pool.
-
-[How to replicate an encrypted data set][encrypted replication] covers
-`--send-raw`, which zfs-replicate passes by default.
-
-[`zfs-send(8)`] and [`zfs-recv(8)`] describe what each underlying flag does.
 
 [encrypted replication]: ./replicate-an-encrypted-data-set.md
 [`zfs-recv(8)`]: https://openzfs.github.io/openzfs-docs/man/master/8/zfs-recv.8.html

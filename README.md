@@ -76,8 +76,8 @@ service.
 * [LICENSE]: Licence file explaining usage of zfs-replicate.
 * [How to replicate an encrypted data set][encrypted replication]: Replicate
   without decrypting, then load the replica's key on the destination.
-* [How to tune the send and receive streams][stream tuning]: Set properties on
-  the replica and control what the send stream carries.
+* [How to tune the send and receive streams][stream tuning]: Control what the
+  send stream carries and set properties on the replica.
 * [Survey of ZFS Replication Tools][survey]: Overview of various ZFS replication
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
