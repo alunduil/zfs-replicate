@@ -29,6 +29,18 @@ log.configure()
 )
 @click.option("--recursive", is_flag=True, help="Recursively replicate snapshots.")
 @click.option(
+    "--jobs",
+    "-j",
+    type=click.IntRange(1, None),
+    metavar="JOBS",
+    default=1,
+    help=(
+        "Replicate up to JOBS data sets at a time. Each data set still"
+        " replicates its own snapshots in order, so the default of 1"
+        " replicates one data set after another."
+    ),
+)
+@click.option(
     "--port",
     "-p",
     type=click.IntRange(1, 65535),
@@ -74,6 +86,7 @@ def main(  # noqa: PLR0913 -- CLI entry point; each argument is a distinct comma
     dry_run: bool,
     follow_delete: bool,
     recursive: bool,
+    jobs: int,
     port: int,
     user: str,
     identity_file: str,
@@ -118,14 +131,12 @@ def main(  # noqa: PLR0913 -- CLI entry point; each argument is a distinct comma
         click.echo(task.report(tasks))
 
     if not dry_run:
-        filesystem_tasks = [
-            (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
-        ]
         task.execute(
             remote_fs,
-            filesystem_tasks,
+            tasks,
             compression=compression,
             send_options=send_options,
             receive_options=receive_options,
             ssh_command=ssh_command,
+            jobs=jobs,
         )

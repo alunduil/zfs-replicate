@@ -4,6 +4,7 @@
 
 ### Added
 
+- `--jobs N / -j N` replicates up to N data sets at a time, cutting a run over many independent data sets to roughly 1/N of its sequential time, with a floor at the slowest single data set. Each data set still replicates its own snapshots in order, and the default of 1 replicates one data set after another (#394).
 - Send-side flags for `zfs send`, grouped under the `--send-` prefix and mirroring `--receive-`: `--send-large-block` passes `-L`, `--send-embed` passes `-e`, `--send-compressed` passes `-c`, `--send-props` passes `-p`, and `--send-raw / --send-no-raw` toggles `-w` (default on, for encrypted data sets) (#392).
 - Receive-side flags for `zfs receive`, grouped under the `--receive-` prefix: `--receive-force / --receive-no-force` toggles `-F` (default on), `--receive-mount / --receive-no-mount` toggles `-u` (default mounts), `--receive-resume-token-capable` passes `-s`, and the repeatable `--receive-set KEY=VALUE` maps to `-o KEY=VALUE` for properties such as `readonly`, `canmount`, or `mountpoint` on the replica without a post-receive patch-up (#393).
 
