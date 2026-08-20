@@ -62,37 +62,13 @@ _N.B., don't use the root user to access your remote system._
 1. `poetry install`
 1. `poetry run -- zfs-replicate --help`
 
+To tune the send stream or set properties on the replica, see
+[How to tune the send and receive streams][stream tuning].
+
 Nix and NixOS users install the `zfs-replicate` package from [nixpkgs] rather
 than building from this repository. NixOS also provides a
 `services.zfs.autoReplication` module that runs replication as a system
 service.
-
-## Setting properties on the replica
-
-To match your destination's policy without a post-receive patch-up, set ZFS
-properties on the received data set with `--receive-set KEY=VALUE` (repeatable)
-and control mounting with `--receive-no-mount`. For example, to set the replica
-`readonly` and keep it from mounting on the destination:
-
-```bash
-zfs-replicate --receive-no-mount --receive-set readonly=on --receive-set canmount=noauto \
-  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
-```
-
-See `zfs-replicate --help` for the full set of `--receive-` flags.
-
-## Tuning the send stream
-
-To replicate a large-block, already-compressed data set without re-reading or
-recompressing it on the way out, tune the `zfs send` stream with the `--send-`
-flags:
-
-```bash
-zfs-replicate --send-large-block --send-compressed \
-  -l backup -i ~/.ssh/id_ed25519 backup.example.com tank/backups tank/data
-```
-
-See `zfs-replicate --help` for the full set of `--send-` flags.
 
 ## Documentation
 
@@ -100,6 +76,8 @@ See `zfs-replicate --help` for the full set of `--send-` flags.
 * [LICENSE]: Licence file explaining usage of zfs-replicate.
 * [How to replicate an encrypted data set][encrypted replication]: Replicate
   without decrypting, then load the replica's key on the destination.
+* [How to tune the send and receive streams][stream tuning]: Control what the
+  send stream carries and set properties on the replica.
 * [Survey of ZFS Replication Tools][survey]: Overview of various ZFS replication
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
@@ -122,6 +100,7 @@ See `zfs-replicate --help` for the full set of `--send-` flags.
 [LICENSE]: ./LICENSE
 [nixpkgs]: https://search.nixos.org/packages?show=zfs-replicate
 [sanoid]: https://github.com/jimsalterjrs/sanoid
+[stream tuning]: ./docs/how-to/tune-the-send-and-receive-streams.md
 [survey]: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 [Working With Oracle Solaris ZFS Snapshots and Clones]: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc
 [ZFS REMOTE REPLICATION SCRIPT WITH REPORTING]: https://techblog.jeppson.org/2014/10/zfs-remote-replication-script-with-reporting/
