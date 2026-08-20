@@ -1,6 +1,5 @@
 Amdahl
 argparse
-CPython
 docstring
 MADR
 nixpkgs

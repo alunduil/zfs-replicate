@@ -35,6 +35,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Every non-EOL CPython release, per
+        # https://devguide.python.org/versions/. A new release is a
+        # `ci` change; raising the floor in pyproject.toml drops
+        # users and is breaking.
         python-version:
           - "3.10"  # EOL 2026-10
           - "3.11"  # EOL 2027-10
