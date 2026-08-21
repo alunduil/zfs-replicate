@@ -16,7 +16,13 @@ from zfs.replicate.snapshot.type import Snapshot
 
 _NOT_WHITESPACE = [x for x in string.printable if x not in string.whitespace and x != "@"]
 
-_FILESYSTEMS = text(_NOT_WHITESPACE).map(lambda x: f"a{x}").map(filesystem)
+
+def _non_empty_name(suffix: str) -> str:
+    """Prefix generated text so the filesystem name is never empty."""
+    return f"a{suffix}"
+
+
+_FILESYSTEMS = text(_NOT_WHITESPACE).map(_non_empty_name).map(filesystem)
 
 _SNAPSHOTS_DICT: Dict[str, SearchStrategy[Any]] = {
     "filesystem": _FILESYSTEMS,

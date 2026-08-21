@@ -10,6 +10,10 @@ from zfs.replicate.snapshot.type import Snapshot
 
 def test_snapshots_vary_filesystem() -> None:
     """SNAPSHOTS draws more than one filesystem name."""
+    assert len(_drawn_filesystem_names()) > 1
+
+
+def _drawn_filesystem_names() -> Set[str]:
     names: Set[str] = set()
 
     @given(sut.SNAPSHOTS)
@@ -18,4 +22,4 @@ def test_snapshots_vary_filesystem() -> None:
 
     collect()
 
-    assert len(names) > 1
+    return names
