@@ -38,20 +38,23 @@ def generate(
 
         lefts, middles, rights = venn(local_snaps, remote_snapshots[destination])
 
-        # execute() runs actions in the order they first appear, so these two
-        # destroys cannot merge into `not middles or follow_delete`: one
-        # belongs before the sends and the other after.
-        if not middles:
-            tasks.extend(_destroy_snapshots(destination, rights))
+        send_tasks = _send_snapshots(remote, lefts)
+        destroy_tasks = _destroy_snapshots(destination, rights)
 
-        tasks.extend(_send_snapshots(remote, lefts))
+        # execute() runs actions in the order they first appear, so which of
+        # these goes first is load bearing.
+        if middles:
+            tasks.extend(send_tasks)
 
-        if middles and follow_delete:
-            tasks.extend(_destroy_snapshots(destination, rights))
+            if follow_delete:
+                tasks.extend(destroy_tasks)
+        else:
+            tasks.extend(destroy_tasks)
+            tasks.extend(send_tasks)
 
-    for destination, snapshots in remote_snapshots.items():
+    for destination, remote_snaps in remote_snapshots.items():
         if destination not in local_snaps_by_destination:
-            tasks.extend(_destroy_snapshots(destination, snapshots))
+            tasks.extend(_destroy_snapshots(destination, remote_snaps))
             tasks.append(Task(action=Action.DESTROY, filesystem=destination, snapshot=None))
 
     return tasks
