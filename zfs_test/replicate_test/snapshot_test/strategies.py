@@ -14,13 +14,11 @@ from hypothesis.strategies import (
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 
-# zfs list -H separates fields with \t and records with \n, and @ splits the filesystem from the
-# snapshot name, so a generated name holding any of them cannot survive _snapshots parsing it back.
+# zfs list -H separates fields with \t and records with \n, and @ splits the filesystem from the snapshot name.
 _ROUND_TRIP_SAFE = [x for x in string.printable if x not in string.whitespace and x != "@"]
 
 
 def _non_empty_name(suffix: str) -> str:
-    """Prefix generated text so the filesystem name is never empty."""
     return f"a{suffix}"
 
 
