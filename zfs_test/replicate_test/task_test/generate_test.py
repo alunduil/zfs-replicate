@@ -87,15 +87,15 @@ def _snapshot(fs: FileSystem, name: str, timestamp: int) -> Snapshot:
     return Snapshot(filesystem=fs, name=name, previous=None, timestamp=timestamp)
 
 
-# Fixed snapshots rather than generated ones: these pin the order tasks come out
-# in, which needs a controlled overlap between the local and remote sets.
+# Pinning task order needs a controlled overlap between the local and remote
+# sets, which generation does not give.
 _SHARED = _snapshot(_LOCAL, "shared", 1)
 _UNSENT = _snapshot(_LOCAL, "unsent", 2)
 _STALE = _snapshot(_DESTINATION, "stale", 3)
 
 
 def test_diverged_destroys_before_sending() -> None:
-    """Without a snapshot in common, the remote is cleared before the sends."""
+    """Without a snapshot in common, the destroys precede the sends."""
     result = generate(_REMOTE, {_LOCAL: [_UNSENT]}, {_DESTINATION: [_STALE]})
 
     assert [(t.action, t.snapshot) for t in result] == [

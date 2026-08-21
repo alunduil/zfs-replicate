@@ -41,8 +41,8 @@ def generate(
         send_tasks = _send_snapshots(remote, lefts)
         destroy_tasks = _destroy_snapshots(destination, rights)
 
-        # execute() runs actions in the order they first appear, so which of
-        # these goes first is load bearing.
+        # execute() runs actions in the order they first appear, so merging
+        # these branches would change what runs first.
         if middles:
             tasks.extend(send_tasks)
 
