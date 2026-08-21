@@ -1,12 +1,19 @@
 """Replication Tasks."""
 
-from typing import Dict, List
+from typing import Dict, Iterable, List
 
-from ..filesystem import FileSystem, remote_filesystem
-from ..filesystem import filesystem as filesystem_t
+from ..filesystem import FileSystem, local_filesystem, remote_filesystem
 from ..list import venn
 from ..snapshot import Snapshot
 from .type import Action, Task
+
+
+def _destroy_snapshots(destination: FileSystem, snapshots: Iterable[Snapshot]) -> List[Task]:
+    return [Task(action=Action.DESTROY, filesystem=destination, snapshot=s) for s in snapshots]
+
+
+def _send_snapshots(remote: FileSystem, snapshots: Iterable[Snapshot]) -> List[Task]:
+    return [Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in snapshots]
 
 
 def generate(
@@ -19,74 +26,35 @@ def generate(
     tasks = []
 
     # zfs list on the remote reports filesystems under the remote's name; both
-    # loops below compare against local filesystems.
-    remote_snaps_by_local_filesystem = {
-        filesystem_t(name=key.name.removeprefix(remote.name + "/"), readonly=key.readonly): value
-        for key, value in remote_snapshots.items()
-    }
+    # loops below compare against local ones.
+    remote_snaps_by_local = {local_filesystem(remote, key): value for key, value in remote_snapshots.items()}
 
     for filesystem, local_snaps in local_snapshots.items():
-        if filesystem not in remote_snaps_by_local_filesystem:
-            tasks.append(
-                Task(
-                    action=Action.CREATE,
-                    filesystem=remote_filesystem(remote, filesystem),
-                    snapshot=None,
-                )
-            )
-            tasks.extend([Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in local_snaps])
+        destination = remote_filesystem(remote, filesystem)
+
+        if filesystem not in remote_snaps_by_local:
+            tasks.append(Task(action=Action.CREATE, filesystem=destination, snapshot=None))
+            tasks.extend(_send_snapshots(remote, local_snaps))
             continue
 
-        lefts: List[Snapshot]
-        middles: List[Snapshot]
-        rights: List[Snapshot]
+        lefts, middles, rights = venn(local_snaps, remote_snaps_by_local[filesystem])
 
-        lefts, middles, rights = venn(local_snaps, remote_snaps_by_local_filesystem[filesystem])
-
+        # Position relative to the sends is meaningful: execute() groups
+        # consecutive same-action runs, so these two destroys cannot collapse
+        # into one `not middles or follow_delete` branch.
         if not middles:
-            tasks.extend(
-                [
-                    Task(
-                        action=Action.DESTROY,
-                        filesystem=remote_filesystem(remote, filesystem),
-                        snapshot=s,
-                    )
-                    for s in rights
-                ],
-            )
+            tasks.extend(_destroy_snapshots(destination, rights))
 
-        tasks.extend([Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in lefts])
+        tasks.extend(_send_snapshots(remote, lefts))
 
         if middles and follow_delete:
-            tasks.extend(
-                [
-                    Task(
-                        action=Action.DESTROY,
-                        filesystem=remote_filesystem(remote, filesystem),
-                        snapshot=s,
-                    )
-                    for s in rights
-                ],
-            )
+            tasks.extend(_destroy_snapshots(destination, rights))
 
-    for filesystem, remote_snaps in remote_snaps_by_local_filesystem.items():
+    for filesystem, snapshots in remote_snaps_by_local.items():
         if filesystem not in local_snapshots:
-            tasks.extend(
-                [
-                    Task(
-                        action=Action.DESTROY,
-                        filesystem=remote_filesystem(remote, filesystem),
-                        snapshot=s,
-                    )
-                    for s in remote_snaps
-                ],
-            )
-            tasks.append(
-                Task(
-                    action=Action.DESTROY,
-                    filesystem=remote_filesystem(remote, filesystem),
-                    snapshot=None,
-                )
-            )
+            destination = remote_filesystem(remote, filesystem)
+
+            tasks.extend(_destroy_snapshots(destination, snapshots))
+            tasks.append(Task(action=Action.DESTROY, filesystem=destination, snapshot=None))
 
     return tasks
