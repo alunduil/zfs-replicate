@@ -14,13 +14,19 @@ from hypothesis.strategies import (
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 
-_NOT_WHITESPACE = [x for x in string.printable if x not in string.whitespace and x != "@"]
+# zfs list -H separates fields with \t and records with \n, and @ splits the filesystem from the snapshot name.
+_ROUND_TRIP_SAFE = [x for x in string.printable if x not in string.whitespace and x != "@"]
 
-_FILESYSTEMS = text(_NOT_WHITESPACE).map(lambda x: "a{x}").map(filesystem)
+
+def _non_empty_name(suffix: str) -> str:
+    return f"a{suffix}"
+
+
+_FILESYSTEMS = text(_ROUND_TRIP_SAFE).map(_non_empty_name).map(filesystem)
 
 _SNAPSHOTS_DICT: Dict[str, SearchStrategy[Any]] = {
     "filesystem": _FILESYSTEMS,
-    "name": text(_NOT_WHITESPACE),
+    "name": text(_ROUND_TRIP_SAFE),
     "timestamp": integers(),
     "previous": none(),
 }
