@@ -25,8 +25,7 @@ def generate(
     """Generate Tasks for replicating local snapshots to remote snapshots."""
     tasks = []
 
-    # zfs list on the remote reports filesystems under the remote's name; both
-    # loops below compare against local ones.
+    # zfs list reports remote filesystems prefixed with the remote's name.
     remote_snaps_by_local = {local_filesystem(remote, key): value for key, value in remote_snapshots.items()}
 
     for filesystem, local_snaps in local_snapshots.items():
@@ -39,9 +38,9 @@ def generate(
 
         lefts, middles, rights = venn(local_snaps, remote_snaps_by_local[filesystem])
 
-        # Position relative to the sends is meaningful: execute() groups
-        # consecutive same-action runs, so these two destroys cannot collapse
-        # into one `not middles or follow_delete` branch.
+        # execute() runs actions in the order they first appear, so these two
+        # destroys cannot merge into `not middles or follow_delete`: one
+        # belongs before the sends and the other after.
         if not middles:
             tasks.extend(_destroy_snapshots(destination, rights))
 

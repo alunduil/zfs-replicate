@@ -15,8 +15,8 @@ _NAMES = text("ab/", min_size=1)
 def test_inverts_remote_filesystem(name: str) -> None:
     """local_filesystem undoes remote_filesystem.
 
-    The explicit examples repeat the remote's name, which only a
-    prefix-anchored strip leaves intact.
+    The examples repeat the remote's name, where stripping the prefix and
+    stripping every occurrence differ.
     """
     remote = filesystem("backup")
     local = filesystem(name)

@@ -60,7 +60,7 @@ def test_empty_locals(snapshots: List[Snapshot]) -> None:
 
 @given(lists(SNAPSHOTS))
 def test_empty_locals_remote_prefixed(snapshots: List[Snapshot]) -> None:
-    """Generate with empty locals and remote snapshots keyed under the remote filesystem."""
+    """Generate with empty locals and prefixed remotes."""
     remote = filesystem("backup")
     snapshots_by_fs = {
         remote_filesystem(remote, k): list(v)

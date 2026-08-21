@@ -17,10 +17,10 @@ def remote_filesystem(remote: FileSystem, local: FileSystem) -> FileSystem:
 
 
 def local_filesystem(remote: FileSystem, remote_fs: FileSystem) -> FileSystem:
-    """Local filesystem for the remote and remote filesystem pair.
+    """Local filesystem for a filesystem on the remote.
 
-    Inverse of remote_filesystem.  Only a leading occurrence of the remote's
-    name is removed, so a local name that repeats it survives.
+    Inverse of remote_filesystem.  Strips only a leading occurrence, so a
+    local name that repeats the remote's survives.
 
     >>> local_filesystem(filesystem("backup"), filesystem("backup/pool/backup"))
     FileSystem(dataset='pool', name='pool/backup', readonly=False)
