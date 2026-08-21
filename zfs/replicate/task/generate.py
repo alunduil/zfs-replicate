@@ -18,16 +18,15 @@ def generate(
     """Generate Tasks for replicating local snapshots to remote snapshots."""
     tasks = []
 
-    for filesystem, local_snaps in local_snapshots.items():
-        remote_snapshots = {
-            filesystem_t(
-                name=key.name.replace(remote.name + "/", ""),
-                readonly=filesystem.readonly,
-            ): value
-            for key, value in remote_snapshots.items()
-        }
+    # zfs list on the remote reports filesystems under the remote's name; both
+    # loops below compare against local filesystems.
+    remote_snaps_by_local_filesystem = {
+        filesystem_t(name=key.name.removeprefix(remote.name + "/"), readonly=key.readonly): value
+        for key, value in remote_snapshots.items()
+    }
 
-        if filesystem not in remote_snapshots:
+    for filesystem, local_snaps in local_snapshots.items():
+        if filesystem not in remote_snaps_by_local_filesystem:
             tasks.append(
                 Task(
                     action=Action.CREATE,
@@ -42,7 +41,7 @@ def generate(
         middles: List[Snapshot]
         rights: List[Snapshot]
 
-        lefts, middles, rights = venn(local_snaps, remote_snapshots[filesystem])
+        lefts, middles, rights = venn(local_snaps, remote_snaps_by_local_filesystem[filesystem])
 
         if not middles:
             tasks.extend(
@@ -70,12 +69,7 @@ def generate(
                 ],
             )
 
-    for remote_fs in remote_snapshots:
-        filesystem = filesystem_t(
-            name=remote_fs.name.replace(remote.name + "/", ""),
-            readonly=remote_fs.readonly,
-        )
-
+    for filesystem, remote_snaps in remote_snaps_by_local_filesystem.items():
         if filesystem not in local_snapshots:
             tasks.extend(
                 [
@@ -84,7 +78,7 @@ def generate(
                         filesystem=remote_filesystem(remote, filesystem),
                         snapshot=s,
                     )
-                    for s in remote_snapshots[filesystem]
+                    for s in remote_snaps
                 ],
             )
             tasks.append(

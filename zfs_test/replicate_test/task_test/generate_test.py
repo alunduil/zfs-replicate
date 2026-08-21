@@ -7,6 +7,7 @@ from typing import List
 from hypothesis import given
 from hypothesis.strategies import lists
 
+from zfs.replicate.filesystem import remote_filesystem
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot import Snapshot
 from zfs.replicate.task.generate import generate
@@ -55,3 +56,23 @@ def test_empty_locals(snapshots: List[Snapshot]) -> None:
         map(len, snapshots_by_fs.values()),
     )
     assert all(t.action == Action.DESTROY for t in result)
+
+
+@given(lists(SNAPSHOTS))
+def test_empty_locals_remote_prefixed(snapshots: List[Snapshot]) -> None:
+    """Generate with empty locals and remote snapshots keyed under the remote filesystem."""
+    remote = filesystem("backup")
+    snapshots_by_fs = {
+        remote_filesystem(remote, k): list(v)
+        for (k, v) in itertools.groupby(
+            sorted(snapshots, key=operator.attrgetter("filesystem")),
+            key=operator.attrgetter("filesystem"),
+        )
+    }
+
+    result = generate(remote, {}, snapshots_by_fs)
+
+    assert len([t for t in result if t.action == Action.DESTROY]) == len(snapshots_by_fs) + sum(
+        map(len, snapshots_by_fs.values()),
+    )
+    assert all(t.filesystem in snapshots_by_fs for t in result)
