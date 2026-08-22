@@ -1,0 +1,6 @@
+extends: occurrence
+message: "This sentence exceeds 180 characters; consider splitting it into shorter instructions."
+level: warning
+scope: sentence
+max: 180
+token: .
