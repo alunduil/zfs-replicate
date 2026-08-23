@@ -43,11 +43,15 @@ wherever it merely has to exist, and as a literal in
 test.
 
 A fixture lives in the class that uses it, and moves to
-[`zfs_test/conftest.py`](../../zfs_test/conftest.py) once a third module needs
-it. Setup that varies per test comes back as a function: the fixture closes
-over the injected collaborators and returns a callable the test calls with the
-one input it varies, as `assemble` and `capture_spawns` do in
-`snapshot_test/send_test.py`.
+[`zfs_test/conftest.py`](../../zfs_test/conftest.py) once a second module needs
+the same setup. Both fixtures there stand at the remote command boundary:
+`ssh_command` builds the invocation a remote command rides on, and `fails_with`
+fails the next run at that boundary with the `stderr` it's given.
+
+Setup that varies per test comes back as a function. The fixture closes over
+the injected collaborators and returns a callable the test calls with the one
+input it varies, as `fails_with` does here and as `assemble` and
+`capture_spawns` do in `snapshot_test/send_test.py`.
 
 ```python
 class TestDestroy:
@@ -58,12 +62,12 @@ class TestDestroy:
 
     def test_reports_stderr_without_line_endings(
         self,
-        mocker: MockerFixture,
+        fails_with: Callable[[bytes], None],
         ssh_command: Command,
         snapshot: Snapshot,
     ) -> None:
         """A failed destroy names the reason without the shell's trailing line ending."""
-        _fails_with(mocker, b"could not find any snapshots to destroy\r\n")
+        fails_with(b"could not find any snapshots to destroy\r\n")
 
         with pytest.raises(ZFSReplicateError) as raised:
             destroy(snapshot, ssh_command)
