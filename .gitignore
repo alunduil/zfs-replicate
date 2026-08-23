@@ -185,6 +185,5 @@ cython_debug/
 .claude/settings.local.json
 
 ### mutmut ###
-# A mutated copy of zfs/ plus the per-mutant verdict cache, rewritten by every
-# `mutmut run`.
+# The mutated copy of zfs/ and the verdict cache, rewritten by every run.
 mutants/

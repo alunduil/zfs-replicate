@@ -2,13 +2,8 @@
 # Render the mutation score as a Markdown table on the job summary.
 #
 # Reads the JSON `mutmut export-cicd-stats` writes and appends to
-# $GITHUB_STEP_SUMMARY. Run from the repository root; outside Actions it
-# prints to stdout, so `mutmut run && mutmut export-cicd-stats &&
-# .github/scripts/mutation-summary.sh` reproduces what the job publishes.
-#
-# Reports without judging: the exit status says whether the summary could be
-# written, never whether the score was high enough. A threshold is #485's
-# stated follow-up.
+# $GITHUB_STEP_SUMMARY. Both paths take an override, so a local run prints the
+# same table to stdout. Run from the repository root.
 set -euo pipefail
 
 : "${STATS_FILE:=mutants/mutmut-cicd-stats.json}"
@@ -19,8 +14,8 @@ die() {
   exit 1
 }
 
-# jq would report a missing file as a parse error, which reads as a broken
-# script rather than a run that never got far enough to export.
+# jq reports a missing file as a parse error, which reads as a broken script
+# rather than a run that stopped before exporting.
 [ -f "$STATS_FILE" ] || die "$STATS_FILE is missing; mutmut export-cicd-stats writes it"
 
 read -r killed survived no_tests timed_out total < <(
@@ -28,8 +23,8 @@ read -r killed survived no_tests timed_out total < <(
     "$STATS_FILE"
 )
 
-# Mutants no test reaches are a coverage gap, not a suite that failed to
-# notice, so the percentage divides by what a test actually ran.
+# Mutants no test reaches are a coverage gap, so the percentage divides by what
+# a test actually ran.
 reached=$((killed + survived))
 
 {
@@ -44,7 +39,7 @@ reached=$((killed + survived))
   if [ "$reached" -eq 0 ]; then
     echo "No mutant reached a test."
   else
-    # Shell arithmetic truncates, which would report 59.9% as 59%.
+    # Shell arithmetic truncates where the score should round.
     percent=$(awk -v killed="$killed" -v reached="$reached" \
       'BEGIN { printf "%.0f", 100 * killed / reached }')
     echo "Killed $percent% of the $reached mutants a test reached."

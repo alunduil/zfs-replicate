@@ -8,11 +8,9 @@ import click
 from .. import receive, send
 
 
-# Both flag groups run as decorators while ``zfs.replicate.cli.main`` imports
-# this module, which happens before mutmut can switch a mutant in, so their
-# mutants report as surviving however thoroughly the tests cover the flags. The
-# pragma keeps that from swamping the mutation score; ``_parse_properties``
-# below is an ordinary call and stays mutated.
+# Click applies both flag groups while ``zfs.replicate.cli.main`` imports this
+# module, before mutmut can switch a mutant in, so every mutant here survives
+# whatever the tests assert. ``_parse_properties`` below stays mutated.
 def send_group(command: Callable[..., None]) -> Callable[..., None]:  # pragma: no mutate block
     """Add the ``--send-*`` flag group to a Click command.
 
@@ -94,7 +92,7 @@ def send_group(command: Callable[..., None]) -> Callable[..., None]:  # pragma: 
     return wrapper
 
 
-# Excluded from mutation for the reason given above ``send_group``.
+# Excluded from mutation for the reason above ``send_group``.
 def receive_group(command: Callable[..., None]) -> Callable[..., None]:  # pragma: no mutate block
     """Add the ``--receive-*`` flag group to a Click command.
 

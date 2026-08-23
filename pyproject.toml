@@ -25,8 +25,8 @@ repository = "https://github.com/alunduil/zfs-replicate"
 ignore_unused = ["coveralls", "mutmut", "pytest-cov", "vale"]
 
 [tool.mutmut]
-# mutmut runs pytest from a copy of the tree under mutants/, so the suite has to
-# be copied alongside the mutated zfs/ for testpaths to resolve.
+# mutmut runs pytest from a copy of the tree under mutants/, so testpaths only
+# resolves if the suite is copied alongside the mutated zfs/.
 also_copy = ["zfs_test"]
 pytest_add_cli_args_test_selection = ["zfs_test"]
 source_paths = ["zfs"]
@@ -60,7 +60,7 @@ python = "^3.10"
 
 [tool.poetry.group.mutation]
 # Optional so the pull request test legs skip mutmut and the libcst and textual
-# trees it pulls in. Only the nightly job installs it, with --with mutation.
+# trees behind it.
 optional = true
 
 [tool.poetry.group.mutation.dependencies]

@@ -75,14 +75,12 @@ jobs:
           filename: python-drift-issue.md
           update_existing: true
 
-  # Reports the score and never fails on it: a mutation score is a reading to
-  # act on in its own change, not a merge gate. Diff-scoped per-pull-request
-  # runs and a threshold are #485's stated follow-ups.
+  # Reports the score and never fails on it, so the number is something to act
+  # on in its own change.
   mutation-score:
     name: Score mutant detection
     runs-on: ubuntu-24.04
-    # A serial sweep of ~900 mutants takes a quarter of an hour on a developer
-    # machine. The cap is headroom for a slower runner, not an estimate.
+    # The sweep runs serially, so the cap is headroom for a slow runner.
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -91,9 +89,8 @@ jobs:
           python-version: "3.12"
       - name: poetry install --with mutation
         run: poetry install --with mutation
-      # --max-children 1 buys reproducibility, not politeness: mutmut's
-      # parallel runner mis-attributes child exit codes on this suite, so the
-      # same mutant reports killed on one run and survived on the next.
+      # Serial is what makes the verdicts reproducible here;
+      # docs/reference/testing.md records what the parallel runner gets wrong.
       - name: poetry run mutmut run
         run: poetry run mutmut run --max-children 1
       - name: Publish the score
