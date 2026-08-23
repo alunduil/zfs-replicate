@@ -22,9 +22,9 @@ def list(
 
     result = process.run(command)
 
-    error = clean(result.stderr)
-
     if result.returncode:
+        error = clean(result.stderr)
+
         raise ZFSReplicateError(
             f"error encountered while listing snapshots of '{filesystem.name}': {error!r}",
             filesystem,

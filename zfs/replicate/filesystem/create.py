@@ -29,9 +29,9 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
 
         result = process.run(over_ssh(ssh_command, _create(path)))
 
-        error = clean(result.stderr)
-
         if result.returncode:
+            error = clean(result.stderr)
+
             if b"successfully created, but not mounted" in error:
                 return  # Ignore this error.
 

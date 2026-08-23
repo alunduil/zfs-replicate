@@ -11,9 +11,9 @@ def destroy(snapshot: Snapshot, ssh_command: Command) -> None:
     """Destroy a remote snapshot."""
     result = process.run(over_ssh(ssh_command, _destroy(snapshot)))
 
-    error = clean(result.stderr)
-
     if result.returncode:
+        error = clean(result.stderr)
+
         raise ZFSReplicateError(
             f"unable to destroy snapshot: '{snapshot.filesystem.name}@{snapshot.name}': {error!r}",
             snapshot,

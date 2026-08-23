@@ -10,7 +10,7 @@ that reports stderr routes it through :func:`clean` first.
 _NONE_CIPHER_WARNING = b"WARNING: ENABLED NONE CIPHER"
 
 
-def clean(error: bytes) -> bytes:
+def clean(stderr: bytes) -> bytes:
     r"""Drop line-ending and none-cipher noise from captured stderr.
 
     >>> clean(b"cannot open 'pool/data': dataset does not exist\n")
@@ -19,4 +19,4 @@ def clean(error: bytes) -> bytes:
     >>> clean(b"WARNING: ENABLED NONE CIPHER\r\n")
     b''
     """
-    return error.strip(b"\n").strip(b"\r").replace(_NONE_CIPHER_WARNING, b"")
+    return stderr.strip(b"\n").strip(b"\r").replace(_NONE_CIPHER_WARNING, b"")

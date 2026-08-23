@@ -17,9 +17,9 @@ def list(filesystem: FileSystem, ssh_command: Command) -> List[FileSystem]:
     """List ZFS FileSystem on the remote reachable through ``ssh_command``."""
     result = process.run(over_ssh(ssh_command, _list(filesystem)))
 
-    error = clean(result.stderr)
-
     if result.returncode:
+        error = clean(result.stderr)
+
         raise ZFSReplicateError(
             f"error encountered while listing filesystems of '{filesystem.name}': {error!r}",
             filesystem,
