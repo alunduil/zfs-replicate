@@ -1,86 +1,42 @@
 # Project guide for Claude Code
 
-This file gives Claude Code (and similar coding agents) the
-project-local context it needs to land changes that fit the
-conventions here. Two friction patterns surfaced during a
-recent `/insights` review and motivated this file (see issue
-#445): agents reaching for `curl` and first-principles
-scripts when local tools already cover the task, and agents
-bleeding scope across linked or sibling issues.
-
 ## Tool inventory
 
-The first move when picking up a task should be discovering
-what's already wired into the project, not reinventing it.
+Reach for these before writing a `curl` call, a manual API
+request, or a one-off `Bash` helper.
 
-- **Package manager:** `Poetry`. `pyproject.toml` is the
-  source of truth; `poetry.lock` pins the resolved versions;
-  `poetry.toml` carries `Poetry` settings.
-- **Development shell:** `.devcontainer/` covers Visual Studio
-  Code and GitHub `Codespaces`;
-  `.devcontainer/post-create.sh` bootstraps the container. This
-  project carries no `Nix` expressions: `nixpkgs` packages
-  `zfs-replicate` upstream, so a local derivation would be a
-  second definition to keep in sync (see #430).
-- **Tests:** `pytest` with `--doctest-modules --cov=zfs
-  --cov-report=term-missing` (configured under
-  `[tool.pytest.ini_options]` in `pyproject.toml`). The test
-  tree lives under `zfs_test/`. `Hypothesis` is available as
-  a development dependency.
-- **Lint and format:** `ruff` (both `ruff check` and `ruff
-  format`), configured under `[tool.ruff]` in `pyproject.toml`.
-  It covers what `black`, `isort`, `flake8`, `pydocstyle`, and
-  `bandit` used to. `mypy` (`[tool.mypy]`) covers types, `Vale`
-  (`.vale.ini`, `styles/`) prose, `vulture` dead code, and
-  `FawltyDeps` unused dependencies. `pre-commit` runs all of
-  them from `.pre-commit-config.yaml`; `pre-commit run
-  --all-files` is the canonical local check.
-- **Entry point:** the command-line tool installs as
-  `zfs-replicate = "zfs.replicate.cli.main:main"` (see
-  `[tool.poetry.scripts]` in `pyproject.toml`).
-
-Use these before hand-rolling alternatives. If a task feels
-as though it needs `curl`, a manual API call, or a one-off
-`Bash` helper, check the inventory first; the local tool that
-already covers it produces less churn for reviewers.
+- **Dependencies:** `Poetry`, resolved from `pyproject.toml`.
+- **Development shell:** `.devcontainer/`. No `Nix` expressions
+  live here: `nixpkgs` packages `zfs-replicate` upstream, so a
+  local derivation would be a second definition to keep in sync.
+- **Tests:** `pytest` over `zfs_test/`. The conventions it
+  follows, from the `sut` import alias to when a property test
+  beats a fixed input, live in
+  [docs/reference/testing.md](docs/reference/testing.md).
+- **Lint, format, and types:** match `ruff` and `mypy` when
+  writing code. `pre-commit run --all-files` is the canonical
+  local check, and `.pre-commit-config.yaml` lists everything
+  else it gates.
+- **Entry point:** `zfs.replicate.cli.main:main`, installed as
+  `zfs-replicate`.
+- **Session setup:** a `SessionStart` hook already ran `poetry
+  install` and `pre-commit install`. Machine-specific overrides
+  belong in `.claude/settings.local.json`.
 
 ## Scope discipline
 
-When working from numbered issues:
+- Keep one concern per pull request. Revert incidental edits
+  before requesting review.
+- Confirm the scope doesn't overlap a linked or sibling issue.
+  If it might, ask in the issue thread.
+- Milestones don't gate work. `release-please` cuts releases
+  from merged commits, so a later milestone is no reason to
+  defer an issue. An unreleased prerequisite is, and belongs on
+  a `blocked-by` edge.
 
-- Before opening a pull request, confirm the scope doesn't
-  overlap with linked or sibling issues. If it might, ask in
-  the issue thread instead of guessing.
-- If an issue is blocked by an unreleased prerequisite, propose
-  deferral with a `blocked-by` edge rather than writing
-  premature code that will need to be reworked.
-- Revert any out-of-scope incidental edits before requesting
-  review. One concern per pull request.
+## Commit and pull request conventions
 
-Most of this is encoded in the `issue-work` skill already;
-this note exists so that Claude applies the discipline
-without having to call the skill explicitly.
-
-## Why this project specifically
-
-GitHub lists the open release milestones, and the active
-`blocked` label signals that sequencing matters here. Clear
-scope discipline avoids prematurely shipping something blocked
-by an earlier milestone. The Python tool stack (`ruff` for
-lint and format, `mypy` for types, all gated through
-`pre-commit`) is one an agent can plausibly reinvent unless the
-inventory is in front of it.
-
-## Session defaults
-
-`.claude/settings.json` ships committed Claude Code defaults
-so agent sessions start productive. A `SessionStart` hook runs
-`poetry install` and `pre-commit install`, mirroring
-`.devcontainer/post-create.sh`, so the environment and git
-hooks are ready before the first turn. The `permissions.allow`
-list pre-approves the inspection commands an agent reaches for
-early: `poetry run pytest`, `pre-commit run`, `poetry run
-zfs-replicate --help`, and `git diff`, `git log`, `git
-status`, and `git show`. Machine-specific overrides go in
-`.claude/settings.local.json`, which `.gitignore` keeps out of
-version control.
+Squash merge lands the pull request title as the commit
+message, so the title is the string `release-please` parses for
+the version bump. Both follow
+[CONTRIBUTING.md](CONTRIBUTING.md#commit-messages).
