@@ -84,10 +84,6 @@ jobs:
     # A serial sweep of ~900 mutants takes a quarter of an hour on a developer
     # machine. The cap is headroom for a slower runner, not an estimate.
     timeout-minutes: 120
-    permissions:
-      # A job-level block replaces the workflow-level one rather than
-      # merging, so the checkout needs `contents` named again here.
-      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
