@@ -9,7 +9,7 @@ from zfs.replicate.snapshot.type import Snapshot
 
 
 class TestSnapshots:
-    """``SNAPSHOTS`` draws the snapshots the suite's property tests run on."""
+    """Drawn snapshots vary their filesystem name."""
 
     def test_vary_filesystem(self) -> None:
         """SNAPSHOTS draws more than one filesystem name."""

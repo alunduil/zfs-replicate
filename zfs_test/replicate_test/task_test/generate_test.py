@@ -30,9 +30,8 @@ _UNSENT = _snapshot(_LOCAL, "unsent", 2)
 _STALE = _snapshot(_DESTINATION, "stale", 3)
 
 
-# Drawn snapshots reach a test as a flat list; generate takes them keyed by
-# filesystem. A fixture cannot do the grouping, since the value it groups is
-# drawn per example rather than resolved once.
+# A fixture cannot do this grouping: the value it groups is drawn per example
+# rather than resolved once.
 def _by_filesystem(snapshots: Iterable[Snapshot]) -> Dict[FileSystem, List[Snapshot]]:
     return {
         k: list(v)
@@ -44,7 +43,7 @@ def _by_filesystem(snapshots: Iterable[Snapshot]) -> Dict[FileSystem, List[Snaps
 
 
 class TestGenerate:
-    """``generate`` turns a local and a remote snapshot listing into a task list."""
+    """The two listings decide which tasks run, and in what order."""
 
     def test_no_tasks(self) -> None:
         """generate(Any, {}, {}) == []."""

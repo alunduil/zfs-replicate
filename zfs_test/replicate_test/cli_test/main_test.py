@@ -9,12 +9,12 @@ from pytest_mock import MockerFixture, MockType
 import zfs.replicate.cli.main as sut
 from zfs.replicate import receive, send
 
-# Every invocation needs a destination and a key file; only the flags under test vary.
+# Every invocation needs a destination and a key file.
 CONNECTION = ["-l", "alunduil", "-i", "pyproject.toml", "example.com", "bogus", "bogus"]
 
 
 class TestMain:
-    """``main`` parses the command line and hands the run to ``task.execute``."""
+    """Parsed options reach ``task.execute`` intact, and bad ones stop the run."""
 
     @pytest.fixture
     def invoke(self) -> Callable[..., Result]:
@@ -27,7 +27,7 @@ class TestMain:
 
     @pytest.fixture
     def execute(self, mocker: MockerFixture) -> MockType:
-        """Stand in for the collaborators a run dispatches to, returning the task.execute stub."""
+        """Stand in for the collaborators a run dispatches to."""
         mocker.patch("zfs.replicate.cli.main.snapshot.list", return_value=[])
         mocker.patch("zfs.replicate.cli.main.filesystem.create")
 

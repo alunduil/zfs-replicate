@@ -10,7 +10,7 @@ from zfs.replicate import optional
 
 
 class TestValue:
-    """``value`` unwraps an optional that must be present."""
+    """A present value comes back, and a missing one raises."""
 
     def test_none(self) -> None:
         """optional.value(None) → RuntimeError."""
@@ -24,7 +24,7 @@ class TestValue:
 
 
 class TestValues:
-    """``values`` keeps the present members of a sequence of optionals."""
+    """Nothing missing survives, and everything present keeps its order."""
 
     @given(lists(one_of(integers(), none())))
     def test_drops_every_none(self, elements: List[Optional[int]]) -> None:

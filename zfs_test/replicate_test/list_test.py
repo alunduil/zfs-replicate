@@ -9,7 +9,7 @@ from zfs.replicate import list as sut
 
 
 class TestInits:
-    """``inits`` enumerates every prefix of a sequence, shortest first."""
+    """Every prefix appears once, in increasing length."""
 
     @given(lists(integers()))
     def test_length(self, elements: List[int]) -> None:
@@ -31,7 +31,7 @@ class TestInits:
 
 
 class TestVenn:
-    """``venn`` splits two sequences into left-only, shared, and right-only parts."""
+    """Each element lands in exactly one of the three parts."""
 
     @given(sets(integers()), sets(integers()))
     def test_subsets(self, lefts: Set[int], rights: Set[int]) -> None:

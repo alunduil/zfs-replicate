@@ -4,7 +4,7 @@ import zfs.replicate.send.type as sut
 
 
 class TestOptionsToFlags:
-    """``Options.to_flags`` renders the ``zfs send`` flags a run asked for."""
+    """Each enabled setting contributes its flag, and nothing else does."""
 
     def test_raws_by_default(self) -> None:
         """Default options render only -w."""

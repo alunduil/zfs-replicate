@@ -5,7 +5,7 @@ from zfs.replicate.command import Command
 
 
 class TestRun:
-    """``run`` executes a command to completion and reports its result."""
+    """Arguments reach the program unexpanded, and a failure keeps its status."""
 
     def test_passes_arguments_without_a_shell(self) -> None:
         """An argument with shell syntax reaches the program verbatim, unexpanded."""
@@ -24,7 +24,7 @@ class TestRun:
 
 
 class TestPipeline:
-    """``pipeline`` chains each command's output into the next."""
+    """Each stage's output feeds the next, and the caller reads the last."""
 
     def test_feeds_each_stage_into_the_next(self) -> None:
         """A stage's stdout arrives on the next stage's stdin."""

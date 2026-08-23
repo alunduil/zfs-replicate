@@ -16,11 +16,7 @@ def _record(level: int, message: str) -> logging.LogRecord:
 
 
 class TestConfigure:
-    """``configure`` installs the formatter that presents operational output.
-
-    That formatter, ``_Formatter``, decides the presentation and is exercised
-    here without routing a whole logging stack through it.
-    """
+    """The installed formatter presents differently off a terminal than on one."""
 
     def test_formatter_prefixes_priority_off_tty(self, mocker: MockerFixture) -> None:
         """Off a terminal, each line carries its sd-daemon priority for journald."""

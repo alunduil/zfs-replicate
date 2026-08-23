@@ -4,7 +4,7 @@ import zfs.replicate.command as sut
 
 
 class TestCommandWithEmptyEnv:
-    """``Command.with_empty_env`` builds a command that runs with no environment."""
+    """The env-empty prefix leads every built argv."""
 
     def test_prefixes_env(self) -> None:
         """The env-empty prefix goes in front of the program and its args."""
@@ -18,7 +18,7 @@ class TestCommandWithEmptyEnv:
 
 
 class TestCommandRender:
-    """``Command.render`` writes an argv as a string a remote shell reparses faithfully."""
+    """Rendering quotes the tokens a remote shell would reparse, and only those."""
 
     def test_quotes_shell_metacharacters(self) -> None:
         """Quoting protects any argv token a remote shell would otherwise reparse."""
@@ -32,7 +32,7 @@ class TestCommandRender:
 
 
 class TestOverSsh:
-    """``over_ssh`` hands commands to ssh as a single remote argument."""
+    """The wrapped commands arrive as ssh's single trailing argument."""
 
     def test_appends_single_quoted_argument(self) -> None:
         """Wrapping hands ssh the command as one shell-safe argument."""

@@ -18,7 +18,7 @@ def ssh_command() -> Command:
 
 @pytest.fixture
 def fails_with(mocker: MockerFixture) -> Callable[[bytes], None]:
-    """Fail the run at the process boundary, reporting the given stderr."""
+    """Fail the next run at the process boundary with the given stderr."""
 
     def _fails_with(error: bytes) -> None:
         mocker.patch.object(process, "run", return_value=subprocess.CompletedProcess([], 1, b"", error))

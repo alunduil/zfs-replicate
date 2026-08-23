@@ -53,10 +53,10 @@ class _FakeProcess:
 
 
 class TestSend:
-    """``send`` replicates a snapshot to a remote filesystem.
+    """``send`` assembles the replication stages, then runs them.
 
-    Its assembly helpers, ``_pipeline`` and ``_send``, render the stages that
-    replication runs and are exercised here without spawning a process.
+    ``_pipeline`` and ``_send`` render those stages without running them, so
+    the tests below reach for them directly.
     """
 
     @pytest.fixture

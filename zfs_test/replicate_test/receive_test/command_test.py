@@ -6,7 +6,7 @@ from zfs.replicate.receive.type import Options
 
 
 class TestCommand:
-    """``command`` renders the remote ``zfs receive`` invocation."""
+    """The rendered argv keeps ``-d`` beside the destination, whatever the flags."""
 
     def test_assembles_receive_invocation(self) -> None:
         """Wrap the flags and destination in a zfs receive argv."""

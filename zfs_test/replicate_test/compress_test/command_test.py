@@ -7,7 +7,7 @@ from zfs.replicate.compress.type import Compression
 
 
 class TestCommand:
-    """``command`` renders the compressor and decompressor a compression names."""
+    """Every compression maps to a command, so no member falls through."""
 
     @pytest.mark.parametrize("compression", list(Compression))
     def test_total(self, compression: Compression) -> None:

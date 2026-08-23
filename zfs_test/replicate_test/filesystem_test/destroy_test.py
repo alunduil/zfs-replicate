@@ -11,7 +11,7 @@ from zfs.replicate.filesystem.type import FileSystem, filesystem
 
 
 class TestDestroy:
-    """``destroy`` removes a remote filesystem, reporting why a failed removal failed."""
+    """A failed destroy raises with the remote's reason, and nothing else."""
 
     @pytest.fixture
     def dataset(self) -> FileSystem:

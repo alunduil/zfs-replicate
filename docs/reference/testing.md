@@ -4,11 +4,13 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
 `--doctest-modules --cov=zfs --cov-report=term-missing` (configured in
 [`pyproject.toml`](../../pyproject.toml)); `testpaths` is `zfs_test`.
 
-`pytest-randomly` shuffles the order on every run, so a test that leans on one
-running before it fails rather than passing by luck. Pass `-p no:randomly` to
-hold the declared order while reproducing such a failure. `pytest-xdist` is installed but stays out of
-`addopts`, since `-n auto` spends more on worker startup than it saves at this
-size; ask for it when a run is slow enough to pay for the workers.
+`pytest-randomly` shuffles the order on every run, so a test that depends on
+an earlier one fails instead of passing by luck. Pass `-p no:randomly` to hold
+the declared order while reproducing such a failure.
+
+`pytest-xdist` stays out of `addopts`: at this size, `-n auto` spends more on
+worker startup than it saves. Pass it when a run grows slow enough to pay for
+the workers.
 
 ## Layout
 
@@ -16,14 +18,16 @@ size; ask for it when a run is slow enough to pay for the workers.
   path segment, directories and file alike.
 - Each test package directory carries an `__init__.py`. Two older directories
   (`cli_test/`, `task_test/`) predate this and lack one; new directories add it.
-- A module's tests group into one class per exported symbol of the module under
-  test, named for that symbol: `TestOverSsh` covers `over_ssh`, and
-  `TestOptionsToFlags` covers `Options.to_flags`.
-- A private helper's tests live in the class of the public symbol it serves.
-  The parsing helpers behind `snapshot.list` are tested under `TestList`, and
-  the assembly helpers behind `snapshot.send` under `TestSend`, so a module's
-  class list reads as its public surface. The method name says which helper the
-  test reaches for.
+- A module's tests group into one class per exported symbol, named for it:
+  `TestOverSsh` covers `over_ssh`, `TestOptionsToFlags` covers
+  `Options.to_flags`.
+- A private helper's tests live in the class of the public symbol it serves, so
+  a module's class list reads as its public surface. `snapshot.list`'s parsing
+  helpers are tested under `TestList`, and `snapshot.send`'s assembly helpers
+  under `TestSend`. The method name says which helper a test reaches for.
+- A class docstring says what its tests hold the symbol to, not what the symbol
+  does. The symbol's own docstring covers that, and a paraphrase here drifts
+  from it.
 
 ## Imports and assertions
 
@@ -35,23 +39,20 @@ size; ask for it when a run is slow enough to pay for the workers.
 
 ## Fixtures
 
-A collaborator the test never asserts on is injected. A value the test asserts
-against is written in the test, so the input and the expectation stay side by
-side. That's why the `ssh` command arrives as the `ssh_command` fixture
-wherever it merely has to exist, and as a literal in
-`replicate_test/command_test.py`, where the wrapping is the subject of the
-test.
+Inject a collaborator the test never asserts on. Write a value the test
+asserts against into the test itself, so the input and the expectation stay
+side by side. The `ssh` command shows both: it arrives as the `ssh_command`
+fixture wherever it merely has to exist, and as a literal in
+`replicate_test/command_test.py`, where the tests check how it gets wrapped.
 
 A fixture lives in the class that uses it, and moves to
 [`zfs_test/conftest.py`](../../zfs_test/conftest.py) once a second module needs
-the same setup. Both fixtures there stand at the remote command boundary:
-`ssh_command` builds the invocation a remote command rides on, and `fails_with`
-fails the next run at that boundary with the `stderr` it's given.
+the same setup.
 
 Setup that varies per test comes back as a function. The fixture closes over
-the injected collaborators and returns a callable the test calls with the one
-input it varies, as `fails_with` does here and as `assemble` and
-`capture_spawns` do in `snapshot_test/send_test.py`.
+its collaborators and returns a callable, which the test calls with the one
+input it varies. `fails_with` below does this, as do `assemble` and
+`capture_spawns` in `snapshot_test/send_test.py`.
 
 ```python
 class TestDestroy:
@@ -93,11 +94,10 @@ Shared strategies for a package live in
 package's tests.
 
 A `@given` test takes no fixtures. A function-scoped fixture resolves once
-while `@given` runs the body many times over fresh examples, which Hypothesis
-reports as a `function_scoped_fixture` health check failure. Generated tests
-therefore take their inputs from strategies alone, and the fixtures in the same
-class serve its example-based tests. No test in the suite suppresses that
-health check.
+while `@given` runs the body many times over fresh examples, and Hypothesis
+reports that as a `function_scoped_fixture` health check failure. Generated
+tests take their inputs from strategies alone, and the fixtures in the same
+class serve its example-based tests.
 
 ```python
 from hypothesis import given
@@ -137,8 +137,9 @@ run-to-completion. Tests never spawn real `zfs` or `ssh`.
 
 The command line is exercised through `click.testing.CliRunner`. A fixture
 patches the collaborators a command dispatches to, such as `snapshot.list` and
-`task.execute`, and hands the test the stub it asserts against. Assertions read
-`result.exit_code`, `result.output`, or the arguments a stub recorded.
+`task.execute`, and hands back the stub the test asserts against. Assertions
+read `result.exit_code`, `result.output`, or the arguments that stub
+recorded.
 
 ```python
 import zfs.replicate.cli.main as sut

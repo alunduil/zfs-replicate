@@ -4,7 +4,7 @@ import zfs.replicate.stderr as sut
 
 
 class TestClean:
-    """``clean`` strips the noise a remote shell adds around an error message."""
+    """The shell's noise goes and the message it wrapped survives."""
 
     def test_keeps_a_plain_message_intact(self) -> None:
         """Stderr carrying no noise survives unchanged."""

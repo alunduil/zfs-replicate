@@ -15,7 +15,7 @@ from zfs.replicate.task.type import Action, Task
 
 
 class TestExecute:
-    """``execute`` dispatches each task to the operation it names."""
+    """Dispatching a task reports it through the ``zfs.replicate`` logger."""
 
     def test_send_dispatch_logs(
         self,

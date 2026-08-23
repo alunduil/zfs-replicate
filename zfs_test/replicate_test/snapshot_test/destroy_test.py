@@ -12,7 +12,7 @@ from zfs.replicate.snapshot.type import Snapshot
 
 
 class TestDestroy:
-    """``destroy`` removes a remote snapshot, reporting why a failed removal failed."""
+    """A failed destroy raises with the remote's reason, and nothing else."""
 
     @pytest.fixture
     def snapshot(self) -> Snapshot:

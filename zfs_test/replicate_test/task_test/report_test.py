@@ -10,7 +10,7 @@ from zfs.replicate.task.type import Task
 
 
 class TestReport:
-    """``report`` renders the tasks a run will perform."""
+    """A report is empty exactly when there are no tasks."""
 
     def test_empty_tasks(self) -> None:
         """Ensure no actions is an empty report."""

@@ -11,10 +11,10 @@ from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 
 class TestList:
-    """``list`` reads ``zfs list`` output back into snapshots.
+    """Rendered ``zfs list`` output parses back to the snapshots it came from.
 
-    Its parsing helpers, ``_snapshots`` and ``_snapshot``, carry that reading
-    and are exercised here without a remote listing to run.
+    ``_snapshots`` and ``_snapshot`` do that parsing, so the tests below reach
+    for them directly.
     """
 
     @given(lists(SNAPSHOTS))

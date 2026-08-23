@@ -4,7 +4,7 @@ import zfs.replicate.receive.type as sut
 
 
 class TestOptionsToFlags:
-    """``Options.to_flags`` renders the ``zfs receive`` flags a run asked for."""
+    """Each enabled setting contributes its flag, and nothing else does."""
 
     def test_forces_by_default(self) -> None:
         """Default options render only -F."""
