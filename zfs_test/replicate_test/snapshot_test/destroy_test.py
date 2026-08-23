@@ -3,6 +3,7 @@
 import subprocess
 
 import pytest
+from pytest_mock import MockerFixture
 
 from zfs.replicate import process
 from zfs.replicate.command import Command
@@ -11,35 +12,46 @@ from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.destroy import destroy
 from zfs.replicate.snapshot.type import Snapshot
 
-SSH = Command.with_empty_env("ssh", "host")
-SNAPSHOT = Snapshot(filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0)
+
+def _fails_with(mocker: MockerFixture, error: bytes) -> None:
+    mocker.patch.object(process, "run", return_value=subprocess.CompletedProcess([], 1, b"", error))
 
 
-def _fails_with(monkeypatch: pytest.MonkeyPatch, error: bytes) -> None:
-    def fake_run(command: Command, **_kwargs: object) -> "subprocess.CompletedProcess[bytes]":
-        return subprocess.CompletedProcess(command.argv, 1, b"", error)
+class TestDestroy:
+    """``destroy`` removes a remote snapshot, reporting why a failed removal failed."""
 
-    monkeypatch.setattr(process, "run", fake_run)
+    @pytest.fixture
+    def snapshot(self) -> Snapshot:
+        """Name the remote snapshot a destroy targets."""
+        return Snapshot(filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0)
 
+    def test_reports_stderr_without_line_endings(
+        self,
+        mocker: MockerFixture,
+        ssh_command: Command,
+        snapshot: Snapshot,
+    ) -> None:
+        """A failed destroy names the reason without the shell's trailing line ending."""
+        _fails_with(mocker, b"could not find any snapshots to destroy\r\n")
 
-def test_destroy_reports_stderr_without_line_endings(monkeypatch: pytest.MonkeyPatch) -> None:
-    """A failed destroy names the reason without the shell's trailing line ending."""
-    _fails_with(monkeypatch, b"could not find any snapshots to destroy\r\n")
+        with pytest.raises(ZFSReplicateError) as raised:
+            destroy(snapshot, ssh_command)
 
-    with pytest.raises(ZFSReplicateError) as raised:
-        destroy(SNAPSHOT, SSH)
+        assert "could not find any snapshots to destroy" in raised.value.message
+        assert "\\r" not in raised.value.message
+        assert "\\n" not in raised.value.message
 
-    assert "could not find any snapshots to destroy" in raised.value.message
-    assert "\\r" not in raised.value.message
-    assert "\\n" not in raised.value.message
+    def test_reports_stderr_without_the_none_cipher_warning(
+        self,
+        mocker: MockerFixture,
+        ssh_command: Command,
+        snapshot: Snapshot,
+    ) -> None:
+        """The ssh banner does not reach a failed destroy's message."""
+        _fails_with(mocker, b"WARNING: ENABLED NONE CIPHERcould not find any snapshots to destroy")
 
+        with pytest.raises(ZFSReplicateError) as raised:
+            destroy(snapshot, ssh_command)
 
-def test_destroy_reports_stderr_without_the_none_cipher_warning(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The ssh banner does not reach a failed destroy's message."""
-    _fails_with(monkeypatch, b"WARNING: ENABLED NONE CIPHERcould not find any snapshots to destroy")
-
-    with pytest.raises(ZFSReplicateError) as raised:
-        destroy(SNAPSHOT, SSH)
-
-    assert "could not find any snapshots to destroy" in raised.value.message
-    assert "NONE CIPHER" not in raised.value.message
+        assert "could not find any snapshots to destroy" in raised.value.message
+        assert "NONE CIPHER" not in raised.value.message

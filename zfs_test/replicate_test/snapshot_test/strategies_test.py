@@ -8,9 +8,12 @@ import zfs_test.replicate_test.snapshot_test.strategies as sut
 from zfs.replicate.snapshot.type import Snapshot
 
 
-def test_snapshots_vary_filesystem() -> None:
-    """SNAPSHOTS draws more than one filesystem name."""
-    assert len(_drawn_filesystem_names()) > 1
+class TestSnapshots:
+    """``SNAPSHOTS`` draws the snapshots the suite's property tests run on."""
+
+    def test_vary_filesystem(self) -> None:
+        """SNAPSHOTS draws more than one filesystem name."""
+        assert len(_drawn_filesystem_names()) > 1
 
 
 def _drawn_filesystem_names() -> Set[str]:

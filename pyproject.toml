@@ -22,7 +22,7 @@ zfs-replicate = "zfs.replicate.cli.main:main"
 repository = "https://github.com/alunduil/zfs-replicate"
 
 [tool.fawltydeps]
-ignore_unused = ["coveralls", "pytest-cov", "vale"]
+ignore_unused = ["coveralls", "pytest-cov", "pytest-randomly", "pytest-xdist", "vale"]
 
 [tool.mypy]
 strict = true
@@ -58,6 +58,9 @@ hypothesis = "6.165.10"
 # anything older resolves into the advisory range and fails dependency review.
 pytest = "==9.1.1"
 pytest-cov = "==7.1.0"
+pytest-mock = "==3.15.1"
+pytest-randomly = "==4.1.0"
+pytest-xdist = "==3.8.0"
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --cov=zfs --cov-report=term-missing"

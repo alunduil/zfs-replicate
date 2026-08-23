@@ -3,41 +3,54 @@
 import subprocess
 
 import pytest
+from pytest_mock import MockerFixture
 
 from zfs.replicate import process
 from zfs.replicate.command import Command
 from zfs.replicate.error import ZFSReplicateError
 from zfs.replicate.filesystem.destroy import destroy
-from zfs.replicate.filesystem.type import filesystem
-
-SSH = Command.with_empty_env("ssh", "host")
+from zfs.replicate.filesystem.type import FileSystem, filesystem
 
 
-def _fails_with(monkeypatch: pytest.MonkeyPatch, error: bytes) -> None:
-    def fake_run(command: Command, **_kwargs: object) -> "subprocess.CompletedProcess[bytes]":
-        return subprocess.CompletedProcess(command.argv, 1, b"", error)
-
-    monkeypatch.setattr(process, "run", fake_run)
+def _fails_with(mocker: MockerFixture, error: bytes) -> None:
+    mocker.patch.object(process, "run", return_value=subprocess.CompletedProcess([], 1, b"", error))
 
 
-def test_destroy_reports_stderr_without_line_endings(monkeypatch: pytest.MonkeyPatch) -> None:
-    """A failed destroy names the reason without the shell's trailing line ending."""
-    _fails_with(monkeypatch, b"cannot destroy 'pool/data': dataset is busy\r\n")
+class TestDestroy:
+    """``destroy`` removes a remote filesystem, reporting why a failed removal failed."""
 
-    with pytest.raises(ZFSReplicateError) as raised:
-        destroy(filesystem("pool/data"), SSH)
+    @pytest.fixture
+    def dataset(self) -> FileSystem:
+        """Name the remote filesystem a destroy targets."""
+        return filesystem("pool/data")
 
-    assert "dataset is busy" in raised.value.message
-    assert "\\r" not in raised.value.message
-    assert "\\n" not in raised.value.message
+    def test_reports_stderr_without_line_endings(
+        self,
+        mocker: MockerFixture,
+        ssh_command: Command,
+        dataset: FileSystem,
+    ) -> None:
+        """A failed destroy names the reason without the shell's trailing line ending."""
+        _fails_with(mocker, b"cannot destroy 'pool/data': dataset is busy\r\n")
 
+        with pytest.raises(ZFSReplicateError) as raised:
+            destroy(dataset, ssh_command)
 
-def test_destroy_reports_stderr_without_the_none_cipher_warning(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The ssh banner does not reach a failed destroy's message."""
-    _fails_with(monkeypatch, b"WARNING: ENABLED NONE CIPHERcannot destroy 'pool/data': dataset is busy")
+        assert "dataset is busy" in raised.value.message
+        assert "\\r" not in raised.value.message
+        assert "\\n" not in raised.value.message
 
-    with pytest.raises(ZFSReplicateError) as raised:
-        destroy(filesystem("pool/data"), SSH)
+    def test_reports_stderr_without_the_none_cipher_warning(
+        self,
+        mocker: MockerFixture,
+        ssh_command: Command,
+        dataset: FileSystem,
+    ) -> None:
+        """The ssh banner does not reach a failed destroy's message."""
+        _fails_with(mocker, b"WARNING: ENABLED NONE CIPHERcannot destroy 'pool/data': dataset is busy")
 
-    assert "dataset is busy" in raised.value.message
-    assert "NONE CIPHER" not in raised.value.message
+        with pytest.raises(ZFSReplicateError) as raised:
+            destroy(dataset, ssh_command)
+
+        assert "dataset is busy" in raised.value.message
+        assert "NONE CIPHER" not in raised.value.message

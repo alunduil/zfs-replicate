@@ -10,24 +10,29 @@ from zfs.replicate.snapshot.type import Snapshot
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 
-@given(lists(SNAPSHOTS))
-def test_snapshots(snapshots: List[Snapshot]) -> None:
-    """_snapshots."""
-    output = "\n".join([_output(s) for s in snapshots])
-    assert _snapshots(output.encode()) == snapshots
+class TestList:
+    """``list`` reads ``zfs list`` output back into snapshots.
 
+    Its parsing helpers, ``_snapshots`` and ``_snapshot``, carry that reading
+    and are exercised here without a remote listing to run.
+    """
 
-@given(lists(SNAPSHOTS, min_size=1))
-def test_snapshots_depth(snapshots: List[Snapshot]) -> None:
-    """Ensure max depth of 2."""
-    output = "\n".join([_output(s) for s in snapshots])
-    assert max(map(_depth, _snapshots(output.encode()))) <= 2
+    @given(lists(SNAPSHOTS))
+    def test_snapshots(self, snapshots: List[Snapshot]) -> None:
+        """_snapshots."""
+        output = "\n".join([_output(s) for s in snapshots])
+        assert _snapshots(output.encode()) == snapshots
 
+    @given(lists(SNAPSHOTS, min_size=1))
+    def test_snapshots_depth(self, snapshots: List[Snapshot]) -> None:
+        """Ensure max depth of 2."""
+        output = "\n".join([_output(s) for s in snapshots])
+        assert max(map(_depth, _snapshots(output.encode()))) <= 2
 
-@given(SNAPSHOTS)
-def test_snapshot(snapshot: Snapshot) -> None:
-    """_snapshot."""
-    assert _snapshot(_output(snapshot).encode()) == snapshot
+    @given(SNAPSHOTS)
+    def test_snapshot(self, snapshot: Snapshot) -> None:
+        """_snapshot."""
+        assert _snapshot(_output(snapshot).encode()) == snapshot
 
 
 def _output(snapshot: Snapshot) -> str:

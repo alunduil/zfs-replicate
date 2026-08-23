@@ -1,21 +1,20 @@
 """zfs.replicate.snapshot.send tests."""
 
-from typing import List, Optional, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import pytest
+from pytest_mock import MockerFixture
 
 from zfs.replicate import process
 from zfs.replicate.command import Command
 from zfs.replicate.compress.type import Compression
 from zfs.replicate.error import ZFSReplicateError
-from zfs.replicate.filesystem.type import filesystem
+from zfs.replicate.filesystem.type import FileSystem, filesystem
 from zfs.replicate.receive.type import Options as ReceiveOptions
 from zfs.replicate.send.type import Options
 from zfs.replicate.snapshot.send import Pipeline, _pipeline, _send, send
 from zfs.replicate.snapshot.type import Snapshot
 
-REMOTE = filesystem("backup")
-SSH = Command.with_empty_env("ssh", "host")
 RECEIVE_DEFAULTS = ReceiveOptions()
 
 
@@ -25,23 +24,6 @@ def _snapshot(name: str = "pool/data", snapshot: str = "snap") -> Snapshot:
         name=snapshot,
         previous=None,
         timestamp=0,
-    )
-
-
-def _assemble(
-    *,
-    compression: Compression = Compression.OFF,
-    receive_options: ReceiveOptions = RECEIVE_DEFAULTS,
-    previous: Optional[Snapshot] = None,
-) -> Pipeline:
-    return _pipeline(
-        REMOTE,
-        _snapshot(),
-        ssh_command=SSH,
-        compression=compression,
-        send_options=Options(),
-        receive_options=receive_options,
-        previous=previous,
     )
 
 
@@ -70,132 +52,197 @@ class _FakeProcess:
         return (b"", self._error)
 
 
-def _capture_spawns(monkeypatch: pytest.MonkeyPatch, returncode: int = 0, error: bytes = b"") -> List[_FakeProcess]:
-    """Replace the process boundary and collect the processes it hands back."""
-    spawned: List[_FakeProcess] = []
+class TestSend:
+    """``send`` replicates a snapshot to a remote filesystem.
 
-    def fake_open(command: Command, **_kwargs: object) -> _FakeProcess:
-        spawned.append(_FakeProcess(command, returncode, error))
+    Its assembly helpers, ``_pipeline`` and ``_send``, render the stages that
+    replication runs and are exercised here without spawning a process.
+    """
 
-        return spawned[-1]
+    @pytest.fixture
+    def remote(self) -> FileSystem:
+        """Name the remote filesystem replication sends to."""
+        return filesystem("backup")
 
-    monkeypatch.setattr(process, "open", fake_open)
+    @pytest.fixture
+    def snapshot(self) -> Snapshot:
+        """Name the snapshot replication sends."""
+        return _snapshot()
 
-    return spawned
+    @pytest.fixture
+    def assemble(
+        self,
+        remote: FileSystem,
+        snapshot: Snapshot,
+        ssh_command: Command,
+    ) -> Callable[..., Pipeline]:
+        """Assemble a replication pipeline, varying one input at a time."""
 
+        def _assemble(
+            *,
+            compression: Compression = Compression.OFF,
+            receive_options: ReceiveOptions = RECEIVE_DEFAULTS,
+            previous: Optional[Snapshot] = None,
+        ) -> Pipeline:
+            return _pipeline(
+                remote,
+                snapshot,
+                ssh_command=ssh_command,
+                compression=compression,
+                send_options=Options(),
+                receive_options=receive_options,
+                previous=previous,
+            )
 
-def _replicate(compression: Compression = Compression.OFF) -> None:
-    send(
-        REMOTE,
-        _snapshot(),
-        ssh_command=SSH,
-        compression=compression,
-        send_options=Options(),
-        receive_options=RECEIVE_DEFAULTS,
-    )
+        return _assemble
 
+    @pytest.fixture
+    def replicate(
+        self,
+        remote: FileSystem,
+        snapshot: Snapshot,
+        ssh_command: Command,
+    ) -> Callable[..., None]:
+        """Run a replication, varying one input at a time."""
 
-def test_send_renders_enabled_flags() -> None:
-    """_send embeds the -X flag for each enabled send option."""
-    command = _send(_snapshot(), options=Options(large_block=True, props=True))
+        def _replicate(compression: Compression = Compression.OFF) -> None:
+            send(
+                remote,
+                snapshot,
+                ssh_command=ssh_command,
+                compression=compression,
+                send_options=Options(),
+                receive_options=ReceiveOptions(),
+            )
 
-    assert "-L" in command.args
-    assert "-p" in command.args
+        return _replicate
 
+    @pytest.fixture
+    def capture_spawns(self, mocker: MockerFixture) -> Callable[..., List[_FakeProcess]]:
+        """Replace the process boundary and collect the processes it hands back."""
 
-def test_send_omits_disabled_flags() -> None:
-    """_send leaves out the -X flag for each disabled send option."""
-    command = _send(_snapshot(), options=Options(raw=False))
+        def _capture_spawns(returncode: int = 0, error: bytes = b"") -> List[_FakeProcess]:
+            spawned: List[_FakeProcess] = []
 
-    assert "-w" not in command.args
-    assert "-L" not in command.args
+            def fake_open(command: Command, **_kwargs: object) -> _FakeProcess:
+                spawned.append(_FakeProcess(command, returncode, error))
 
+                return spawned[-1]
 
-def test_send_keeps_hostile_snapshot_as_one_token() -> None:
-    """A snapshot name with shell metacharacters stays a single argv token."""
-    command = _send(_snapshot("pool/data a$b"), options=Options())
+            mocker.patch.object(process, "open", fake_open)
 
-    assert command.args[-1] == "pool/data a$b@snap"
-    assert "'pool/data a$b@snap'" in command.render()
+            return spawned
 
+        return _capture_spawns
 
-def test_pipeline_drops_both_compression_stages_when_off() -> None:
-    """OFF leaves no local compressor and no remote decompress prefix."""
-    pipeline = _assemble(compression=Compression.OFF)
+    def test_send_renders_enabled_flags(self, snapshot: Snapshot) -> None:
+        """_send embeds the -X flag for each enabled send option."""
+        command = _send(snapshot, options=Options(large_block=True, props=True))
 
-    assert pipeline.send.args[-1] == "pool/data@snap"
-    assert pipeline.compress is None
-    assert pipeline.receive.args[-1] == "/usr/bin/env - zfs receive -F -d backup/pool"
+        assert "-L" in command.args
+        assert "-p" in command.args
 
+    def test_send_omits_disabled_flags(self, snapshot: Snapshot) -> None:
+        """_send leaves out the -X flag for each disabled send option."""
+        command = _send(snapshot, options=Options(raw=False))
 
-def test_pipeline_pairs_the_compressor_with_a_remote_decompress() -> None:
-    """lz4 compresses locally and decompresses ahead of the remote receive."""
-    pipeline = _assemble(compression=Compression.LZ4)
+        assert "-w" not in command.args
+        assert "-L" not in command.args
 
-    assert pipeline.compress is not None
-    assert pipeline.compress.argv == ["/usr/bin/env", "-", "lz4"]
-    assert pipeline.receive.args[-1] == "/usr/bin/env - lz4 -d | /usr/bin/env - zfs receive -F -d backup/pool"
+    def test_send_keeps_hostile_snapshot_as_one_token(self) -> None:
+        """A snapshot name with shell metacharacters stays a single argv token."""
+        command = _send(_snapshot("pool/data a$b"), options=Options())
 
+        assert command.args[-1] == "pool/data a$b@snap"
+        assert "'pool/data a$b@snap'" in command.render()
 
-def test_pipeline_hands_the_remote_side_to_ssh() -> None:
-    """The remote pipeline rides as a single argument to the configured ssh command."""
-    pipeline = _assemble()
+    def test_pipeline_drops_both_compression_stages_when_off(self, assemble: Callable[..., Pipeline]) -> None:
+        """OFF leaves no local compressor and no remote decompress prefix."""
+        pipeline = assemble(compression=Compression.OFF)
 
-    assert pipeline.receive.argv[:4] == ["/usr/bin/env", "-", "ssh", "host"]
-    assert len(pipeline.receive.argv) == 5
+        assert pipeline.send.args[-1] == "pool/data@snap"
+        assert pipeline.compress is None
+        assert pipeline.receive.args[-1] == "/usr/bin/env - zfs receive -F -d backup/pool"
 
+    def test_pipeline_pairs_the_compressor_with_a_remote_decompress(self, assemble: Callable[..., Pipeline]) -> None:
+        """lz4 compresses locally and decompresses ahead of the remote receive."""
+        pipeline = assemble(compression=Compression.LZ4)
 
-def test_pipeline_marks_an_incremental_send_with_its_previous_snapshot() -> None:
-    """A previous snapshot becomes the -i source of the send stage."""
-    pipeline = _assemble(previous=_snapshot(snapshot="older"))
+        assert pipeline.compress is not None
+        assert pipeline.compress.argv == ["/usr/bin/env", "-", "lz4"]
+        assert pipeline.receive.args[-1] == "/usr/bin/env - lz4 -d | /usr/bin/env - zfs receive -F -d backup/pool"
 
-    assert pipeline.send.args[-3:] == ["-i", "pool/data@older", "pool/data@snap"]
+    def test_pipeline_hands_the_remote_side_to_ssh(self, assemble: Callable[..., Pipeline]) -> None:
+        """The remote pipeline rides as a single argument to the configured ssh command."""
+        pipeline = assemble()
 
+        assert pipeline.receive.argv[:4] == ["/usr/bin/env", "-", "ssh", "host"]
+        assert len(pipeline.receive.argv) == 5
 
-def test_pipeline_omits_the_incremental_flag_for_a_full_send() -> None:
-    """Without a previous snapshot the send stage carries no -i source."""
-    pipeline = _assemble()
+    def test_pipeline_marks_an_incremental_send_with_its_previous_snapshot(
+        self,
+        assemble: Callable[..., Pipeline],
+    ) -> None:
+        """A previous snapshot becomes the -i source of the send stage."""
+        pipeline = assemble(previous=_snapshot(snapshot="older"))
 
-    assert "-i" not in pipeline.send.args
+        assert pipeline.send.args[-3:] == ["-i", "pool/data@older", "pool/data@snap"]
 
+    def test_pipeline_omits_the_incremental_flag_for_a_full_send(self, assemble: Callable[..., Pipeline]) -> None:
+        """Without a previous snapshot the send stage carries no -i source."""
+        pipeline = assemble()
 
-def test_pipeline_threads_receive_options_into_the_remote_side() -> None:
-    """Non-default receive settings reach the remote zfs receive invocation."""
-    pipeline = _assemble(
-        receive_options=ReceiveOptions(force=False, no_mount=True, resume=True, properties={"readonly": "on"}),
-    )
+        assert "-i" not in pipeline.send.args
 
-    assert pipeline.receive.args[-1] == "/usr/bin/env - zfs receive -u -s -o readonly=on -d backup/pool"
+    def test_pipeline_threads_receive_options_into_the_remote_side(self, assemble: Callable[..., Pipeline]) -> None:
+        """Non-default receive settings reach the remote zfs receive invocation."""
+        pipeline = assemble(
+            receive_options=ReceiveOptions(force=False, no_mount=True, resume=True, properties={"readonly": "on"}),
+        )
 
+        assert pipeline.receive.args[-1] == "/usr/bin/env - zfs receive -u -s -o readonly=on -d backup/pool"
 
-def test_send_spawns_each_assembled_stage(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Each assembled stage runs as a process, in pipeline order."""
-    spawned = _capture_spawns(monkeypatch)
+    def test_send_spawns_each_assembled_stage(
+        self,
+        capture_spawns: Callable[..., List[_FakeProcess]],
+        replicate: Callable[..., None],
+    ) -> None:
+        """Each assembled stage runs as a process, in pipeline order."""
+        spawned = capture_spawns()
 
-    _replicate(compression=Compression.LZ4)
+        replicate(compression=Compression.LZ4)
 
-    assert [proc.command.args[1] for proc in spawned] == ["zfs", "lz4", "ssh"]
+        assert [proc.command.args[1] for proc in spawned] == ["zfs", "lz4", "ssh"]
 
+    def test_send_detaches_the_parent_from_every_upstream_stage(
+        self,
+        capture_spawns: Callable[..., List[_FakeProcess]],
+        replicate: Callable[..., None],
+    ) -> None:
+        """The parent closes every piped stdout but the last, whose output it reads."""
+        spawned = capture_spawns()
 
-def test_send_detaches_the_parent_from_every_upstream_stage(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The parent closes every piped stdout but the last, whose output it reads."""
-    spawned = _capture_spawns(monkeypatch)
+        replicate(compression=Compression.LZ4)
 
-    _replicate(compression=Compression.LZ4)
+        assert [proc.stdout.closed for proc in spawned] == [True, True, False]
 
-    assert [proc.stdout.closed for proc in spawned] == [True, True, False]
+    def test_send_ignores_a_missing_mountpoint(
+        self,
+        capture_spawns: Callable[..., List[_FakeProcess]],
+        replicate: Callable[..., None],
+    ) -> None:
+        """Replication tolerates a failure to create the destination mountpoint."""
+        capture_spawns(returncode=1, error=b"cannot mount 'backup/pool': failed to create mountpoint")
 
+        replicate()
 
-def test_send_ignores_a_missing_mountpoint(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Replication tolerates a failure to create the destination mountpoint."""
-    _capture_spawns(monkeypatch, returncode=1, error=b"cannot mount 'backup/pool': failed to create mountpoint")
+    def test_send_raises_on_any_other_failure(
+        self,
+        capture_spawns: Callable[..., List[_FakeProcess]],
+        replicate: Callable[..., None],
+    ) -> None:
+        """A failed pipeline surfaces its stderr as a ZFSReplicateError."""
+        capture_spawns(returncode=1, error=b"cannot receive: dataset does not exist")
 
-    _replicate()
-
-
-def test_send_raises_on_any_other_failure(monkeypatch: pytest.MonkeyPatch) -> None:
-    """A failed pipeline surfaces its stderr as a ZFSReplicateError."""
-    _capture_spawns(monkeypatch, returncode=1, error=b"cannot receive: dataset does not exist")
-
-    with pytest.raises(ZFSReplicateError, match="pool/data@snap"):
-        _replicate()
+        with pytest.raises(ZFSReplicateError, match="pool/data@snap"):
+            replicate()

@@ -1,144 +1,100 @@
 """zfs.replicate.cli.main tests."""
 
-from typing import Any, Dict, List
+from typing import Callable
 
 import pytest
-from click.testing import CliRunner
+from click.testing import CliRunner, Result
+from pytest_mock import MockerFixture, MockType
 
 import zfs.replicate.cli.main as sut
 from zfs.replicate import receive, send
-from zfs.replicate.snapshot.type import Snapshot
+
+# Every invocation needs a destination and a key file; only the flags under test vary.
+CONNECTION = ["-l", "alunduil", "-i", "pyproject.toml", "example.com", "bogus", "bogus"]
 
 
-def test_invokes_without_stacktrace() -> None:
-    """Invoke without stacktrace.
+class TestMain:
+    """``main`` parses the command line and hands the run to ``task.execute``."""
 
-    .. code:: bash
+    @pytest.fixture
+    def invoke(self) -> Callable[..., Result]:
+        """Invoke the command line with the connection arguments every run needs."""
 
-        zfs-replicate -l alunduil -i pyproject.toml example.com bogus bogus
-    """
-    runner = CliRunner()
-    result = runner.invoke(sut.main, ["-l", "alunduil", "-i", "pyproject.toml", "example.com", "bogus", "bogus"])
-    assert isinstance(result.exception, SystemExit) or (
-        isinstance(result.exception, FileNotFoundError) and result.exception.filename == "/usr/bin/env"
-    ), "Expected SystemExit or FileNotFoundError."
+        def _invoke(*options: str) -> Result:
+            return CliRunner().invoke(sut.main, [*options, *CONNECTION])
 
+        return _invoke
 
-def test_send_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Send flags reach task.execute as the expected send.Options.
+    @pytest.fixture
+    def execute(self, mocker: MockerFixture) -> MockType:
+        """Stand in for the collaborators a run dispatches to, returning the task.execute stub."""
+        mocker.patch("zfs.replicate.cli.main.snapshot.list", return_value=[])
+        mocker.patch("zfs.replicate.cli.main.filesystem.create")
 
-    .. code:: bash
+        return mocker.patch("zfs.replicate.cli.main.task.execute")
 
-        zfs-replicate --send-no-raw --send-large-block --send-embed --send-compressed --send-props ...
-    """
-    captured: Dict[str, Any] = {}
+    def test_invokes_without_stacktrace(self, invoke: Callable[..., Result]) -> None:
+        """Invoke without stacktrace.
 
-    def fake_list(*_args: Any, **_kwargs: Any) -> List[Snapshot]:
-        return []
+        .. code:: bash
 
-    def fake_create(*_args: Any, **_kwargs: Any) -> None:
-        return None
+            zfs-replicate -l alunduil -i pyproject.toml example.com bogus bogus
+        """
+        result = invoke()
 
-    def fake_execute(*_args: Any, **kwargs: Any) -> None:
-        captured.update(kwargs)
+        assert isinstance(result.exception, SystemExit) or (
+            isinstance(result.exception, FileNotFoundError) and result.exception.filename == "/usr/bin/env"
+        ), "Expected SystemExit or FileNotFoundError."
 
-    monkeypatch.setattr("zfs.replicate.cli.main.snapshot.list", fake_list)
-    monkeypatch.setattr("zfs.replicate.cli.main.filesystem.create", fake_create)
-    monkeypatch.setattr("zfs.replicate.cli.main.task.execute", fake_execute)
+    def test_send_options_thread_to_execute(self, invoke: Callable[..., Result], execute: MockType) -> None:
+        """Send flags reach task.execute as the expected send.Options.
 
-    runner = CliRunner()
-    result = runner.invoke(
-        sut.main,
-        [
+        .. code:: bash
+
+            zfs-replicate --send-no-raw --send-large-block --send-embed --send-compressed --send-props ...
+        """
+        result = invoke(
             "--send-no-raw",
             "--send-large-block",
             "--send-embed",
             "--send-compressed",
             "--send-props",
-            "-l",
-            "alunduil",
-            "-i",
-            "pyproject.toml",
-            "example.com",
-            "bogus",
-            "bogus",
-        ],
-    )
-    assert result.exit_code == 0, result.output
+        )
+        assert result.exit_code == 0, result.output
 
-    assert captured.get("send_options") == send.Options(
-        large_block=True, raw=False, embed=True, compressed=True, props=True
-    )
+        assert execute.call_args.kwargs["send_options"] == send.Options(
+            large_block=True, raw=False, embed=True, compressed=True, props=True
+        )
 
+    def test_receive_options_thread_to_execute(self, invoke: Callable[..., Result], execute: MockType) -> None:
+        """Receive flags reach task.execute and shape the receive command.
 
-def test_receive_options_thread_to_execute(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Receive flags reach task.execute and shape the receive command.
+        .. code:: bash
 
-    .. code:: bash
-
-        zfs-replicate --receive-no-force --receive-no-mount --receive-resume-token-capable --receive-set readonly=on ...
-    """
-    captured: Dict[str, Any] = {}
-
-    def fake_list(*_args: Any, **_kwargs: Any) -> List[Snapshot]:
-        return []
-
-    def fake_create(*_args: Any, **_kwargs: Any) -> None:
-        return None
-
-    def fake_execute(*_args: Any, **kwargs: Any) -> None:
-        captured.update(kwargs)
-
-    monkeypatch.setattr("zfs.replicate.cli.main.snapshot.list", fake_list)
-    monkeypatch.setattr("zfs.replicate.cli.main.filesystem.create", fake_create)
-    monkeypatch.setattr("zfs.replicate.cli.main.task.execute", fake_execute)
-
-    runner = CliRunner()
-    result = runner.invoke(
-        sut.main,
-        [
+            zfs-replicate --receive-no-force --receive-no-mount
+                --receive-resume-token-capable --receive-set readonly=on ...
+        """
+        result = invoke(
             "--receive-no-force",
             "--receive-no-mount",
             "--receive-resume-token-capable",
             "--receive-set",
             "readonly=on",
-            "-l",
-            "alunduil",
-            "-i",
-            "pyproject.toml",
-            "example.com",
-            "bogus",
-            "bogus",
-        ],
-    )
-    assert result.exit_code == 0, result.output
+        )
+        assert result.exit_code == 0, result.output
 
-    assert captured.get("receive_options") == receive.Options(
-        force=False, no_mount=True, resume=True, properties={"readonly": "on"}
-    )
+        assert execute.call_args.kwargs["receive_options"] == receive.Options(
+            force=False, no_mount=True, resume=True, properties={"readonly": "on"}
+        )
 
+    def test_set_rejects_malformed_property(self, invoke: Callable[..., Result]) -> None:
+        """`--receive-set` without an equals sign is rejected before execution.
 
-def test_set_rejects_malformed_property() -> None:
-    """`--receive-set` without an equals sign is rejected before execution.
+        .. code:: bash
 
-    .. code:: bash
+            zfs-replicate --receive-set readonly -l alunduil -i pyproject.toml example.com bogus bogus
+        """
+        result = invoke("--receive-set", "readonly")
 
-        zfs-replicate --receive-set readonly -l alunduil -i pyproject.toml example.com bogus bogus
-    """
-    runner = CliRunner()
-    result = runner.invoke(
-        sut.main,
-        [
-            "--receive-set",
-            "readonly",
-            "-l",
-            "alunduil",
-            "-i",
-            "pyproject.toml",
-            "example.com",
-            "bogus",
-            "bogus",
-        ],
-    )
-    assert result.exit_code != 0
-    assert "KEY=VALUE" in result.output
+        assert result.exit_code != 0
+        assert "KEY=VALUE" in result.output

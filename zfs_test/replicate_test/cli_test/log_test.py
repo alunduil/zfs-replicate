@@ -2,7 +2,7 @@
 
 import logging
 
-import pytest
+from pytest_mock import MockerFixture
 
 import zfs.replicate.cli.log as sut
 
@@ -15,19 +15,25 @@ def _record(level: int, message: str) -> logging.LogRecord:
     return logging.LogRecord("zfs.replicate", level, __file__, 0, message, None, None)
 
 
-def test_formatter_prefixes_priority_off_tty(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Off a terminal, each line carries its sd-daemon priority for journald."""
-    monkeypatch.setattr(sut, "_stderr_is_tty", lambda: False)
+class TestConfigure:
+    """``configure`` installs the formatter that presents operational output.
 
-    assert Formatter().format(_record(logging.ERROR, "boom")) == "<3>boom"
-    assert Formatter().format(_record(logging.INFO, "a\nb")) == "<6>a\n<6>b"
+    That formatter, ``_Formatter``, decides the presentation and is exercised
+    here without routing a whole logging stack through it.
+    """
 
+    def test_formatter_prefixes_priority_off_tty(self, mocker: MockerFixture) -> None:
+        """Off a terminal, each line carries its sd-daemon priority for journald."""
+        mocker.patch.object(sut, "_stderr_is_tty", return_value=False)
 
-def test_formatter_colors_on_tty(monkeypatch: pytest.MonkeyPatch) -> None:
-    """On a terminal, click-log's colored ``level:`` presentation is kept."""
-    monkeypatch.setattr(sut, "_stderr_is_tty", lambda: True)
+        assert Formatter().format(_record(logging.ERROR, "boom")) == "<3>boom"
+        assert Formatter().format(_record(logging.INFO, "a\nb")) == "<6>a\n<6>b"
 
-    formatted = Formatter().format(_record(logging.ERROR, "boom"))
+    def test_formatter_colors_on_tty(self, mocker: MockerFixture) -> None:
+        """On a terminal, click-log's colored ``level:`` presentation is kept."""
+        mocker.patch.object(sut, "_stderr_is_tty", return_value=True)
 
-    assert not formatted.startswith("<")
-    assert "error: " in formatted
+        formatted = Formatter().format(_record(logging.ERROR, "boom"))
+
+        assert not formatted.startswith("<")
+        assert "error: " in formatted
