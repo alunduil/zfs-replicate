@@ -2,6 +2,7 @@
 
 from typing import List, Optional
 
+import pytest
 from hypothesis import given
 from hypothesis.strategies import integers, lists, none, one_of
 
@@ -13,13 +14,8 @@ class TestValue:
 
     def test_none(self) -> None:
         """optional.value(None) → RuntimeError."""
-        # Use try except due to lack of typing on pytest module.
-        try:
+        with pytest.raises(RuntimeError):
             optional.value(None)
-        except RuntimeError:
-            pass
-        except:  # noqa: E722
-            raise AssertionError("Expected RuntimeError") from None
 
     @given(integers())
     def test_not_none(self, value: int) -> None:
