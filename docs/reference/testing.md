@@ -4,9 +4,9 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
 `--doctest-modules --cov=zfs --cov-report=term-missing` (configured in
 [`pyproject.toml`](../../pyproject.toml)); `testpaths` is `zfs_test`.
 
-`pytest-randomly` shuffles the order on every run, so a test that depends on
-one before it fails somewhere. Pass `-p no:randomly` to hold the declared order
-while reproducing such a failure. `pytest-xdist` is installed but stays out of
+`pytest-randomly` shuffles the order on every run, so a test that leans on one
+running before it fails rather than passing by luck. Pass `-p no:randomly` to
+hold the declared order while reproducing such a failure. `pytest-xdist` is installed but stays out of
 `addopts`, since `-n auto` spends more on worker startup than it saves at this
 size; ask for it when a run is slow enough to pay for the workers.
 
