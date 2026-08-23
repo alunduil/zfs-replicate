@@ -72,23 +72,19 @@ def _pipeline(  # noqa: PLR0913 -- carries the full replication call surface
     previous: Optional[Snapshot] = None,
 ) -> Pipeline:
     """Assemble the pipeline that replicates ``current`` onto ``remote``, spawning nothing."""
-    compression_commands = compress.command(compression)
-
-    compress_command: Optional[Command] = None
-    decompress_command: Optional[Command] = None
-
-    if compression_commands is not None:
-        compress_command = compression_commands.compress
-        decompress_command = compression_commands.decompress
-
+    send_command = _send(current, previous, options=send_options)
     destination = filesystem.remote_dataset(remote, current.filesystem)
+    receive = receive_command(destination, receive_options)
 
-    remote_side = optional.values(decompress_command, receive_command(destination, receive_options))
+    commands = compress.command(compression)
+
+    if commands is None:
+        return Pipeline(send=send_command, compress=None, receive=over_ssh(ssh_command, receive))
 
     return Pipeline(
-        send=_send(current, previous, options=send_options),
-        compress=compress_command,
-        receive=over_ssh(ssh_command, *remote_side),
+        send=send_command,
+        compress=commands.compress,
+        receive=over_ssh(ssh_command, commands.decompress, receive),
     )
 
 
