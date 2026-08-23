@@ -93,7 +93,7 @@ jobs:
       - uses: ./.github/actions/setup-poetry
         with:
           python-version: "3.12"
-      - name: poetry install
+      - name: poetry install --with mutation
         run: poetry install --with mutation
       # --max-children 1 buys reproducibility, not politeness: mutmut's
       # parallel runner mis-attributes child exit codes on this suite, so the
@@ -104,15 +104,4 @@ jobs:
         if: always()
         run: |
           poetry run mutmut export-cicd-stats
-          jq -r '(.killed + .survived) as $reached
-            | "| Verdict | Mutants |",
-              "| --- | --- |",
-              "| Killed | \(.killed) |",
-              "| Survived | \(.survived) |",
-              "| Unreached by any test | \(.no_tests) |",
-              "| Timed out | \(.timeout) |",
-              "| Total | \(.total) |",
-              "",
-              (if $reached == 0 then "No mutant reached a test."
-               else "Killed \(100 * .killed / $reached | round)% of the \($reached) mutants a test reached."
-               end)' mutants/mutmut-cicd-stats.json >> "$GITHUB_STEP_SUMMARY"
+          .github/scripts/mutation-summary.sh
