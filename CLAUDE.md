@@ -10,8 +10,8 @@ request, or a one-off `Bash` helper.
   live here: `nixpkgs` packages `zfs-replicate` upstream, so a
   local derivation would be a second definition to keep in sync.
 - **Tests:** `pytest` over `zfs_test/`. The conventions it
-  follows, from the `sut` import alias to when a property test
-  beats a fixed input, live in
+  follows, from the class-per-symbol layout and its fixtures to
+  when a property test beats a fixed input, live in
   [docs/reference/testing.md](docs/reference/testing.md).
 - **Lint, format, and types:** match `ruff` and `mypy` when
   writing code. `pre-commit run --all-files` is the canonical
