@@ -6,6 +6,7 @@ from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..filesystem import FileSystem, filesystem
+from ..stderr import clean
 from .type import Snapshot
 
 
@@ -21,9 +22,9 @@ def list(
 
     result = process.run(command)
 
-    error = result.stderr.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
-
     if result.returncode:
+        error = clean(result.stderr)
+
         raise ZFSReplicateError(
             f"error encountered while listing snapshots of '{filesystem.name}': {error!r}",
             filesystem,

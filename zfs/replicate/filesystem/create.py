@@ -6,6 +6,7 @@ from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
 from ..list import inits
+from ..stderr import clean
 from . import type
 from .list import list
 from .type import FileSystem
@@ -28,9 +29,9 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
 
         result = process.run(over_ssh(ssh_command, _create(path)))
 
-        error = result.stderr.strip(b"\n").strip(b"\r").replace(b"WARNING: ENABLED NONE CIPHER", b"")
-
         if result.returncode:
+            error = clean(result.stderr)
+
             if b"successfully created, but not mounted" in error:
                 return  # Ignore this error.
 
