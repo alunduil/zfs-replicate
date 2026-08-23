@@ -36,10 +36,6 @@ class TestVenn:
     @given(sets(integers()), sets(integers()))
     def test_subsets(self, lefts: Set[int], rights: Set[int]) -> None:
         """All combinations of venn with subsets."""
-        r_lefts: List[int]
-        r_middles: List[int]
-        r_rights: List[int]
-
         r_lefts, r_middles, r_rights = sut.venn(list(lefts), list(lefts | rights))
 
         assert (set(r_lefts), set(r_middles), set(r_rights)) == (
@@ -61,10 +57,6 @@ class TestVenn:
         """Venn with disjoint."""
         e_lefts = list(filter(lambda x: x % 2 == 0, both))
         e_rights = list(filter(lambda x: x % 2 != 0, both))
-
-        r_lefts: List[int]
-        r_middles: List[int]
-        r_rights: List[int]
 
         r_lefts, r_middles, r_rights = sut.venn(list(e_lefts), list(e_rights))
 
