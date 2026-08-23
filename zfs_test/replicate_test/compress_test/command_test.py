@@ -9,10 +9,7 @@ from zfs.replicate.compress.type import Compression
 class TestCommand:
     """``command`` renders the compressor and decompressor a compression names."""
 
-    def test_total(self) -> None:
+    @pytest.mark.parametrize("compression", list(Compression))
+    def test_total(self, compression: Compression) -> None:
         """Ensure command is a total function."""
-        for compression in Compression:
-            try:
-                command(compression)
-            except ValueError:
-                pytest.fail(f"unhandled case for {compression}")
+        command(compression)
