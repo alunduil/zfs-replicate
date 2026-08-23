@@ -74,3 +74,45 @@ jobs:
         with:
           filename: python-drift-issue.md
           update_existing: true
+
+  # Reports the score and never fails on it: a mutation score is a reading to
+  # act on in its own change, not a merge gate. Diff-scoped per-pull-request
+  # runs and a threshold are #485's stated follow-ups.
+  mutation-score:
+    name: Score mutant detection
+    runs-on: ubuntu-24.04
+    # A serial sweep of ~900 mutants takes well over an hour on a two-core
+    # runner.
+    timeout-minutes: 120
+    permissions:
+      # A job-level block replaces the workflow-level one rather than
+      # merging, so the checkout needs `contents` named again here.
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-poetry
+        with:
+          python-version: "3.12"
+      - name: poetry install
+        run: poetry install --with mutation
+      # --max-children 1 buys reproducibility, not politeness: mutmut's
+      # parallel runner mis-attributes child exit codes on this suite, so the
+      # same mutant reports killed on one run and survived on the next.
+      - name: poetry run mutmut run
+        run: poetry run mutmut run --max-children 1
+      - name: Publish the score
+        if: always()
+        run: |
+          poetry run mutmut export-cicd-stats
+          jq -r '(.killed + .survived) as $reached
+            | "| Verdict | Mutants |",
+              "| --- | --- |",
+              "| Killed | \(.killed) |",
+              "| Survived | \(.survived) |",
+              "| Unreached by any test | \(.no_tests) |",
+              "| Timed out | \(.timeout) |",
+              "| Total | \(.total) |",
+              "",
+              (if $reached == 0 then "No mutant reached a test."
+               else "Killed \(100 * .killed / $reached | round)% of the \($reached) mutants a test reached."
+               end)' mutants/mutmut-cicd-stats.json >> "$GITHUB_STEP_SUMMARY"
