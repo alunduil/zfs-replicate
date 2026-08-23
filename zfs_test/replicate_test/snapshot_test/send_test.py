@@ -112,7 +112,7 @@ class TestSend:
                 ssh_command=ssh_command,
                 compression=compression,
                 send_options=Options(),
-                receive_options=ReceiveOptions(),
+                receive_options=RECEIVE_DEFAULTS,
             )
 
         return _replicate
