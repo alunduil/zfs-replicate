@@ -81,8 +81,8 @@ jobs:
   mutation-score:
     name: Score mutant detection
     runs-on: ubuntu-24.04
-    # A serial sweep of ~900 mutants takes well over an hour on a two-core
-    # runner.
+    # A serial sweep of ~900 mutants takes a quarter of an hour on a developer
+    # machine. The cap is headroom for a slower runner, not an estimate.
     timeout-minutes: 120
     permissions:
       # A job-level block replaces the workflow-level one rather than

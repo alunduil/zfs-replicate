@@ -118,8 +118,8 @@ poetry run mutmut results
 ```
 
 `mutmut run` copies `zfs/` and `zfs_test/` into `mutants/`, builds the mutants,
-and tests each one. Expect around half an hour for the whole tree. `mutmut
-results` then lists everything that survived.
+and tests each one, which takes roughly a quarter of an hour for the whole tree.
+`mutmut results` then lists everything that survived.
 
 Pass `--max-children 1`. The parallel runner mis-attributes child exit codes on
 this suite: a mutant that survives every time on its own reports as killed on
@@ -131,7 +131,7 @@ mutants already built.
 
 ### Read a survivor
 
-Start from the diff:
+Take a name from `mutmut results` and read the edit it stands for:
 
 ```bash
 poetry run mutmut show zfs.replicate.snapshot.list.x__snapshot__mutmut_4
