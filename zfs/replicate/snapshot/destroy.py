@@ -3,6 +3,7 @@
 from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
+from ..stderr import clean
 from .type import Snapshot
 
 
@@ -10,11 +11,13 @@ def destroy(snapshot: Snapshot, ssh_command: Command) -> None:
     """Destroy a remote snapshot."""
     result = process.run(over_ssh(ssh_command, _destroy(snapshot)))
 
+    error = clean(result.stderr)
+
     if result.returncode:
         raise ZFSReplicateError(
-            f"unable to destroy snapshot: '{snapshot.filesystem.name}@{snapshot.name}': {result.stderr!r}",
+            f"unable to destroy snapshot: '{snapshot.filesystem.name}@{snapshot.name}': {error!r}",
             snapshot,
-            result.stderr,
+            error,
         )
 
 
