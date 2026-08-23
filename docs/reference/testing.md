@@ -8,8 +8,8 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
 
 - A test module mirrors the module under test, with `_test` appended to every
   path segment, directories and file alike.
-- Each test package directory carries an `__init__.py`. Two older directories
-  (`cli_test/`, `task_test/`) predate this and lack one; new directories add it.
+- Each test package directory carries an `__init__.py` with a one-line
+  docstring naming the package under test.
 
 ## Imports and assertions
 
