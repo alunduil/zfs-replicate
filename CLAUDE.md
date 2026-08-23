@@ -5,25 +5,24 @@
 Reach for these before writing a `curl` call, a manual API
 request, or a one-off `Bash` helper.
 
-- **Package manager:** `Poetry`. `pyproject.toml` is the source
-  of truth, `poetry.lock` pins the resolved versions, and
-  `poetry.toml` carries `Poetry` settings.
-- **Development shell:** `.devcontainer/`, bootstrapped by
-  `.devcontainer/post-create.sh`. No `Nix` expressions live
-  here: `nixpkgs` packages `zfs-replicate` upstream, so a local
-  derivation would be a second definition to keep in sync
+- **Dependencies:** `Poetry`, resolved from `pyproject.toml`.
+- **Development shell:** `.devcontainer/`. No `Nix` expressions
+  live here: `nixpkgs` packages `zfs-replicate` upstream, so a
+  local derivation would be a second definition to keep in sync
   (#430).
-- **Tests:** `pytest` over `zfs_test/`, configured under
-  `[tool.pytest.ini_options]`. `--doctest-modules` runs every
-  docstring example in `zfs/` as a test. `Hypothesis` is a
-  development dependency.
-- **Lint and format:** `ruff` (lint and format), `mypy`
-  (types), `Vale` (prose), `vulture` (dead code), and
-  `FawltyDeps` (unused dependencies), each gated through
-  `pre-commit`. Run `pre-commit run --all-files` as the
-  canonical local check.
-- **Entry point:** the command-line tool installs as
-  `zfs-replicate = "zfs.replicate.cli.main:main"`.
+- **Tests:** `pytest` over `zfs_test/`. The conventions it
+  follows, from the `sut` import alias to when a property test
+  beats a fixed input, live in
+  [docs/reference/testing.md](docs/reference/testing.md).
+- **Lint, format, and types:** match `ruff` and `mypy` when
+  writing code. `pre-commit run --all-files` is the canonical
+  local check, and `.pre-commit-config.yaml` lists everything
+  else it gates.
+- **Entry point:** `zfs.replicate.cli.main:main`, installed as
+  `zfs-replicate`.
+- **Session setup:** a `SessionStart` hook already ran `poetry
+  install` and `pre-commit install`. Machine-specific overrides
+  belong in `.claude/settings.local.json`.
 
 ## Scope discipline
 
@@ -33,20 +32,12 @@ request, or a one-off `Bash` helper.
   If it might, ask in the issue thread.
 - Milestones don't gate work. `release-please` cuts releases
   from merged commits, so a later milestone is no reason to
-  defer an issue. An unreleased prerequisite is, and belongs
-  on a `blocked-by` edge.
+  defer an issue. An unreleased prerequisite is, and belongs on
+  a `blocked-by` edge.
 
 ## Commit and pull request conventions
 
 Squash merge lands the pull request title as the commit
-message, so the title is what `release-please` parses for the
-version bump. Both follow the conventional-commit rules in
+message, so the title is the string `release-please` parses for
+the version bump. Both follow
 [CONTRIBUTING.md](CONTRIBUTING.md#commit-messages).
-
-## Session defaults
-
-A `SessionStart` hook in `.claude/settings.json` runs `poetry
-install` and `pre-commit install`, so dependencies and git
-hooks are ready before the first turn. Machine-specific
-overrides belong in `.claude/settings.local.json`, which
-`.gitignore` excludes.
