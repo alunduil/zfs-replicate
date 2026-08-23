@@ -8,8 +8,7 @@ request, or a one-off `Bash` helper.
 - **Dependencies:** `Poetry`, resolved from `pyproject.toml`.
 - **Development shell:** `.devcontainer/`. No `Nix` expressions
   live here: `nixpkgs` packages `zfs-replicate` upstream, so a
-  local derivation would be a second definition to keep in sync
-  (#430).
+  local derivation would be a second definition to keep in sync.
 - **Tests:** `pytest` over `zfs_test/`. The conventions it
   follows, from the `sut` import alias to when a property test
   beats a fixed input, live in
