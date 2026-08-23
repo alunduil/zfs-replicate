@@ -4,7 +4,7 @@ import zfs.replicate.stderr as sut
 
 
 def test_clean_keeps_a_plain_message_intact() -> None:
-    """Stderr carrying neither kind of noise survives unchanged."""
+    """Stderr carrying no noise survives unchanged."""
     assert sut.clean(b"cannot destroy 'pool/data': dataset is busy") == b"cannot destroy 'pool/data': dataset is busy"
 
 
@@ -19,5 +19,5 @@ def test_clean_drops_the_none_cipher_warning() -> None:
 
 
 def test_clean_keeps_a_message_the_none_cipher_warning_precedes() -> None:
-    """Removing the banner leaves the real failure behind it readable."""
+    """The failure reported after the banner survives its removal."""
     assert sut.clean(b"WARNING: ENABLED NONE CIPHERcannot open 'pool/data'\n") == b"cannot open 'pool/data'"

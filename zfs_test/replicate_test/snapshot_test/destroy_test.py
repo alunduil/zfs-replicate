@@ -8,9 +8,6 @@ from zfs.replicate import process
 from zfs.replicate.command import Command
 from zfs.replicate.error import ZFSReplicateError
 from zfs.replicate.filesystem.type import filesystem
-
-# zfs.replicate.snapshot re-exports destroy, so the package attribute is the function,
-# not the module -- import the function rather than aliasing the module as sut.
 from zfs.replicate.snapshot.destroy import destroy
 from zfs.replicate.snapshot.type import Snapshot
 
@@ -38,7 +35,7 @@ def test_destroy_reports_stderr_without_line_endings(monkeypatch: pytest.MonkeyP
 
 
 def test_destroy_reports_stderr_without_the_none_cipher_warning(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The ssh banner does not ride along into a failed destroy's message."""
+    """The ssh banner does not reach a failed destroy's message."""
     _fails_with(monkeypatch, b"WARNING: ENABLED NONE CIPHERcould not find any snapshots to destroy")
 
     with pytest.raises(ZFSReplicateError) as raised:
