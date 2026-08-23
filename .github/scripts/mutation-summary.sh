@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Render the mutation score as a Markdown table on the job summary.
+# Render the mutation score as a create-an-issue body.
 #
-# Reads the JSON `mutmut export-cicd-stats` writes and appends to
-# $GITHUB_STEP_SUMMARY. Both paths take an override, so a local run prints the
-# same table to stdout. Run from the repository root.
+# Reads the JSON `mutmut export-cicd-stats` writes and fills $ISSUE_FILE, whose
+# front matter carries the title create-an-issue matches on. Both paths take an
+# override. Run from the repository root.
 set -euo pipefail
 
 : "${STATS_FILE:=mutants/mutmut-cicd-stats.json}"
-: "${GITHUB_STEP_SUMMARY:=/dev/stdout}"
+: "${ISSUE_FILE:=mutation-score-issue.md}"
 
 die() {
   echo "$1; aborting" >&2
@@ -27,7 +27,15 @@ read -r killed survived no_tests timed_out total < <(
 # a test actually ran.
 reached=$((killed + survived))
 
+# create-an-issue finds the issue to refresh by title, so the title has to stay
+# stable or each run opens another one.
 {
+  echo "---"
+  echo "title: Mutation score"
+  echo "---"
+  echo "The nightly \`Score mutant detection\` job rewrites this issue after each"
+  echo "sweep. Any work it implies is filed separately."
+  echo
   echo "| Verdict | Mutants |"
   echo "| --- | --- |"
   echo "| Killed | $killed |"
@@ -44,4 +52,4 @@ reached=$((killed + survived))
       'BEGIN { printf "%.0f", 100 * killed / reached }')
     echo "Killed $percent% of the $reached mutants a test reached."
   fi
-} >> "$GITHUB_STEP_SUMMARY"
+} > "$ISSUE_FILE"
