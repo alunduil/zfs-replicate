@@ -112,3 +112,11 @@ read `result.exit_code`, `result.output`, or the arguments that stub recorded.
 A bug fix adds a test that fails before the fix and passes after. Its docstring
 describes the behavior or scenario under test and links the issue, not the issue
 alone (for example, `Rejects a snapshot name containing '@'; see #123.`).
+
+## Mutation testing
+
+A nightly job scores the suite by mutation testing, configured under
+`[tool.mutmut]` in [`pyproject.toml`](../../pyproject.toml). A mutant that
+survives is killed by a new test, recorded as an equivalent mutant in a comment
+at the code, or excluded with `# pragma: no mutate block` and the reason no test
+can reach it.

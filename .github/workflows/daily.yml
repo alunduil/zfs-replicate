@@ -74,3 +74,46 @@ jobs:
         with:
           filename: python-drift-issue.md
           update_existing: true
+
+  # Reports the score and never fails on it, so the number is something to act
+  # on in its own change.
+  mutation-score:
+    name: Score mutant detection
+    runs-on: ubuntu-24.04
+    # The sweep runs serially, so the cap is headroom for a slow runner.
+    timeout-minutes: 120
+    permissions:
+      # A job-level block replaces the workflow-level one rather than
+      # merging, so the checkout needs `contents` named again here.
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-poetry
+        with:
+          python-version: "3.12"
+      - name: poetry install --with mutation
+        run: poetry install --with mutation
+      # Serial keeps the verdicts reproducible: the parallel runner
+      # mis-attributes child exit codes here, so the same mutant reports killed
+      # on one run and survived on the next.
+      - name: poetry run mutmut run
+        run: poetry run mutmut run --max-children 1
+      # No `if: always()`: a sweep that died partway exports a partial tally,
+      # and the issue is better left holding the last number a full run
+      # produced.
+      - name: Render the score
+        run: |
+          poetry run mutmut export-cicd-stats
+          .github/scripts/mutation-summary.sh
+
+      # Title comes from the file's front matter, not from `with`. Updating one
+      # issue keeps the current score in place instead of accruing one issue
+      # per night.
+      - name: File or refresh the score issue
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          filename: mutation-score-issue.md
+          update_existing: true
