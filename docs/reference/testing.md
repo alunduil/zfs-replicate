@@ -4,13 +4,8 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
 `--doctest-modules --cov=zfs --cov-report=term-missing` (configured in
 [`pyproject.toml`](../../pyproject.toml)); `testpaths` is `zfs_test`.
 
-`pytest-randomly` shuffles the order on every run, so a test that depends on
-an earlier one fails instead of passing by luck. Pass `-p no:randomly` to hold
-the declared order while reproducing such a failure.
-
-`pytest-xdist` stays out of `addopts`: at this size, `-n auto` spends more on
-worker startup than it saves. Pass it when a run grows slow enough to pay for
-the workers.
+Test order is randomized, so pass `-p no:randomly` to reproduce a failure that
+only appears in some runs.
 
 ## Layout
 
@@ -18,9 +13,7 @@ the workers.
   path segment, directories and file alike.
 - Each test package directory carries an `__init__.py`. Two older directories
   (`cli_test/`, `task_test/`) predate this and lack one; new directories add it.
-- A module's tests group into one class per exported symbol, named for it:
-  `TestOverSsh` covers `over_ssh`, `TestOptionsToFlags` covers
-  `Options.to_flags`.
+- A module's tests group into one class per exported symbol, named for it.
 - A private helper's tests live in the class of the public symbol it serves, so
   a module's class list reads as its public surface. `snapshot.list`'s parsing
   helpers are tested under `TestList`, and `snapshot.send`'s assembly helpers
@@ -49,32 +42,9 @@ A fixture lives in the class that uses it, and moves to
 [`zfs_test/conftest.py`](../../zfs_test/conftest.py) once a second module needs
 the same setup.
 
-Setup that varies per test comes back as a function. The fixture closes over
-its collaborators and returns a callable, which the test calls with the one
-input it varies. `fails_with` below does this, as do `assemble` and
-`capture_spawns` in `snapshot_test/send_test.py`.
-
-```python
-class TestDestroy:
-    @pytest.fixture
-    def snapshot(self) -> Snapshot:
-        """Name the remote snapshot a destroy targets."""
-        return Snapshot(filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0)
-
-    def test_reports_stderr_without_line_endings(
-        self,
-        fails_with: Callable[[bytes], None],
-        ssh_command: Command,
-        snapshot: Snapshot,
-    ) -> None:
-        """A failed destroy names the reason without the shell's trailing line ending."""
-        fails_with(b"could not find any snapshots to destroy\r\n")
-
-        with pytest.raises(ZFSReplicateError) as raised:
-            destroy(snapshot, ssh_command)
-
-        assert "could not find any snapshots to destroy" in raised.value.message
-```
+Setup that varies per test comes back as a function: the fixture closes over
+its collaborators and returns a callable, as `fails_with`, `assemble`, and
+`capture_spawns` do.
 
 ## Property tests
 
@@ -93,11 +63,8 @@ Shared strategies for a package live in
 `zfs_test/replicate_test/<pkg>_test/strategies.py` and are imported by that
 package's tests.
 
-A `@given` test takes no fixtures. A function-scoped fixture resolves once
-while `@given` runs the body many times over fresh examples, and Hypothesis
-reports that as a `function_scoped_fixture` health check failure. Generated
-tests take their inputs from strategies alone, and the fixtures in the same
-class serve its example-based tests.
+A `@given` test takes no fixtures; the fixtures in its class serve the
+example-based tests beside it.
 
 ```python
 from hypothesis import given
@@ -109,7 +76,7 @@ from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 
 class TestList:
-    """``list`` reads ``zfs list`` output back into snapshots."""
+    """Rendered ``zfs list`` output parses back to the snapshots it came from."""
 
     @given(lists(SNAPSHOTS))
     def test_snapshots(self, snapshots: list[Snapshot]) -> None:
@@ -138,36 +105,7 @@ run-to-completion. Tests never spawn real `zfs` or `ssh`.
 The command line is exercised through `click.testing.CliRunner`. A fixture
 patches the collaborators a command dispatches to, such as `snapshot.list` and
 `task.execute`, and hands back the stub the test asserts against. Assertions
-read `result.exit_code`, `result.output`, or the arguments that stub
-recorded.
-
-```python
-import zfs.replicate.cli.main as sut
-from click.testing import CliRunner
-
-# Every invocation needs a destination and a key file; only the flags under test vary.
-CONNECTION = ["-l", "alunduil", "-i", "pyproject.toml", "example.com", "bogus", "bogus"]
-
-
-class TestMain:
-    """``main`` parses the command line and hands the run to ``task.execute``."""
-
-    @pytest.fixture
-    def invoke(self) -> Callable[..., Result]:
-        """Invoke the command line with the connection arguments every run needs."""
-
-        def _invoke(*options: str) -> Result:
-            return CliRunner().invoke(sut.main, [*options, *CONNECTION])
-
-        return _invoke
-
-    def test_set_rejects_malformed_property(self, invoke: Callable[..., Result]) -> None:
-        """`--receive-set` without an equals sign is rejected before execution."""
-        result = invoke("--receive-set", "readonly")
-
-        assert result.exit_code != 0
-        assert "KEY=VALUE" in result.output
-```
+read `result.exit_code`, `result.output`, or the arguments that stub recorded.
 
 ## Regression tests
 
