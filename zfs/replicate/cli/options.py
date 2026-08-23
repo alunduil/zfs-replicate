@@ -8,7 +8,10 @@ import click
 from .. import receive, send
 
 
-def send_group(command: Callable[..., None]) -> Callable[..., None]:
+# Click applies both flag groups while ``zfs.replicate.cli.main`` imports this
+# module, before mutmut can switch a mutant in, so every mutant here survives
+# whatever the tests assert. ``_parse_properties`` below stays mutated.
+def send_group(command: Callable[..., None]) -> Callable[..., None]:  # pragma: no mutate block
     """Add the ``--send-*`` flag group to a Click command.
 
     The decorated command must take a single ``send_options: send.Options``
@@ -89,7 +92,8 @@ def send_group(command: Callable[..., None]) -> Callable[..., None]:
     return wrapper
 
 
-def receive_group(command: Callable[..., None]) -> Callable[..., None]:
+# Excluded from mutation for the reason above ``send_group``.
+def receive_group(command: Callable[..., None]) -> Callable[..., None]:  # pragma: no mutate block
     """Add the ``--receive-*`` flag group to a Click command.
 
     The decorated command must take a single ``receive_options:
