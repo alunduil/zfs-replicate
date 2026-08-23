@@ -9,13 +9,11 @@ from .type import Compression
 
 @dataclass(frozen=True)
 class Commands:
-    """The pair of commands a compression stage needs.
+    """The two halves of a compression stage, one per side of the ssh boundary.
 
-    The two are not interchangeable: ``compress`` runs locally on the sending
-    side, ``decompress`` runs on the far side of ssh. Naming the slots keeps a
-    call site from transposing them, and making both fields required means a
-    half-configured stage cannot be built. Compression is on or off, never
-    one-sided.
+    ``compress`` runs locally on the sending side; ``decompress`` runs remotely,
+    ahead of ``zfs receive``. Compression is on or off, never one-sided, so a
+    stage always carries both.
     """
 
     compress: Command
