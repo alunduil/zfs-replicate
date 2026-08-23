@@ -43,6 +43,7 @@ repos:
           - click-log
           - hypothesis
           - pytest
+          - pytest-mock
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.16
     hooks:

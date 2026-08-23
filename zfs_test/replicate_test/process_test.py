@@ -4,37 +4,41 @@ import zfs.replicate.process as sut
 from zfs.replicate.command import Command
 
 
-def test_run_passes_arguments_without_a_shell() -> None:
-    """An argument with shell syntax reaches the program verbatim, unexpanded."""
-    hostile = "$(echo pwned) `id` ; rm -rf"
+class TestRun:
+    """Arguments reach the program unexpanded, and a failure keeps its status."""
 
-    result = sut.run(Command("printf", ["%s", hostile]))
+    def test_passes_arguments_without_a_shell(self) -> None:
+        """An argument with shell syntax reaches the program verbatim, unexpanded."""
+        hostile = "$(echo pwned) `id` ; rm -rf"
 
-    assert result.returncode == 0
-    assert result.stdout == hostile.encode()
+        result = sut.run(Command("printf", ["%s", hostile]))
 
+        assert result.returncode == 0
+        assert result.stdout == hostile.encode()
 
-def test_run_reports_nonzero_returncode() -> None:
-    """A failing program surfaces its exit status on the result."""
-    result = sut.run(Command("false", []))
+    def test_reports_nonzero_returncode(self) -> None:
+        """A failing program surfaces its exit status on the result."""
+        result = sut.run(Command("false", []))
 
-    assert result.returncode != 0
-
-
-def test_pipeline_feeds_each_stage_into_the_next() -> None:
-    """A stage's stdout arrives on the next stage's stdin."""
-    proc = sut.pipeline(Command("printf", ["%s", "replicate"]), Command("tr", ["a-z", "A-Z"]))
-
-    output, _ = proc.communicate()
-
-    assert output == b"REPLICATE"
+        assert result.returncode != 0
 
 
-def test_pipeline_captures_both_streams_of_a_lone_stage() -> None:
-    """A lone stage is also the last one, so its streams reach the caller."""
-    proc = sut.pipeline(Command("printf", ["%s", "solo"]))
+class TestPipeline:
+    """Each stage's output feeds the next, and the caller reads the last."""
 
-    output, error = proc.communicate()
+    def test_feeds_each_stage_into_the_next(self) -> None:
+        """A stage's stdout arrives on the next stage's stdin."""
+        proc = sut.pipeline(Command("printf", ["%s", "replicate"]), Command("tr", ["a-z", "A-Z"]))
 
-    assert output == b"solo"
-    assert error == b""
+        output, _ = proc.communicate()
+
+        assert output == b"REPLICATE"
+
+    def test_captures_both_streams_of_a_lone_stage(self) -> None:
+        """A lone stage is also the last one, so its streams reach the caller."""
+        proc = sut.pipeline(Command("printf", ["%s", "solo"]))
+
+        output, error = proc.communicate()
+
+        assert output == b"solo"
+        assert error == b""

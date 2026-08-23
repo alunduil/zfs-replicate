@@ -2,7 +2,7 @@
 
 import logging
 
-import pytest
+from pytest_mock import MockerFixture
 
 import zfs.replicate.cli.log as sut
 
@@ -15,19 +15,21 @@ def _record(level: int, message: str) -> logging.LogRecord:
     return logging.LogRecord("zfs.replicate", level, __file__, 0, message, None, None)
 
 
-def test_formatter_prefixes_priority_off_tty(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Off a terminal, each line carries its sd-daemon priority for journald."""
-    monkeypatch.setattr(sut, "_stderr_is_tty", lambda: False)
+class TestConfigure:
+    """The installed formatter presents differently off a terminal than on one."""
 
-    assert Formatter().format(_record(logging.ERROR, "boom")) == "<3>boom"
-    assert Formatter().format(_record(logging.INFO, "a\nb")) == "<6>a\n<6>b"
+    def test_formatter_prefixes_priority_off_tty(self, mocker: MockerFixture) -> None:
+        """Off a terminal, each line carries its sd-daemon priority for journald."""
+        mocker.patch.object(sut, "_stderr_is_tty", return_value=False)
 
+        assert Formatter().format(_record(logging.ERROR, "boom")) == "<3>boom"
+        assert Formatter().format(_record(logging.INFO, "a\nb")) == "<6>a\n<6>b"
 
-def test_formatter_colors_on_tty(monkeypatch: pytest.MonkeyPatch) -> None:
-    """On a terminal, click-log's colored ``level:`` presentation is kept."""
-    monkeypatch.setattr(sut, "_stderr_is_tty", lambda: True)
+    def test_formatter_colors_on_tty(self, mocker: MockerFixture) -> None:
+        """On a terminal, click-log's colored ``level:`` presentation is kept."""
+        mocker.patch.object(sut, "_stderr_is_tty", return_value=True)
 
-    formatted = Formatter().format(_record(logging.ERROR, "boom"))
+        formatted = Formatter().format(_record(logging.ERROR, "boom"))
 
-    assert not formatted.startswith("<")
-    assert "error: " in formatted
+        assert not formatted.startswith("<")
+        assert "error: " in formatted

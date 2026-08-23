@@ -4,12 +4,23 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
 `--doctest-modules --cov=zfs --cov-report=term-missing` (configured in
 [`pyproject.toml`](../../pyproject.toml)); `testpaths` is `zfs_test`.
 
+Test order is randomized, so pass `-p no:randomly` to reproduce a failure that
+only appears in some runs.
+
 ## Layout
 
 - A test module mirrors the module under test, with `_test` appended to every
   path segment, directories and file alike.
 - Each test package directory carries an `__init__.py`. Two older directories
   (`cli_test/`, `task_test/`) predate this and lack one; new directories add it.
+- A module's tests group into one class per exported symbol, named for it.
+- A private helper's tests live in the class of the public symbol it serves, so
+  a module's class list reads as its public surface. `snapshot.list`'s parsing
+  helpers are tested under `TestList`, and `snapshot.send`'s assembly helpers
+  under `TestSend`. The method name says which helper a test reaches for.
+- A class docstring says what its tests hold the symbol to, not what the symbol
+  does. The symbol's own docstring covers that, and a paraphrase here drifts
+  from it.
 
 ## Imports and assertions
 
@@ -18,6 +29,22 @@ The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
   rather than re-exporting its symbols.
 - `assert` statements need no marker. `ruff` ignores `S101` (assert-used)
   under `zfs_test/` through `per-file-ignores`, so test code asserts directly.
+
+## Fixtures
+
+Inject a collaborator the test never asserts on. Write a value the test
+asserts against into the test itself, so the input and the expectation stay
+side by side. The `ssh` command shows both: it arrives as the `ssh_command`
+fixture wherever it merely has to exist, and as a literal in
+`replicate_test/command_test.py`, where the tests check how it gets wrapped.
+
+A fixture lives in the class that uses it, and moves to
+[`zfs_test/conftest.py`](../../zfs_test/conftest.py) once a second module needs
+the same setup.
+
+Setup that varies per test comes back as a function: the fixture closes over
+its collaborators and returns a callable, as `fails_with`, `assemble`, and
+`capture_spawns` do.
 
 ## Property tests
 
@@ -36,6 +63,9 @@ Shared strategies for a package live in
 `zfs_test/replicate_test/<pkg>_test/strategies.py` and are imported by that
 package's tests.
 
+A `@given` test takes no fixtures; the fixtures in its class serve the
+example-based tests beside it.
+
 ```python
 from hypothesis import given
 from hypothesis.strategies import lists
@@ -45,11 +75,14 @@ from zfs.replicate.snapshot.type import Snapshot
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 
-@given(lists(SNAPSHOTS))  # type: ignore[misc]
-def test_snapshots(snapshots: list[Snapshot]) -> None:
-    """Round-trip the rendered list back through the parser."""
-    output = "\n".join(f"{s.filesystem.name}@{s.name}\t{s.timestamp}" for s in snapshots)
-    assert _snapshots(output.encode()) == snapshots
+class TestList:
+    """Rendered ``zfs list`` output parses back to the snapshots it came from."""
+
+    @given(lists(SNAPSHOTS))
+    def test_snapshots(self, snapshots: list[Snapshot]) -> None:
+        """Round-trip the rendered list back through the parser."""
+        output = "\n".join(f"{s.filesystem.name}@{s.name}\t{s.timestamp}" for s in snapshots)
+        assert _snapshots(output.encode()) == snapshots
 ```
 
 ## The process boundary
@@ -62,33 +95,17 @@ run-to-completion. Tests never spawn real `zfs` or `ssh`.
 - Command *builders* (`*/command.py`) construct a `Command` and spawn nothing.
   Their tests assert on `Command.argv` and `Command.render()` directly.
 - Code that *runs* a command patches the boundary. A test replaces
-  `zfs.replicate.process.run` (or `process.open`) with `monkeypatch.setattr`,
+  `zfs.replicate.process.run` (or `process.open`) through the `mocker` fixture,
   returning a fake `subprocess.CompletedProcess` or `Popen`, so no external
   binary runs. Patching `process.open` also covers `process.pipeline`, which
   spawns each of its stages through it.
 
 ## Command-line tests
 
-The command line is exercised through `click.testing.CliRunner`. The
-collaborators a command dispatches to—`snapshot.list`, `task.execute`, and the
-like—are patched with `monkeypatch.setattr`; assertions read `result.exit_code`,
-`result.output`, or the arguments the fakes captured.
-
-```python
-import zfs.replicate.cli.main as sut
-from click.testing import CliRunner
-
-
-def test_set_rejects_malformed_property() -> None:
-    """`--receive-set` without an equals sign is rejected before execution."""
-    result = CliRunner().invoke(
-        sut.main,
-        ["--receive-set", "readonly", "-l", "alunduil", "-i", "pyproject.toml",
-         "example.com", "bogus", "bogus"],
-    )
-    assert result.exit_code != 0
-    assert "KEY=VALUE" in result.output
-```
+The command line is exercised through `click.testing.CliRunner`. A fixture
+patches the collaborators a command dispatches to, such as `snapshot.list` and
+`task.execute`, and hands back the stub the test asserts against. Assertions
+read `result.exit_code`, `result.output`, or the arguments that stub recorded.
 
 ## Regression tests
 

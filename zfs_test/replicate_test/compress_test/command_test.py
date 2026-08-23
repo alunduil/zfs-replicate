@@ -6,10 +6,10 @@ from zfs.replicate.compress.command import command
 from zfs.replicate.compress.type import Compression
 
 
-def test_command_total() -> None:
-    """Ensure command is a total function."""
-    for compression in Compression:
-        try:
-            command(compression)
-        except ValueError:
-            pytest.fail(f"unhandled case for {compression}")
+class TestCommand:
+    """Every compression maps to a command, so no member falls through."""
+
+    @pytest.mark.parametrize("compression", list(Compression))
+    def test_total(self, compression: Compression) -> None:
+        """Ensure command is a total function."""
+        command(compression)
