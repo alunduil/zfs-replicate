@@ -98,58 +98,9 @@ alone (for example, `Rejects a snapshot name containing '@'; see #123.`).
 
 ## Mutation testing
 
-Mutation testing measures whether the suite would notice if `zfs/` were wrong.
-Line coverage only records that a line ran. `mutmut` rewrites `zfs/` one small
-edit at a time, flipping a comparison or replacing a literal, and reruns the
-suite against each edit. Each edit is a mutant. The suite kills a mutant that
-makes it fail. A mutant it still passes survives, and names an assertion that
-doesn't constrain the behavior it appears to cover.
-
-The `Score mutant detection` job in
-[`daily.yml`](../../.github/workflows/daily.yml) sweeps the tree nightly and
-writes the tally to its run summary. It gates nothing.
-
-### Run the sweep
-
-```bash
-poetry install --with mutation
-poetry run mutmut run --max-children 1
-poetry run mutmut results
-```
-
-`mutmut run` copies `zfs/` and `zfs_test/` into `mutants/`, builds the mutants,
-and tests each one, which takes roughly a quarter of an hour for the whole tree.
-`mutmut results` then lists everything that survived.
-
-`--max-children 1` is required. The parallel runner mis-attributes child exit
-codes on this suite, so a mutant that survives every time on its own reports as
-killed on some runs and survived on others. Serial verdicts are reproducible.
-
-`mutmut run` also takes names and globs, so
-`mutmut run 'zfs.replicate.snapshot.*'` re-tests one package against the mutants
-already built.
-
-### Read a survivor
-
-Take a name from `mutmut results` and read the edit it stands for:
-
-```bash
-poetry run mutmut show zfs.replicate.snapshot.list.x__snapshot__mutmut_4
-```
-
-Each diff is one of three things:
-
-- **A gap in the suite.** The edit changes what a user would see and nothing
-  caught it. Write a test that fails on the mutated behavior, then
-  `mutmut run <name>` to confirm the mutant dies.
-- **An equivalent mutant.** The edit can't change observable behavior, so no
-  test can kill it. A message string a caller never reads and a `sorted()` call
-  on an already-ordered sequence both land here. Leave it.
-- **Out of reach.** `mutmut` activates a mutant when the mutated function runs.
-  Code that runs while the module is first imported has already finished by
-  then. `# pragma: no mutate block` on the enclosing function excludes it, with
-  a comment giving the reason, as the two Click option groups in
-  [`zfs/replicate/cli/options.py`](../../zfs/replicate/cli/options.py) do.
-
-`mutmut browse` shows the same diffs in a terminal UI and re-tests a mutant in
-place, which saves a round trip while writing the test that kills it.
+A nightly job scores the suite by mutation testing, configured under
+`[tool.mutmut]` in [`pyproject.toml`](../../pyproject.toml). A mutant that
+survives is killed by a new test, recorded as an equivalent mutant in a comment
+at the code, or excluded with `# pragma: no mutate block` and the reason no test
+can reach it. [How to work a surviving
+mutant](../how-to/work-a-surviving-mutant.md) covers running the sweep.

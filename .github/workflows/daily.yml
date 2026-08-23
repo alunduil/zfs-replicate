@@ -90,7 +90,8 @@ jobs:
       - name: poetry install --with mutation
         run: poetry install --with mutation
       # Serial is what makes the verdicts reproducible here;
-      # docs/reference/testing.md records what the parallel runner gets wrong.
+      # docs/how-to/work-a-surviving-mutant.md records what the parallel runner
+      # gets wrong.
       - name: poetry run mutmut run
         run: poetry run mutmut run --max-children 1
       - name: Publish the score

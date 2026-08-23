@@ -58,9 +58,9 @@ For small changes, feel free to use the in GitHub editor or skip running the
 tests locally. Tests are double checked in the pull request automatically.
 
 A nightly job scores the suite by mutation testing, which no contributor needs
-to run per change. [Mutation
-testing](docs/reference/testing.md#mutation-testing) covers running it yourself
-and working through a mutant the suite failed to catch.
+to run per change. [How to work a surviving
+mutant](docs/how-to/work-a-surviving-mutant.md) covers running it yourself and
+dealing with a mutant the suite failed to catch.
 
 Small change examples:
 
