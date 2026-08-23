@@ -102,5 +102,4 @@ A nightly job scores the suite by mutation testing, configured under
 `[tool.mutmut]` in [`pyproject.toml`](../../pyproject.toml). A mutant that
 survives is killed by a new test, recorded as an equivalent mutant in a comment
 at the code, or excluded with `# pragma: no mutate block` and the reason no test
-can reach it. [How to work a surviving
-mutant](../how-to/work-a-surviving-mutant.md) covers running the sweep.
+can reach it.

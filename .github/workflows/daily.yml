@@ -89,9 +89,9 @@ jobs:
           python-version: "3.12"
       - name: poetry install --with mutation
         run: poetry install --with mutation
-      # Serial is what makes the verdicts reproducible here;
-      # docs/how-to/work-a-surviving-mutant.md records what the parallel runner
-      # gets wrong.
+      # Serial keeps the verdicts reproducible: the parallel runner
+      # mis-attributes child exit codes here, so the same mutant reports killed
+      # on one run and survived on the next.
       - name: poetry run mutmut run
         run: poetry run mutmut run --max-children 1
       - name: Publish the score
