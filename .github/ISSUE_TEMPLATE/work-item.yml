@@ -23,8 +23,7 @@ body:
       label: Current behaviour
       description: >-
         Describe what the tree does today, naming the files, jobs, or commands
-        as they stand at HEAD. An implementer starts by reading what you name
-        here.
+        as they stand at HEAD.
       placeholder: >-
         daily.yml runs `mutmut run --max-children 1`, one mutant at a time,
         under a 120-minute cap.
@@ -67,8 +66,8 @@ body:
       label: Out of scope
       description: >-
         Name what this deliberately leaves out, and the issue that carries it
-        if one does. A pull request keeps to one concern, so the boundary is
-        worth stating before the work starts.
+        if one does. A pull request keeps to one concern, so the boundary
+        belongs here.
 
   - type: textarea
     id: acceptance-criteria
@@ -80,8 +79,7 @@ body:
         worth doing.
       placeholder: |
         - [ ] Tests and pre-commit pass
-        - [ ] If the measurement says otherwise, this closes with the numbers
-              recorded, so the next person does not re-derive them
+        - [ ] If the change proves not worth making, this closes with the numbers recorded
     validations:
       required: true
 
