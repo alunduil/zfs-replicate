@@ -42,7 +42,7 @@ body:
       description: >-
         List the conditions that hold when this is done. Write each as a task
         a reviewer can check off.
-      value: |
+      placeholder: |
         - [ ] Tests and pre-commit pass
     validations:
       required: true
