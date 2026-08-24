@@ -98,23 +98,19 @@ src = ["."]
 quote-style = "double"
 
 [tool.ruff.lint]
-# PGH and RUF stand in for the removed pygrep-hooks and yesqa hooks; G for
-# python-no-log-warn; S covers python-no-eval and the bandit rule set.
-#
-# Groups weighed for this list and rejected:
-# A          filesystem.list, filesystem.type, and process.open shadow builtins on purpose.
+# Groups deliberately absent:
+# A          modules named for zfs subcommands shadow list, type, and open.
 # ANN        mypy strict already demands the annotations.
 # COM        COM812 disagrees with ruff format about trailing commas.
 # CPY        the license sits at the repository root, not in file headers.
 # DOC        every rule is preview-gated, so selecting it enforces nothing.
-# FBT        would require making readonly, recursive, and follow_delete keyword-only.
+# FBT        readonly, recursive, and follow_delete would become keyword-only.
 # FIX, TD    work is tracked in issues rather than in-code TODOs.
-# INP        the absent zfs_test __init__.py files are #621.
+# INP        cli_test and task_test still lack an __init__.py.
 # ISC        ruff format already joins implicit string concatenations.
-# PTH        the sole os.path call assembles a zfs dataset name, not a path.
+# PTH        os.path here assembles zfs dataset names, not filesystem paths.
 # TID        the package imports relatively throughout.
-# UP         the annotation rewrites are #501.
-# AIR, DJ, FAST, NPY, PD    frameworks this project does not use.
+# UP         enabling it rewrites about 130 typing annotations.
 select = [
   "ARG",
   "ASYNC",
