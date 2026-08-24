@@ -1,7 +1,5 @@
 """ZFS Snapshot listing."""
 
-import builtins
-
 from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
@@ -10,11 +8,11 @@ from ..stderr import clean
 from .type import Snapshot
 
 
-def list(
+def list_snapshots(
     filesystem: FileSystem,
     recursive: bool,
     ssh_command: Command | None = None,
-) -> builtins.list[Snapshot]:
+) -> list[Snapshot]:
     """List ZFS snapshots."""
     command = _list(filesystem, recursive)
     if ssh_command is not None:
@@ -44,7 +42,7 @@ def _list(filesystem: FileSystem, recursive: bool) -> Command:
     return Command.with_empty_env("zfs", "list", *options, filesystem.name)
 
 
-def _snapshots(zfs_list_output: bytes) -> builtins.list[Snapshot]:
+def _snapshots(zfs_list_output: bytes) -> list[Snapshot]:
     snapshots = [_snapshot(x) for x in zfs_list_output.split(b"\n") if x != b""]
 
     if not snapshots:

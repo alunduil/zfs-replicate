@@ -8,7 +8,7 @@ from ..error import ZFSReplicateError
 from ..list import inits
 from ..stderr import clean
 from . import type
-from .list import list
+from .list import list_filesystems
 from .type import FileSystem
 
 
@@ -19,7 +19,7 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
 
     top_level = type.filesystem(name=filesystem.dataset, readonly=filesystem.readonly)
 
-    filesystems = [x.name for x in list(top_level, ssh_command=ssh_command)]
+    filesystems = [x.name for x in list_filesystems(top_level, ssh_command=ssh_command)]
 
     for head in inits(filesystem.name.split("/"))[1:]:
         path = os.path.join(*head)
