@@ -7,8 +7,7 @@ body:
     attributes:
       value: >-
         Write the title as a statement that is true once the issue is done, so
-        the tracker reads as a list of outcomes. Fill the fields below to carry
-        the motivation, the concrete scope, and the test for completion.
+        the tracker reads as a list of outcomes.
 
   - type: textarea
     id: summary
@@ -40,8 +39,8 @@ body:
     attributes:
       label: Acceptance criteria
       description: >-
-        List the conditions that hold when this is done. Write each as a task
-        a reviewer can check off.
+        List the conditions that hold when this is done, each as a task a
+        reviewer can check off.
       placeholder: |
         - [ ] Tests and pre-commit pass
     validations:
