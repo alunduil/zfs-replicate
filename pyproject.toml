@@ -107,10 +107,8 @@ select = ["E", "F", "I", "B", "SIM", "D", "N", "S", "G010", "PGH", "PL", "RUF100
 "zfs_test/**" = ["PLR2004", "S101"]
 
 [tool.ruff.lint.pydocstyle]
-# Switching to google or numpy would add section markup, not enforcement: D417
-# only inspects an Args section that already exists, while PEP 257 asks for
-# argument, return, and raises documentation where applicable. Sections pay off
-# alongside a generated API reference, which this console script doesn't ship.
+# D203/D211 and D212/D213 are incompatible pairs; naming a convention settles
+# each one instead of leaving ruff to warn and choose.
 convention = "pep257"
 
 [tool.vulture]
