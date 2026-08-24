@@ -1,7 +1,5 @@
 """Tests for zfs.replicate.optional."""
 
-from typing import List, Optional
-
 import pytest
 from hypothesis import given
 from hypothesis.strategies import integers, lists, none, one_of
@@ -27,7 +25,7 @@ class TestValues:
     """Nothing missing survives, and everything present keeps its order."""
 
     @given(lists(one_of(integers(), none())))
-    def test_drops_every_none(self, elements: List[Optional[int]]) -> None:
+    def test_drops_every_none(self, elements: list[int | None]) -> None:
         """No None survives, and a second pass has nothing left to drop."""
         kept = optional.values(*elements)
 
@@ -35,6 +33,6 @@ class TestValues:
         assert optional.values(*kept) == kept
 
     @given(lists(integers()))
-    def test_keeps_present_values_in_order(self, elements: List[int]) -> None:
+    def test_keeps_present_values_in_order(self, elements: list[int]) -> None:
         """Nothing is missing, so everything comes back as it went in."""
         assert optional.values(*elements) == elements

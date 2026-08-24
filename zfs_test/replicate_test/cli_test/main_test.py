@@ -1,6 +1,6 @@
 """zfs.replicate.cli.main tests."""
 
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
 from click.testing import CliRunner, Result

@@ -1,6 +1,7 @@
 """Common List Functions."""
 
-from typing import List, Sequence, Tuple, TypeVar
+from collections.abc import Sequence
+from typing import TypeVar
 
 __all__ = ("inits", "venn")
 
@@ -19,9 +20,9 @@ def inits(elements: Sequence[T]) -> Sequence[Sequence[T]]:
 
 
 def venn(
-    lefts: List[T],
-    rights: List[T],
-) -> Tuple[List[T], List[T], List[T]]:
+    lefts: list[T],
+    rights: list[T],
+) -> tuple[list[T], list[T], list[T]]:
     """Calculate venn diagram of the two sequences.
 
     A venn diagram shows the elements both sets contain individually as

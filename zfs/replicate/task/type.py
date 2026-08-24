@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Optional
 
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
@@ -22,4 +21,4 @@ class Task:
 
     action: Action
     filesystem: FileSystem
-    snapshot: Optional[Snapshot]
+    snapshot: Snapshot | None

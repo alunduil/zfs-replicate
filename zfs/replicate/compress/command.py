@@ -1,7 +1,6 @@
 """ZFS Replication Compression Command Mapping."""
 
 from dataclasses import dataclass
-from typing import Optional
 
 from ..command import Command
 from .type import Compression
@@ -20,7 +19,7 @@ class Commands:
     decompress: Command
 
 
-def command(compression: Compression) -> Optional[Commands]:
+def command(compression: Compression) -> Commands | None:
     """Map a compression to its local compress and remote decompress commands.
 
     ``OFF`` yields ``None`` -- no compression stage.

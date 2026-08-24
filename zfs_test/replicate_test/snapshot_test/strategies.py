@@ -1,7 +1,7 @@
 """Snapshot Hypothesis Strategies."""
 
 import string
-from typing import Any, Dict
+from typing import Any
 
 from hypothesis.strategies import (
     SearchStrategy,
@@ -24,7 +24,7 @@ def _non_empty_name(suffix: str) -> str:
 
 _FILESYSTEMS = text(_ROUND_TRIP_SAFE).map(_non_empty_name).map(filesystem)
 
-_SNAPSHOTS_DICT: Dict[str, SearchStrategy[Any]] = {
+_SNAPSHOTS_DICT: dict[str, SearchStrategy[Any]] = {
     "filesystem": _FILESYSTEMS,
     "name": text(_ROUND_TRIP_SAFE),
     "timestamp": integers(),

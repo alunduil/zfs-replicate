@@ -2,7 +2,7 @@
 
 import itertools
 import operator
-from typing import Dict, Iterable, List
+from collections.abc import Iterable
 
 from hypothesis import given
 from hypothesis.strategies import lists
@@ -32,7 +32,7 @@ _STALE = _snapshot(_DESTINATION, "stale", 3)
 
 # A fixture cannot do this grouping: the value it groups is drawn per example
 # rather than resolved once.
-def _by_filesystem(snapshots: Iterable[Snapshot]) -> Dict[FileSystem, List[Snapshot]]:
+def _by_filesystem(snapshots: Iterable[Snapshot]) -> dict[FileSystem, list[Snapshot]]:
     return {
         k: list(v)
         for (k, v) in itertools.groupby(
@@ -50,7 +50,7 @@ class TestGenerate:
         assert not generate(filesystem("pool/filesystem"), {}, {})
 
     @given(lists(SNAPSHOTS))
-    def test_empty_remotes(self, snapshots: List[Snapshot]) -> None:
+    def test_empty_remotes(self, snapshots: list[Snapshot]) -> None:
         """Generate with empty remotes."""
         snapshots_by_fs = _by_filesystem(snapshots)
 
@@ -62,7 +62,7 @@ class TestGenerate:
         )
 
     @given(lists(SNAPSHOTS))
-    def test_empty_locals(self, snapshots: List[Snapshot]) -> None:
+    def test_empty_locals(self, snapshots: list[Snapshot]) -> None:
         """Generate with empty locals."""
         snapshots_by_fs = _by_filesystem(snapshots)
 
@@ -74,7 +74,7 @@ class TestGenerate:
         assert all(t.action == Action.DESTROY for t in result)
 
     @given(lists(SNAPSHOTS))
-    def test_empty_locals_remote_prefixed(self, snapshots: List[Snapshot]) -> None:
+    def test_empty_locals_remote_prefixed(self, snapshots: list[Snapshot]) -> None:
         """Generate with empty locals and prefixed remotes."""
         remote = filesystem("backup")
         snapshots_by_fs = {remote_filesystem(remote, k): v for (k, v) in _by_filesystem(snapshots).items()}

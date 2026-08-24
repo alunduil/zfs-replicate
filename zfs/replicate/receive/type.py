@@ -1,7 +1,7 @@
 """ZFS Receive Type."""
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import List, Mapping
 
 
 @dataclass(frozen=True)
@@ -17,7 +17,7 @@ class Options:
     resume: bool = False
     properties: Mapping[str, str] = field(default_factory=dict)
 
-    def to_flags(self) -> List[str]:
+    def to_flags(self) -> list[str]:
         """Render these settings as ``zfs receive`` argv tokens (the caller adds ``-d``).
 
         Each ``-o`` property is two tokens (``"-o"`` then ``"key=value"``) so

@@ -1,7 +1,6 @@
 """ZFS Snapshot Send."""
 
 from dataclasses import dataclass
-from typing import List, Optional
 
 from .. import compress, filesystem, optional, process, receive
 from ..command import Command, over_ssh
@@ -24,11 +23,11 @@ class Pipeline:
     """
 
     send: Command
-    compress: Optional[Command]
+    compress: Command | None
     receive: Command
 
     @property
-    def stages(self) -> List[Command]:
+    def stages(self) -> list[Command]:
         """The commands to run, in pipeline order."""
         return optional.values(self.send, self.compress, self.receive)
 
@@ -41,7 +40,7 @@ def send(  # noqa: PLR0913 -- carries the full replication call surface
     compression: Compression,
     send_options: SendOptions,
     receive_options: receive.Options,
-    previous: Optional[Snapshot] = None,
+    previous: Snapshot | None = None,
 ) -> None:
     """Send ZFS Snapshot."""
     pipeline = _pipeline(
@@ -69,7 +68,7 @@ def _pipeline(  # noqa: PLR0913 -- carries the full replication call surface
     compression: Compression,
     send_options: SendOptions,
     receive_options: receive.Options,
-    previous: Optional[Snapshot] = None,
+    previous: Snapshot | None = None,
 ) -> Pipeline:
     """Assemble the pipeline that replicates ``current`` onto ``remote``, spawning nothing."""
     send_command = _send(current, previous, options=send_options)
@@ -102,7 +101,7 @@ def _raise_for_failure(current: Snapshot, returncode: int, error: bytes) -> None
 
 def _send(
     current: Snapshot,
-    previous: Optional[Snapshot] = None,
+    previous: Snapshot | None = None,
     *,
     options: SendOptions,
 ) -> Command:

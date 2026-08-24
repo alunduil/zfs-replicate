@@ -1,7 +1,5 @@
 """zfs_test.replicate_test.snapshot_test.strategies tests."""
 
-from typing import Set
-
 from hypothesis import given
 
 import zfs_test.replicate_test.snapshot_test.strategies as sut
@@ -16,8 +14,8 @@ class TestSnapshots:
         assert len(_drawn_filesystem_names()) > 1
 
 
-def _drawn_filesystem_names() -> Set[str]:
-    names: Set[str] = set()
+def _drawn_filesystem_names() -> set[str]:
+    names: set[str] = set()
 
     @given(sut.SNAPSHOTS)
     def collect(snapshot: Snapshot) -> None:

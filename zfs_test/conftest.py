@@ -2,7 +2,7 @@
 
 import os
 import subprocess
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
 from hypothesis import HealthCheck, settings
