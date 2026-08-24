@@ -1,8 +1,9 @@
 # Testing conventions
 
 The conventions the `zfs_test/` suite follows. Tests run under `pytest` with
-`--doctest-modules --cov=zfs --cov-report=term-missing` (configured in
-[`pyproject.toml`](../../pyproject.toml)); `testpaths` is `zfs_test`.
+`--doctest-modules` (configured in [`pyproject.toml`](../../pyproject.toml));
+`testpaths` is `zfs_test`. Coverage is off by default. Run
+`pytest --cov --cov-report=term-missing` to measure it locally.
 
 Test order is randomized, so pass `-p no:randomly` to reproduce a failure that
 only appears in some runs.

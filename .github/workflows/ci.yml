@@ -58,13 +58,39 @@ jobs:
         run: poetry install
       - name: poetry run pytest
         run: poetry run pytest
-      - name: poetry run coveralls
-        if: matrix.python-version == '3.x'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          poetry run pytest
-          poetry run coveralls --service=github || poetry run coveralls --service=github-actions
+
+  # Coverage measures which lines ran, so every matrix leg would upload the
+  # same report. A job of its own also keeps a Codecov outage out of a check
+  # named for a Python version.
+  coverage:
+    name: Report coverage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      # A job-level block replaces the workflow-level one rather than
+      # merging, so the checkout needs `contents` named again here.
+      contents: read
+      # codecov-action authenticates by OIDC, so there is no upload token to
+      # store or rotate.
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-poetry
+        with:
+          python-version: "3.12"
+      - name: poetry install
+        run: poetry install
+      - name: poetry run pytest --cov
+        run: poetry run pytest --cov --cov-report=xml
+      # A fork's pull request gets a read-only GITHUB_TOKEN, which downgrades
+      # the id-token: write above and leaves OIDC nothing to present. Failing
+      # here would block a contributor who cannot grant it, so skip instead.
+      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        if: github.event.pull_request.head.repo.fork != true
+        with:
+          use_oidc: true
+          files: coverage.xml
+          fail_ci_if_error: true
 
   cli-entry-point:
     name: Check CLI entry point ${{ matrix.python-version }}
