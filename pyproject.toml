@@ -161,6 +161,8 @@ select = [
 "zfs_test/**" = ["PLR2004", "S101"]
 
 [tool.ruff.lint.pydocstyle]
+# D203/D211 and D212/D213 are incompatible pairs; naming a convention settles
+# each one instead of leaving ruff to warn and choose.
 convention = "pep257"
 
 [tool.vulture]
