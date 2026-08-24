@@ -32,16 +32,14 @@ class Snapshot:
     def _key(self) -> Tuple[str, int]:
         """Fields two equal Snapshots agree on exactly.
 
-        Hashing what __eq__ compares exactly holds equal Snapshots to equal
-        hashes.  The filesystem stays out because equality accepts a suffix
-        match, so equal Snapshots can carry different filesystem names, and
-        previous stays out because equality ignores it.
+        The filesystem is absent because equality accepts a suffix match, so
+        equal Snapshots can carry different filesystem names.
         """
         return self.name, self.timestamp
 
 
 def _same_filesystem(left: FileSystem, right: FileSystem) -> bool:
-    """Whether two filesystems hold the same dataset.
+    """Whether the two name the same filesystem.
 
     zfs list reports a remote filesystem under the destination's name, leaving
     the local name a slash-aligned suffix of the remote one.

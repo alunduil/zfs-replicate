@@ -17,11 +17,11 @@ class TestSnapshots:
 
 
 class TestRebasedSnapshots:
-    """Drawn pairs differ in filesystem name yet compare equal."""
+    """Drawn pairs stand in for a local snapshot and its remote counterpart."""
 
     @given(sut.REBASED_SNAPSHOTS)
     def test_rebased(self, rebased: Tuple[Snapshot, Snapshot]) -> None:
-        """REBASED_SNAPSHOTS draws pairs that equality spans and identity does not."""
+        """REBASED_SNAPSHOTS draws pairs with differing filesystems that compare equal."""
         local, remote = rebased
         assert local.filesystem != remote.filesystem
         assert local == remote

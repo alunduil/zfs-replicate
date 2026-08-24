@@ -43,6 +43,5 @@ def _rebase(drawn: Tuple[Snapshot, str]) -> Tuple[Snapshot, Snapshot]:
     return snapshot, replace(snapshot, filesystem=filesystem(f"{parent}/{snapshot.filesystem.name}"))
 
 
-# A remote filesystem carries the destination's name ahead of the local one, which is the case
-# Snapshot equality spans.
+# Pairs whose fields differ but which Snapshot equality treats as one.
 REBASED_SNAPSHOTS = tuples(SNAPSHOTS, _NAMES).map(_rebase)

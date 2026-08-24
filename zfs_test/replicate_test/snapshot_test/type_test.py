@@ -37,7 +37,7 @@ class TestSnapshotEq:
 
 
 class TestSnapshotHash:
-    """``Snapshot.__hash__`` collapses the fields ``__eq__`` is free to differ on."""
+    """``Snapshot.__hash__`` holds equal Snapshots to one hash."""
 
     @given(REBASED_SNAPSHOTS)
     def test_ignores_filesystem(self, rebased: Tuple[Snapshot, Snapshot]) -> None:
@@ -52,7 +52,7 @@ class TestSnapshotHash:
         assert remote in {local}
 
     def test_ignores_previous(self) -> None:
-        """A snapshot hashes as one differing only in previous; see #502."""
+        """Two snapshots differing only in previous share a hash; see #502."""
         zero = Snapshot(filesystem=filesystem(""), name="", previous=None, timestamp=0)
         previous = Snapshot(filesystem=filesystem(""), name="", previous=zero, timestamp=0)
         assert hash(zero) == hash(previous)
