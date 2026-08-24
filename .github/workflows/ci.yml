@@ -82,7 +82,11 @@ jobs:
         run: poetry install
       - name: poetry run pytest --cov
         run: poetry run pytest --cov=zfs --cov-report=xml
+      # A fork's pull request gets a read-only GITHUB_TOKEN, so the
+      # id-token: write above is downgraded and OIDC has nothing to present.
+      # Skipping beats failing a check the contributor cannot act on.
       - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        if: github.event.pull_request.head.repo.fork != true
         with:
           use_oidc: true
           files: coverage.xml
