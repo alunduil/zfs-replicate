@@ -1,6 +1,6 @@
 """Replication Tasks."""
 
-from typing import Dict, Iterable, List
+from collections.abc import Iterable
 
 from ..filesystem import FileSystem, remote_filesystem
 from ..list import venn
@@ -8,20 +8,20 @@ from ..snapshot import Snapshot
 from .type import Action, Task
 
 
-def _destroy_snapshots(destination: FileSystem, snapshots: Iterable[Snapshot]) -> List[Task]:
+def _destroy_snapshots(destination: FileSystem, snapshots: Iterable[Snapshot]) -> list[Task]:
     return [Task(action=Action.DESTROY, filesystem=destination, snapshot=s) for s in snapshots]
 
 
-def _send_snapshots(remote: FileSystem, snapshots: Iterable[Snapshot]) -> List[Task]:
+def _send_snapshots(remote: FileSystem, snapshots: Iterable[Snapshot]) -> list[Task]:
     return [Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in snapshots]
 
 
 def generate(
     remote: FileSystem,
-    local_snapshots: Dict[FileSystem, List[Snapshot]],
-    remote_snapshots: Dict[FileSystem, List[Snapshot]],
+    local_snapshots: dict[FileSystem, list[Snapshot]],
+    remote_snapshots: dict[FileSystem, list[Snapshot]],
     follow_delete: bool = False,
-) -> List[Task]:
+) -> list[Task]:
     """Generate Tasks for replicating local snapshots to remote snapshots."""
     tasks = []
 

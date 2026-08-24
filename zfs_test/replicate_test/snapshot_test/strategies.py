@@ -2,7 +2,7 @@
 
 import string
 from dataclasses import replace
-from typing import Any, Dict, Tuple
+from typing import Any
 
 from hypothesis.strategies import (
     SearchStrategy,
@@ -28,7 +28,7 @@ _NAMES = text(_ROUND_TRIP_SAFE).map(_non_empty_name)
 
 _FILESYSTEMS = _NAMES.map(filesystem)
 
-_SNAPSHOTS_DICT: Dict[str, SearchStrategy[Any]] = {
+_SNAPSHOTS_DICT: dict[str, SearchStrategy[Any]] = {
     "filesystem": _FILESYSTEMS,
     "name": text(_ROUND_TRIP_SAFE),
     "timestamp": integers(),
@@ -37,7 +37,7 @@ _SNAPSHOTS_DICT: Dict[str, SearchStrategy[Any]] = {
 SNAPSHOTS = fixed_dictionaries(_SNAPSHOTS_DICT).map(lambda kwargs: Snapshot(**kwargs))
 
 
-def _rebase(drawn: Tuple[Snapshot, str]) -> Tuple[Snapshot, Snapshot]:
+def _rebase(drawn: tuple[Snapshot, str]) -> tuple[Snapshot, Snapshot]:
     snapshot, parent = drawn
 
     return snapshot, replace(snapshot, filesystem=filesystem(f"{parent}/{snapshot.filesystem.name}"))

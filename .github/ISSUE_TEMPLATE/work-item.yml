@@ -1,0 +1,91 @@
+---
+name: Work item
+description: Track planned development work with a definition of done.
+type: Task
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Write the title as a statement that is true once the issue is done, so
+        the tracker reads as a list of outcomes.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: State the change in a sentence or two.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behaviour
+    attributes:
+      label: Current behaviour
+      description: >-
+        Describe what the tree does today, naming the files, jobs, or commands
+        as they stand at HEAD.
+      placeholder: >-
+        daily.yml runs `mutmut run --max-children 1`, one mutant at a time,
+        under a 120-minute cap.
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: >-
+        Explain what this unblocks or improves, for whom, and what changed to
+        make it worth doing now.
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Approach and alternatives
+      description: >-
+        Describe the approach you have in mind and the ones you set aside.
+        Where a claim is about speed or size, give the numbers and say where
+        they came from.
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Name the modules, workflows, and documents the change touches.
+      placeholder: >-
+        zfs/replicate/snapshot/send.py, .github/workflows/daily.yml,
+        docs/reference/testing.md
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: >-
+        Name what this deliberately leaves out, and the issue that carries it
+        if one does. A pull request keeps to one concern, so the boundary
+        belongs here.
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: >-
+        List the conditions that hold when this is done, each as a task a
+        reviewer can check off. Cover the outcome where the work proves not
+        worth doing.
+      placeholder: |
+        - [ ] Tests and pre-commit pass
+        - [ ] If the change proves not worth making, this closes with the numbers recorded
+    validations:
+      required: true
+
+  - type: textarea
+    id: related-issues
+    attributes:
+      label: Related issues
+      description: >-
+        Add a blocked-by relationship for anything this cannot ship without.
+        Use this field for what the relationship does not record: what each
+        issue contributes.
+      placeholder: >-
+        #679 settles the import alias, which has to land before a check for it
+        can go on.

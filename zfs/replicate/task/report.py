@@ -1,7 +1,6 @@
 """Task Reporting Functions."""
 
 import itertools
-from typing import List, Tuple
 
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
@@ -12,7 +11,7 @@ LIMITS = {"filesystem": 6, "action": 4, "snapshot": 13}
 AFTERS = {"filesystem": "action", "action": "snapshot"}
 
 
-def report(tasks: List[Task]) -> str:
+def report(tasks: list[Task]) -> str:
     """Pretty printed report on given Tasks."""
     filesystems = [
         (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
@@ -24,7 +23,7 @@ def report(tasks: List[Task]) -> str:
     return _report_filesystem(filesystems)
 
 
-def _report_filesystem(filesystems: List[Tuple[FileSystem, List[Task]]]) -> str:
+def _report_filesystem(filesystems: list[tuple[FileSystem, list[Task]]]) -> str:
     output = ""
 
     for filesystem, tasks in filesystems:
@@ -40,7 +39,7 @@ def _report_filesystem(filesystems: List[Tuple[FileSystem, List[Task]]]) -> str:
     return output
 
 
-def _report_action(actions: List[Tuple[Action, List[Task]]], indentation: str = "") -> str:
+def _report_action(actions: list[tuple[Action, list[Task]]], indentation: str = "") -> str:
     output = ""
 
     for action, tasks in actions:
@@ -60,7 +59,7 @@ def _report_action(actions: List[Tuple[Action, List[Task]]], indentation: str = 
     return output
 
 
-def _report_snapshot(snapshots: List[Tuple[Snapshot, List[Task]]], indentation: str = "") -> str:
+def _report_snapshot(snapshots: list[tuple[Snapshot, list[Task]]], indentation: str = "") -> str:
     output = "\n".join([f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s, _ in snapshots])
 
     if output:
@@ -69,7 +68,7 @@ def _report_snapshot(snapshots: List[Tuple[Snapshot, List[Task]]], indentation: 
     return output
 
 
-def _counts(current: str, tasks: List[Task], indentation: str = "") -> str:
+def _counts(current: str, tasks: list[Task], indentation: str = "") -> str:
     group = {getattr(x, current) for x in tasks}
 
     output = f"{indentation}{current}:{len(group)}\n"

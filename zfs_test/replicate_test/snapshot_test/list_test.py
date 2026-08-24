@@ -1,7 +1,5 @@
 """zfs.replicate.snapshot tests."""
 
-from typing import List
-
 from hypothesis import given
 from hypothesis.strategies import lists
 
@@ -18,13 +16,13 @@ class TestList:
     """
 
     @given(lists(SNAPSHOTS))
-    def test_snapshots(self, snapshots: List[Snapshot]) -> None:
+    def test_snapshots(self, snapshots: list[Snapshot]) -> None:
         """_snapshots."""
         output = "\n".join([_output(s) for s in snapshots])
         assert _snapshots(output.encode()) == snapshots
 
     @given(lists(SNAPSHOTS, min_size=1))
-    def test_snapshots_depth(self, snapshots: List[Snapshot]) -> None:
+    def test_snapshots_depth(self, snapshots: list[Snapshot]) -> None:
         """Ensure max depth of 2."""
         output = "\n".join([_output(s) for s in snapshots])
         assert max(map(_depth, _snapshots(output.encode()))) <= 2

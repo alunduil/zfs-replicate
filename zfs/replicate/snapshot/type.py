@@ -1,7 +1,7 @@
 """ZFS Snapshot Type."""
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
 from ..filesystem import FileSystem
 
@@ -29,7 +29,7 @@ class Snapshot:
         """Hash of a Snapshot."""
         return hash(self._key())
 
-    def _key(self) -> Tuple[str, int]:
+    def _key(self) -> tuple[str, int]:
         """Fields two equal Snapshots agree on exactly.
 
         The filesystem is absent because equality accepts a suffix match, so

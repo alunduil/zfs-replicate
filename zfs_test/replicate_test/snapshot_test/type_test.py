@@ -1,7 +1,5 @@
 """zfs.replicate.snapshot.type tests."""
 
-from typing import Tuple
-
 from hypothesis import given
 
 from zfs.replicate.filesystem.type import filesystem
@@ -40,13 +38,13 @@ class TestSnapshotHash:
     """``Snapshot.__hash__`` holds equal Snapshots to one hash."""
 
     @given(REBASED_SNAPSHOTS)
-    def test_ignores_filesystem(self, rebased: Tuple[Snapshot, Snapshot]) -> None:
+    def test_ignores_filesystem(self, rebased: tuple[Snapshot, Snapshot]) -> None:
         """A remote rebased under another dataset hashes as its local origin; see #502."""
         local, remote = rebased
         assert hash(local) == hash(remote)
 
     @given(REBASED_SNAPSHOTS)
-    def test_set_membership(self, rebased: Tuple[Snapshot, Snapshot]) -> None:
+    def test_set_membership(self, rebased: tuple[Snapshot, Snapshot]) -> None:
         """A set holding a local snapshot contains its rebased remote; see #502."""
         local, remote = rebased
         assert remote in {local}
