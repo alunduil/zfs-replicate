@@ -22,9 +22,9 @@ zfs-replicate = "zfs.replicate.cli.main:main"
 repository = "https://github.com/alunduil/zfs-replicate"
 
 [tool.coverage.run]
-# The XML report names files relative to its <source>. Unset, that source is
-# the runner's absolute checkout path, which Codecov has to strip before the
-# names reach the zfs/ paths it reports against.
+# relative_files keeps the XML report's <source> from being the runner's
+# absolute checkout path, which Codecov would have to strip before the
+# filenames reach the zfs/ paths it reports against.
 relative_files = true
 source = ["zfs"]
 
@@ -83,8 +83,8 @@ pytest-mock = "==3.15.1"
 pytest-randomly = "==4.1.0"
 
 [tool.pytest.ini_options]
-# Coverage stays off by default so the version matrix and mutmut's per-mutant
-# runs don't pay for it; the CI coverage job passes --cov on the command line.
+# Coverage is off here so the version matrix and mutmut's per-mutant runs
+# don't pay for it. The callers that want it pass --cov on the command line.
 addopts = "--doctest-modules"
 testpaths = ["zfs_test"]
 

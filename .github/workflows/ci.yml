@@ -59,9 +59,9 @@ jobs:
       - name: poetry run pytest
         run: poetry run pytest
 
-  # Separate from the matrix, on one version: coverage measures which lines
-  # ran, so every leg would upload the same report, and a Codecov outage would
-  # fail a check named for a Python version.
+  # Coverage measures which lines ran, so every matrix leg would upload the
+  # same report. A job of its own also keeps a Codecov outage out of a check
+  # named for a Python version.
   coverage:
     name: Report coverage
     runs-on: ubuntu-24.04
@@ -82,9 +82,9 @@ jobs:
         run: poetry install
       - name: poetry run pytest --cov
         run: poetry run pytest --cov --cov-report=xml
-      # A fork's pull request gets a read-only GITHUB_TOKEN, so the
-      # id-token: write above is downgraded and OIDC has nothing to present.
-      # Skipping beats failing a check the contributor cannot act on.
+      # A fork's pull request gets a read-only GITHUB_TOKEN, which downgrades
+      # the id-token: write above and leaves OIDC nothing to present. Failing
+      # here would block a contributor who cannot grant it, so skip instead.
       - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         if: github.event.pull_request.head.repo.fork != true
         with:
