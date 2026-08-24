@@ -1,0 +1,54 @@
+---
+name: Work item
+description: Track planned development work with a definition of done.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Write the title as a statement that is true once the issue is done, so
+        the tracker reads as a list of outcomes. Fill the fields below to carry
+        the motivation, the concrete scope, and the test for completion.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: State the change in a sentence or two.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Explain what this unblocks or improves, and for whom.
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: Name the modules, commands, and documents the change touches.
+      placeholder: zfs/replicate/snapshot/send.py, zfs/replicate/cli/options.py
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: >-
+        List the conditions that hold when this is done. Write each as a task
+        a reviewer can check off.
+      value: |
+        - [ ] Tests and pre-commit pass
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Link related issues, prior discussion, or upstream references.
