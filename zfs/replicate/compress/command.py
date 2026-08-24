@@ -33,4 +33,5 @@ def command(compression: Compression) -> Commands | None:
     if compression == Compression.OFF:
         return None
 
-    raise ValueError(f"invalid compression: '{compression}'", compression)
+    msg = f"invalid compression: '{compression}'"
+    raise ValueError(msg, compression)

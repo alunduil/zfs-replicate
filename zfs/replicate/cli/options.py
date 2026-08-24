@@ -168,7 +168,8 @@ def _parse_properties(properties: tuple[str, ...]) -> dict[str, str]:
     for item in properties:
         key, separator, value = item.partition("=")
         if not separator or not key:
-            raise click.BadParameter(f"expected KEY=VALUE, got {item!r}", param_hint="--receive-set")
+            msg = f"expected KEY=VALUE, got {item!r}"
+            raise click.BadParameter(msg, param_hint="--receive-set")
         parsed[key] = value
 
     return parsed

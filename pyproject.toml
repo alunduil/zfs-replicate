@@ -98,9 +98,63 @@ src = ["."]
 quote-style = "double"
 
 [tool.ruff.lint]
-# PGH and RUF100 stand in for the removed pygrep-hooks and yesqa hooks; G010 for
-# python-no-log-warn; S (above) covers python-no-eval and the bandit rule set.
-select = ["E", "F", "I", "B", "SIM", "D", "N", "S", "G010", "PGH", "PL", "RUF100", "UP"]
+# Groups deliberately absent:
+# A          the public API is named for zfs subcommands: list, type, open.
+# ANN        mypy strict already demands the annotations.
+# COM        COM812 disagrees with ruff format about trailing commas.
+# CPY        the license sits at the repository root, not in file headers.
+# DOC        every rule is preview-gated, so selecting it enforces nothing.
+# FBT        readonly, recursive, and follow_delete would become keyword-only.
+# FIX, TD    work is tracked in issues rather than in-code TODOs.
+# INP        cli_test and task_test still lack an __init__.py.
+# ISC        ruff format already joins implicit string concatenations.
+# PTH        os.path here assembles zfs dataset names, not filesystem paths.
+# TID        the package imports relatively throughout.
+select = [
+  "ARG",
+  "ASYNC",
+  "B",
+  "BLE",
+  "C4",
+  "C90",
+  "D",
+  "DTZ",
+  "E",
+  "EM",
+  "ERA",
+  "EXE",
+  "F",
+  "FA",
+  "FLY",
+  "FURB",
+  "G",
+  "I",
+  "ICN",
+  "INT",
+  "LOG",
+  "N",
+  "PERF",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PYI",
+  "Q",
+  "RET",
+  "RSE",
+  "RUF",
+  "S",
+  "SIM",
+  "SLF",
+  "SLOT",
+  "T10",
+  "T20",
+  "TC",
+  "TRY",
+  "UP",
+  "W",
+  "YTT"
+]
 
 [tool.ruff.lint.per-file-ignores]
 # Tests assert (S101) and compare against literal expectations (PLR2004) by design.

@@ -47,7 +47,7 @@ class TestSnapshotHash:
     def test_set_membership(self, rebased: tuple[Snapshot, Snapshot]) -> None:
         """A set holding a local snapshot contains its rebased remote; see #502."""
         local, remote = rebased
-        assert remote in {local}
+        assert remote in {local}  # noqa: FURB171 -- set lookup is the point; equality skips __hash__
 
     def test_ignores_previous(self) -> None:
         """Two snapshots differing only in previous share a hash; see #502."""

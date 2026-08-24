@@ -14,11 +14,8 @@ def destroy(filesystem: FileSystem, ssh_command: Command) -> None:
     if result.returncode:
         error = clean(result.stderr)
 
-        raise ZFSReplicateError(
-            f"unable to destroy dataset: '{filesystem.dataset}': {error!r}",
-            filesystem,
-            error,
-        )
+        msg = f"unable to destroy dataset: '{filesystem.dataset}': {error!r}"
+        raise ZFSReplicateError(msg, filesystem, error)
 
 
 def _destroy(filesystem: FileSystem) -> Command:

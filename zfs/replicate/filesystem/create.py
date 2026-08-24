@@ -15,7 +15,8 @@ from .type import FileSystem
 def create(filesystem: FileSystem, ssh_command: Command) -> None:
     """Create a Remote FileSystem."""
     if filesystem.name is None:
-        raise ZFSReplicateError(f"refusing to create dataset: '{filesystem.dataset}'", filesystem)
+        msg = f"refusing to create dataset: '{filesystem.dataset}'"
+        raise ZFSReplicateError(msg, filesystem)
 
     top_level = type.filesystem(name=filesystem.dataset, readonly=filesystem.readonly)
 
@@ -35,11 +36,8 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
             if b"successfully created, but not mounted" in error:
                 return  # Ignore this error.
 
-            raise ZFSReplicateError(
-                f"unable to create remote dataset: '{filesystem.dataset}': {error!r}",
-                filesystem,
-                error,
-            )
+            msg = f"unable to create remote dataset: '{filesystem.dataset}': {error!r}"
+            raise ZFSReplicateError(msg, filesystem, error)
 
 
 def _create(filesystem: str) -> Command:

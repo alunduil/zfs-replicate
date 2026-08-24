@@ -26,11 +26,8 @@ def list_snapshots(
     if result.returncode:
         error = clean(result.stderr)
 
-        raise ZFSReplicateError(
-            f"error encountered while listing snapshots of '{filesystem.name}': {error!r}",
-            filesystem,
-            error,
-        )
+        msg = f"error encountered while listing snapshots of '{filesystem.name}': {error!r}"
+        raise ZFSReplicateError(msg, filesystem, error)
 
     return _snapshots(result.stdout)
 
