@@ -1,7 +1,8 @@
 """Snapshot Hypothesis Strategies."""
 
 import string
-from typing import Any, Dict
+from dataclasses import replace
+from typing import Any, Dict, Tuple
 
 from hypothesis.strategies import (
     SearchStrategy,
@@ -9,6 +10,7 @@ from hypothesis.strategies import (
     integers,
     none,
     text,
+    tuples,
 )
 
 from zfs.replicate.filesystem.type import filesystem
@@ -31,3 +33,14 @@ _SNAPSHOTS_DICT: Dict[str, SearchStrategy[Any]] = {
     "previous": none(),
 }
 SNAPSHOTS = fixed_dictionaries(_SNAPSHOTS_DICT).map(lambda kwargs: Snapshot(**kwargs))
+
+
+def _rebase(drawn: Tuple[Snapshot, str]) -> Tuple[Snapshot, Snapshot]:
+    snapshot, parent = drawn
+
+    return snapshot, replace(snapshot, filesystem=filesystem(f"{parent}/{snapshot.filesystem.name}"))
+
+
+# A remote filesystem carries the destination's name ahead of the local one, which is the case
+# Snapshot equality spans.
+REBASED_SNAPSHOTS = tuples(SNAPSHOTS, text(_ROUND_TRIP_SAFE).map(_non_empty_name)).map(_rebase)
