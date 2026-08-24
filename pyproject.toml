@@ -26,6 +26,7 @@ repository = "https://github.com/alunduil/zfs-replicate"
 # the runner's absolute checkout path, which Codecov has to strip before the
 # names reach the zfs/ paths it reports against.
 relative_files = true
+source = ["zfs"]
 
 [tool.fawltydeps]
 ignore_unused = ["mutmut", "pytest-cov", "pytest-randomly", "vale"]
