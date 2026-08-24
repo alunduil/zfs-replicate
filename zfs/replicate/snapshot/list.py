@@ -25,8 +25,9 @@ def list(
     if result.returncode:
         error = clean(result.stderr)
 
+        msg = f"error encountered while listing snapshots of '{filesystem.name}': {error!r}"
         raise ZFSReplicateError(
-            f"error encountered while listing snapshots of '{filesystem.name}': {error!r}",
+            msg,
             filesystem,
             error,
         )

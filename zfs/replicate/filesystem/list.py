@@ -20,8 +20,9 @@ def list(filesystem: FileSystem, ssh_command: Command) -> List[FileSystem]:
     if result.returncode:
         error = clean(result.stderr)
 
+        msg = f"error encountered while listing filesystems of '{filesystem.name}': {error!r}"
         raise ZFSReplicateError(
-            f"error encountered while listing filesystems of '{filesystem.name}': {error!r}",
+            msg,
             filesystem,
             error,
         )

@@ -17,7 +17,7 @@ class EnumChoice(click.Choice[str]):
 
         choices = [x.lower() for x in enum._member_names_]
 
-        super().__init__(list(sorted(set(choices))))
+        super().__init__(sorted(set(choices)))
 
     def convert(self, value: Any, param: Any, ctx: Any) -> Any:
         """Convert string value to Enum value."""
