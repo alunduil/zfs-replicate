@@ -13,7 +13,10 @@ def list_snapshots(
     recursive: bool,
     ssh_command: Command | None = None,
 ) -> list[Snapshot]:
-    """List ZFS snapshots."""
+    """List ZFS snapshots, each chained to its predecessor in the same filesystem.
+
+    The ``previous`` link is what a later send turns into ``zfs send -i``.
+    """
     command = _list(filesystem, recursive)
     if ssh_command is not None:
         command = over_ssh(ssh_command, command)
