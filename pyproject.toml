@@ -21,8 +21,14 @@ zfs-replicate = "zfs.replicate.cli.main:main"
 [project.urls]
 repository = "https://github.com/alunduil/zfs-replicate"
 
+[tool.coverage.run]
+# The XML report names files relative to its <source>. Unset, that source is
+# the runner's absolute checkout path, which Codecov has to strip before the
+# names reach the zfs/ paths it reports against.
+relative_files = true
+
 [tool.fawltydeps]
-ignore_unused = ["coveralls", "mutmut", "pytest-cov", "pytest-randomly", "vale"]
+ignore_unused = ["mutmut", "pytest-cov", "pytest-randomly", "vale"]
 
 [tool.mutmut]
 # mutmut runs pytest from a copy of the tree under mutants/, so testpaths only
@@ -67,7 +73,6 @@ optional = true
 mutmut = "==3.7.0"
 
 [tool.poetry.group.test.dependencies]
-coveralls = "==4.1.0"
 hypothesis = "6.165.10"
 # The floor is the first release past GHSA-6w46-j5rx-g56g (tmpdir handling);
 # anything older resolves into the advisory range and fails dependency review.
@@ -77,7 +82,9 @@ pytest-mock = "==3.15.1"
 pytest-randomly = "==4.1.0"
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --cov=zfs --cov-report=term-missing"
+# Coverage stays off by default so the version matrix and mutmut's per-mutant
+# runs don't pay for it; the CI coverage job passes --cov on the command line.
+addopts = "--doctest-modules"
 testpaths = ["zfs_test"]
 
 [tool.ruff]
