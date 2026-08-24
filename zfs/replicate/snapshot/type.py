@@ -7,7 +7,7 @@ from ..filesystem import FileSystem
 
 
 @dataclass(frozen=True)
-class Snapshot:  # noqa: PLW1641 -- frozen dataclass generates __hash__; ruff sees only the explicit __eq__
+class Snapshot:
     """ZFS Snapshot Type."""
 
     filesystem: FileSystem
@@ -23,8 +23,25 @@ class Snapshot:  # noqa: PLW1641 -- frozen dataclass generates __hash__; ruff se
         if not isinstance(other, Snapshot):
             raise NotImplementedError
 
-        left = self.filesystem.name
-        right = other.filesystem.name
-        is_suffix = left == right or left.endswith("/" + right) or right.endswith("/" + left)
+        return _same_filesystem(self.filesystem, other.filesystem) and self._key() == other._key()
 
-        return is_suffix and self.name == other.name and self.timestamp == other.timestamp
+    def __hash__(self) -> int:
+        """Hash of a Snapshot."""
+        return hash(self._key())
+
+    def _key(self) -> tuple[str, int]:
+        """Fields two equal Snapshots agree on exactly.
+
+        The filesystem is absent because equality accepts a suffix match, so
+        equal Snapshots can carry different filesystem names.
+        """
+        return self.name, self.timestamp
+
+
+def _same_filesystem(left: FileSystem, right: FileSystem) -> bool:
+    """Whether the two name the same filesystem.
+
+    zfs list reports a remote filesystem under the destination's name, leaving
+    the local name a slash-aligned suffix of the remote one.
+    """
+    return left.name == right.name or left.name.endswith("/" + right.name) or right.name.endswith("/" + left.name)

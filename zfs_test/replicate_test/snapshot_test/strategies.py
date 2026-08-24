@@ -1,6 +1,7 @@
 """Snapshot Hypothesis Strategies."""
 
 import string
+from dataclasses import replace
 from typing import Any
 
 from hypothesis.strategies import (
@@ -9,6 +10,7 @@ from hypothesis.strategies import (
     integers,
     none,
     text,
+    tuples,
 )
 
 from zfs.replicate.filesystem.type import filesystem
@@ -22,7 +24,9 @@ def _non_empty_name(suffix: str) -> str:
     return f"a{suffix}"
 
 
-_FILESYSTEMS = text(_ROUND_TRIP_SAFE).map(_non_empty_name).map(filesystem)
+_NAMES = text(_ROUND_TRIP_SAFE).map(_non_empty_name)
+
+_FILESYSTEMS = _NAMES.map(filesystem)
 
 _SNAPSHOTS_DICT: dict[str, SearchStrategy[Any]] = {
     "filesystem": _FILESYSTEMS,
@@ -31,3 +35,13 @@ _SNAPSHOTS_DICT: dict[str, SearchStrategy[Any]] = {
     "previous": none(),
 }
 SNAPSHOTS = fixed_dictionaries(_SNAPSHOTS_DICT).map(lambda kwargs: Snapshot(**kwargs))
+
+
+def _rebase(drawn: tuple[Snapshot, str]) -> tuple[Snapshot, Snapshot]:
+    snapshot, parent = drawn
+
+    return snapshot, replace(snapshot, filesystem=filesystem(f"{parent}/{snapshot.filesystem.name}"))
+
+
+# Pairs whose fields differ but which Snapshot equality treats as one.
+REBASED_SNAPSHOTS = tuples(SNAPSHOTS, _NAMES).map(_rebase)

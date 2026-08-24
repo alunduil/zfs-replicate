@@ -14,6 +14,17 @@ class TestSnapshots:
         assert len(_drawn_filesystem_names()) > 1
 
 
+class TestRebasedSnapshots:
+    """Drawn pairs stand in for a local snapshot and its remote counterpart."""
+
+    @given(sut.REBASED_SNAPSHOTS)
+    def test_rebased(self, rebased: tuple[Snapshot, Snapshot]) -> None:
+        """REBASED_SNAPSHOTS draws pairs with differing filesystems that compare equal."""
+        local, remote = rebased
+        assert local.filesystem != remote.filesystem
+        assert local == remote
+
+
 def _drawn_filesystem_names() -> set[str]:
     names: set[str] = set()
 
