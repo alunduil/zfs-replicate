@@ -8,7 +8,7 @@ import zfs.replicate.cli.log as sut
 
 # Module-private, but exercised directly here rather than through the whole
 # logging stack.
-Formatter = sut._Formatter  # pylint: disable=protected-access
+Formatter = sut._Formatter  # noqa: SLF001
 
 
 def _record(level: int, message: str) -> logging.LogRecord:

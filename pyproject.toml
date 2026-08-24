@@ -98,11 +98,67 @@ src = ["."]
 quote-style = "double"
 
 [tool.ruff.lint]
-# UP (pyupgrade) is intentionally omitted here: enabling it rewrites ~99 typing
-# annotations across the tree, deferred to keep this migration reviewable (#501).
-# PGH and RUF100 stand in for the removed pygrep-hooks and yesqa hooks; G010 for
-# python-no-log-warn; S (above) covers python-no-eval and the bandit rule set.
-select = ["E", "F", "I", "B", "SIM", "D", "N", "S", "G010", "PGH", "PL", "RUF100"]
+# PGH and RUF stand in for the removed pygrep-hooks and yesqa hooks; G for
+# python-no-log-warn; S covers python-no-eval and the bandit rule set.
+#
+# Groups weighed for this list and rejected:
+# A          filesystem.list, filesystem.type, and process.open shadow builtins on purpose.
+# ANN        mypy strict already demands the annotations.
+# COM        COM812 disagrees with ruff format about trailing commas.
+# CPY        the license sits at the repository root, not in file headers.
+# DOC        every rule is preview-gated, so selecting it enforces nothing.
+# FBT        would require making readonly, recursive, and follow_delete keyword-only.
+# FIX, TD    work is tracked in issues rather than in-code TODOs.
+# INP        the absent zfs_test __init__.py files are #621.
+# ISC        ruff format already joins implicit string concatenations.
+# PTH        the sole os.path call assembles a zfs dataset name, not a path.
+# TID        the package imports relatively throughout.
+# UP         the annotation rewrites are #501.
+# AIR, DJ, FAST, NPY, PD    frameworks this project does not use.
+select = [
+  "ARG",
+  "ASYNC",
+  "B",
+  "BLE",
+  "C4",
+  "C90",
+  "D",
+  "DTZ",
+  "E",
+  "EM",
+  "ERA",
+  "EXE",
+  "F",
+  "FA",
+  "FLY",
+  "FURB",
+  "G",
+  "I",
+  "ICN",
+  "INT",
+  "LOG",
+  "N",
+  "PERF",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PYI",
+  "Q",
+  "RET",
+  "RSE",
+  "RUF",
+  "S",
+  "SIM",
+  "SLF",
+  "SLOT",
+  "T10",
+  "T20",
+  "TC",
+  "TRY",
+  "W",
+  "YTT"
+]
 
 [tool.ruff.lint.per-file-ignores]
 # Tests assert (S101) and compare against literal expectations (PLR2004) by design.
