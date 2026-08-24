@@ -1,7 +1,7 @@
 """ZFS Snapshot Type."""
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Tuple
 
 from ..filesystem import FileSystem
 
@@ -23,18 +23,27 @@ class Snapshot:
         if not isinstance(other, Snapshot):
             raise NotImplementedError
 
-        left = self.filesystem.name
-        right = other.filesystem.name
-        is_suffix = left == right or left.endswith("/" + right) or right.endswith("/" + left)
-
-        return is_suffix and self.name == other.name and self.timestamp == other.timestamp
+        return _same_filesystem(self.filesystem, other.filesystem) and self._key() == other._key()
 
     def __hash__(self) -> int:
-        """Hash of a Snapshot.
+        """Hash of a Snapshot."""
+        return hash(self._key())
 
-        Keys on the fields __eq__ compares exactly.  The filesystem is left out
-        because equality accepts a suffix match, so equal Snapshots can carry
-        different filesystem names; previous is left out because equality
-        ignores it.
+    def _key(self) -> Tuple[str, int]:
+        """Fields two equal Snapshots agree on exactly.
+
+        Hashing what __eq__ compares exactly holds equal Snapshots to equal
+        hashes.  The filesystem stays out because equality accepts a suffix
+        match, so equal Snapshots can carry different filesystem names, and
+        previous stays out because equality ignores it.
         """
-        return hash((self.name, self.timestamp))
+        return self.name, self.timestamp
+
+
+def _same_filesystem(left: FileSystem, right: FileSystem) -> bool:
+    """Whether two filesystems hold the same dataset.
+
+    zfs list reports a remote filesystem under the destination's name, leaving
+    the local name a slash-aligned suffix of the remote one.
+    """
+    return left.name == right.name or left.name.endswith("/" + right.name) or right.name.endswith("/" + left.name)

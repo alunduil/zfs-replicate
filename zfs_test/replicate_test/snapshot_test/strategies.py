@@ -24,7 +24,9 @@ def _non_empty_name(suffix: str) -> str:
     return f"a{suffix}"
 
 
-_FILESYSTEMS = text(_ROUND_TRIP_SAFE).map(_non_empty_name).map(filesystem)
+_NAMES = text(_ROUND_TRIP_SAFE).map(_non_empty_name)
+
+_FILESYSTEMS = _NAMES.map(filesystem)
 
 _SNAPSHOTS_DICT: Dict[str, SearchStrategy[Any]] = {
     "filesystem": _FILESYSTEMS,
@@ -43,4 +45,4 @@ def _rebase(drawn: Tuple[Snapshot, str]) -> Tuple[Snapshot, Snapshot]:
 
 # A remote filesystem carries the destination's name ahead of the local one, which is the case
 # Snapshot equality spans.
-REBASED_SNAPSHOTS = tuples(SNAPSHOTS, text(_ROUND_TRIP_SAFE).map(_non_empty_name)).map(_rebase)
+REBASED_SNAPSHOTS = tuples(SNAPSHOTS, _NAMES).map(_rebase)
