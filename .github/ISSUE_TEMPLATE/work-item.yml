@@ -85,28 +85,6 @@ body:
     validations:
       required: true
 
-  - type: dropdown
-    id: commit-type
-    attributes:
-      label: Expected commit type
-      description: >-
-        The pull request title carries this type, CI checks it, and
-        release-please reads it for the version bump. See the commit-messages
-        section of CONTRIBUTING.md.
-      options:
-        - "feat (minor bump): new user-visible capability"
-        - "fix (patch bump): bug fix"
-        - "perf (patch bump): performance improvement, no functional change"
-        - "refactor (no release): internal change, no behaviour change"
-        - "docs (no release): documentation only"
-        - "test (no release): adding or fixing tests"
-        - "build (no release): build system, packaging, or dependencies"
-        - "ci (no release): CI configuration"
-        - "chore (no release): maintenance with no source impact"
-        - "Not sure yet"
-    validations:
-      required: true
-
   - type: textarea
     id: related-issues
     attributes:
