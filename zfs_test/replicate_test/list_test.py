@@ -1,7 +1,5 @@
 """Tests for zfs.replicate.list."""
 
-from typing import List, Set
-
 from hypothesis import given
 from hypothesis.strategies import integers, lists, sets
 
@@ -12,18 +10,18 @@ class TestInits:
     """Every prefix appears once, in increasing length."""
 
     @given(lists(integers()))
-    def test_length(self, elements: List[int]) -> None:
+    def test_length(self, elements: list[int]) -> None:
         """len(inits(elements)) == len(elements) + 1."""
         assert len(sut.inits(elements)) == len(elements) + 1
 
     @given(lists(integers(), min_size=2))
-    def test_heads(self, elements: List[int]) -> None:
+    def test_heads(self, elements: list[int]) -> None:
         """inits(elements)[:1] == [[], [elements[0]]."""
         assert sut.inits(elements)[0] == []
         assert sut.inits(elements)[1] == [elements[0]]
 
     @given(lists(integers()))
-    def test_monotonic_length(self, elements: List[int]) -> None:
+    def test_monotonic_length(self, elements: list[int]) -> None:
         """[len(x) for xs in inits(elements)] == range(len(elements) + 1)."""
         lengths = [len(xs) for xs in sut.inits(elements)]
 
@@ -34,7 +32,7 @@ class TestVenn:
     """Each element lands in exactly one of the three parts."""
 
     @given(sets(integers()), sets(integers()))
-    def test_subsets(self, lefts: Set[int], rights: Set[int]) -> None:
+    def test_subsets(self, lefts: set[int], rights: set[int]) -> None:
         """All combinations of venn with subsets."""
         r_lefts, r_middles, r_rights = sut.venn(list(lefts), list(lefts | rights))
 
@@ -53,7 +51,7 @@ class TestVenn:
         )
 
     @given(lists(integers()))
-    def test_disjoint(self, both: List[int]) -> None:
+    def test_disjoint(self, both: list[int]) -> None:
         """Venn with disjoint."""
         e_lefts = list(filter(lambda x: x % 2 == 0, both))
         e_rights = list(filter(lambda x: x % 2 != 0, both))

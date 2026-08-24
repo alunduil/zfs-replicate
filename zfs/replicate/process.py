@@ -7,7 +7,7 @@ shell-free guarantee lives here and nowhere else.
 """
 
 import subprocess
-from typing import IO, Optional, Union
+from typing import IO
 
 from .command import Command
 
@@ -18,7 +18,7 @@ Popen = subprocess.Popen
 
 # None means "inherit the parent's stream"; an int is a file descriptor or one
 # of PIPE/DEVNULL/STDOUT; an IO wires one process's stream to another's.
-Stream = Optional[Union[IO[bytes], int]]
+Stream = IO[bytes] | int | None
 
 
 def open(
@@ -74,7 +74,7 @@ def run(
     return subprocess.CompletedProcess(command.argv, proc.returncode, output, error)
 
 
-def _detach(stream: Optional[IO[bytes]]) -> None:
+def _detach(stream: IO[bytes] | None) -> None:
     """Drop the parent's copy of a piped stream so its reader sees EOF/SIGPIPE."""
     if stream is not None:
         stream.close()

@@ -1,6 +1,6 @@
 """zfs.replicate.snapshot.send tests."""
 
-from typing import Callable, List, Optional, Tuple
+from collections.abc import Callable
 
 import pytest
 from pytest_mock import MockerFixture
@@ -47,7 +47,7 @@ class _FakeProcess:
         self.stdout = _FakeStream()
         self._error = error
 
-    def communicate(self) -> Tuple[bytes, bytes]:
+    def communicate(self) -> tuple[bytes, bytes]:
         """Return the captured streams the real ``Popen`` would."""
         return (b"", self._error)
 
@@ -82,7 +82,7 @@ class TestSend:
             *,
             compression: Compression = Compression.OFF,
             receive_options: ReceiveOptions = RECEIVE_DEFAULTS,
-            previous: Optional[Snapshot] = None,
+            previous: Snapshot | None = None,
         ) -> Pipeline:
             return _pipeline(
                 remote,
@@ -118,11 +118,11 @@ class TestSend:
         return _replicate
 
     @pytest.fixture
-    def capture_spawns(self, mocker: MockerFixture) -> Callable[..., List[_FakeProcess]]:
+    def capture_spawns(self, mocker: MockerFixture) -> Callable[..., list[_FakeProcess]]:
         """Replace the process boundary and collect the processes it hands back."""
 
-        def _capture_spawns(returncode: int = 0, error: bytes = b"") -> List[_FakeProcess]:
-            spawned: List[_FakeProcess] = []
+        def _capture_spawns(returncode: int = 0, error: bytes = b"") -> list[_FakeProcess]:
+            spawned: list[_FakeProcess] = []
 
             def fake_open(command: Command, **_kwargs: object) -> _FakeProcess:
                 spawned.append(_FakeProcess(command, returncode, error))
@@ -204,7 +204,7 @@ class TestSend:
 
     def test_send_spawns_each_assembled_stage(
         self,
-        capture_spawns: Callable[..., List[_FakeProcess]],
+        capture_spawns: Callable[..., list[_FakeProcess]],
         replicate: Callable[..., None],
     ) -> None:
         """Each assembled stage runs as a process, in pipeline order."""
@@ -216,7 +216,7 @@ class TestSend:
 
     def test_send_detaches_the_parent_from_every_upstream_stage(
         self,
-        capture_spawns: Callable[..., List[_FakeProcess]],
+        capture_spawns: Callable[..., list[_FakeProcess]],
         replicate: Callable[..., None],
     ) -> None:
         """The parent closes every piped stdout but the last, whose output it reads."""
@@ -228,7 +228,7 @@ class TestSend:
 
     def test_send_ignores_a_missing_mountpoint(
         self,
-        capture_spawns: Callable[..., List[_FakeProcess]],
+        capture_spawns: Callable[..., list[_FakeProcess]],
         replicate: Callable[..., None],
     ) -> None:
         """Replication tolerates a failure to create the destination mountpoint."""
@@ -238,7 +238,7 @@ class TestSend:
 
     def test_send_raises_on_any_other_failure(
         self,
-        capture_spawns: Callable[..., List[_FakeProcess]],
+        capture_spawns: Callable[..., list[_FakeProcess]],
         replicate: Callable[..., None],
     ) -> None:
         """A failed pipeline surfaces its stderr as a ZFSReplicateError."""

@@ -99,7 +99,7 @@ quote-style = "double"
 
 [tool.ruff.lint]
 # Groups deliberately absent:
-# A          modules named for zfs subcommands shadow list, type, and open.
+# A          the public API is named for zfs subcommands: list, type, open.
 # ANN        mypy strict already demands the annotations.
 # COM        COM812 disagrees with ruff format about trailing commas.
 # CPY        the license sits at the repository root, not in file headers.
@@ -110,7 +110,6 @@ quote-style = "double"
 # ISC        ruff format already joins implicit string concatenations.
 # PTH        os.path here assembles zfs dataset names, not filesystem paths.
 # TID        the package imports relatively throughout.
-# UP         enabling it rewrites about 130 typing annotations.
 select = [
   "ARG",
   "ASYNC",
@@ -152,6 +151,7 @@ select = [
   "T20",
   "TC",
   "TRY",
+  "UP",
   "W",
   "YTT"
 ]

@@ -1,7 +1,5 @@
 """ZFS Snapshot listing."""
 
-from typing import List, Optional
-
 from .. import process
 from ..command import Command, over_ssh
 from ..error import ZFSReplicateError
@@ -10,12 +8,15 @@ from ..stderr import clean
 from .type import Snapshot
 
 
-def list(
+def list_snapshots(
     filesystem: FileSystem,
     recursive: bool,
-    ssh_command: Optional[Command] = None,
-) -> List[Snapshot]:
-    """List ZFS snapshots."""
+    ssh_command: Command | None = None,
+) -> list[Snapshot]:
+    """List ZFS snapshots, each chained to its predecessor in the same filesystem.
+
+    The ``previous`` link is what a later send turns into ``zfs send -i``.
+    """
     command = _list(filesystem, recursive)
     if ssh_command is not None:
         command = over_ssh(ssh_command, command)
@@ -41,7 +42,7 @@ def _list(filesystem: FileSystem, recursive: bool) -> Command:
     return Command.with_empty_env("zfs", "list", *options, filesystem.name)
 
 
-def _snapshots(zfs_list_output: bytes) -> List[Snapshot]:
+def _snapshots(zfs_list_output: bytes) -> list[Snapshot]:
     snapshots = [_snapshot(x) for x in zfs_list_output.split(b"\n") if x != b""]
 
     if not snapshots:
@@ -66,7 +67,7 @@ def _snapshot(zfs_list_line: bytes) -> Snapshot:
     )
 
 
-def _add_previous(snapshot: Snapshot, previous: Optional[Snapshot] = None) -> Snapshot:
+def _add_previous(snapshot: Snapshot, previous: Snapshot | None = None) -> Snapshot:
     if previous is not None and snapshot.filesystem != previous.filesystem:
         previous = None
 

@@ -1,11 +1,11 @@
 """Optional Functions."""
 
-from typing import List, Optional, TypeVar
+from typing import TypeVar
 
 Value = TypeVar("Value")
 
 
-def value(optional: Optional[Value]) -> Value:
+def value(optional: Value | None) -> Value:
     """Raise error if optional is None."""
     if optional is None:
         msg = "unexpected None"
@@ -14,7 +14,7 @@ def value(optional: Optional[Value]) -> Value:
     return optional
 
 
-def values(*optionals: Optional[Value]) -> List[Value]:
+def values(*optionals: Value | None) -> list[Value]:
     """Keep the values that are present, in the order given.
 
     >>> values(1, None, 3)

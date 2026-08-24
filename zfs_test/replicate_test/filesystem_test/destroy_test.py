@@ -1,6 +1,6 @@
 """zfs.replicate.filesystem.destroy tests."""
 
-from typing import Callable
+from collections.abc import Callable
 
 import pytest
 

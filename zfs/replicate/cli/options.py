@@ -1,7 +1,7 @@
 """Command-line option groups."""
 
 import functools
-from typing import Callable, Dict, Tuple
+from collections.abc import Callable
 
 import click
 
@@ -145,7 +145,7 @@ def receive_group(command: Callable[..., None]) -> Callable[..., None]:  # pragm
         receive_force: bool,
         receive_mount: bool,
         receive_resume: bool,
-        receive_set: Tuple[str, ...],
+        receive_set: tuple[str, ...],
         **kwargs: object,
     ) -> None:
         return command(
@@ -162,8 +162,8 @@ def receive_group(command: Callable[..., None]) -> Callable[..., None]:  # pragm
     return wrapper
 
 
-def _parse_properties(properties: Tuple[str, ...]) -> Dict[str, str]:
-    parsed: Dict[str, str] = {}
+def _parse_properties(properties: tuple[str, ...]) -> dict[str, str]:
+    parsed: dict[str, str] = {}
 
     for item in properties:
         key, separator, value = item.partition("=")
