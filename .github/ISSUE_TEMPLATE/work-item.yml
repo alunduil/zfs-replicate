@@ -18,21 +18,57 @@ body:
       required: true
 
   - type: textarea
+    id: current-behaviour
+    attributes:
+      label: Current behaviour
+      description: >-
+        Describe what the tree does today, naming the files, jobs, or commands
+        as they stand at HEAD. An implementer starts by reading what you name
+        here.
+      placeholder: >-
+        daily.yml runs `mutmut run --max-children 1`, one mutant at a time,
+        under a 120-minute cap.
+    validations:
+      required: true
+
+  - type: textarea
     id: motivation
     attributes:
       label: Motivation
-      description: Explain what this unblocks or improves, and for whom.
+      description: >-
+        Explain what this unblocks or improves, for whom, and what changed to
+        make it worth doing now.
     validations:
       required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Approach and alternatives
+      description: >-
+        Describe the approach you have in mind and the ones you set aside.
+        Where a claim is about speed or size, give the numbers and say where
+        they came from.
 
   - type: textarea
     id: scope
     attributes:
       label: Scope
-      description: Name the modules, commands, and documents the change touches.
-      placeholder: zfs/replicate/snapshot/send.py, zfs/replicate/cli/options.py
+      description: Name the modules, workflows, and documents the change touches.
+      placeholder: >-
+        zfs/replicate/snapshot/send.py, .github/workflows/daily.yml,
+        docs/reference/testing.md
     validations:
       required: true
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: >-
+        Name what this deliberately leaves out, and the issue that carries it
+        if one does. A pull request keeps to one concern, so the boundary is
+        worth stating before the work starts.
 
   - type: textarea
     id: acceptance-criteria
@@ -40,14 +76,44 @@ body:
       label: Acceptance criteria
       description: >-
         List the conditions that hold when this is done, each as a task a
-        reviewer can check off.
+        reviewer can check off. Cover the outcome where the work proves not
+        worth doing.
       placeholder: |
         - [ ] Tests and pre-commit pass
+        - [ ] If the measurement says otherwise, this closes with the numbers
+              recorded, so the next person does not re-derive them
+    validations:
+      required: true
+
+  - type: dropdown
+    id: commit-type
+    attributes:
+      label: Expected commit type
+      description: >-
+        The pull request title carries this type, CI checks it, and
+        release-please reads it for the version bump. See the commit-messages
+        section of CONTRIBUTING.md.
+      options:
+        - "feat (minor bump): new user-visible capability"
+        - "fix (patch bump): bug fix"
+        - "perf (patch bump): performance improvement, no functional change"
+        - "refactor (no release): internal change, no behaviour change"
+        - "docs (no release): documentation only"
+        - "test (no release): adding or fixing tests"
+        - "build (no release): build system, packaging, or dependencies"
+        - "ci (no release): CI configuration"
+        - "chore (no release): maintenance with no source impact"
+        - "Not sure yet"
     validations:
       required: true
 
   - type: textarea
-    id: additional-context
+    id: related-issues
     attributes:
-      label: Additional context
-      description: Link related issues, prior discussion, or upstream references.
+      label: Related issues
+      description: >-
+        List one issue per line, saying what each contributes rather than the
+        number alone.
+      placeholder: >-
+        #679 settles the import alias, which has to land before a check for it
+        can go on.
