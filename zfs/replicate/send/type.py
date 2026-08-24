@@ -1,7 +1,6 @@
 """ZFS Send Type."""
 
 from dataclasses import dataclass
-from typing import List
 
 
 @dataclass(frozen=True)
@@ -33,7 +32,7 @@ class Options:
     compressed: bool = False
     props: bool = False
 
-    def to_flags(self) -> List[str]:
+    def to_flags(self) -> list[str]:
         """Return the enabled options as ``zfs send`` tokens, e.g. ``["-L", "-w"]``.
 
         Emits flags in a stable ``-L -w -e -c -p`` order and omits the

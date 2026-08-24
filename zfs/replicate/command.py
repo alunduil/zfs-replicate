@@ -14,11 +14,11 @@ hand-placed quotes.
 """
 
 import shlex
+from collections.abc import Mapping
 from dataclasses import dataclass, field
-from typing import List, Mapping, Optional, Tuple
 
 # Prefix that empties the environment before exec, kept in one place.
-ENV: Tuple[str, str] = ("/usr/bin/env", "-")
+ENV: tuple[str, str] = ("/usr/bin/env", "-")
 
 
 @dataclass(frozen=True)
@@ -33,8 +33,8 @@ class Command:
     """
 
     program: str
-    args: List[str] = field(default_factory=list)
-    env: Optional[Mapping[str, str]] = None
+    args: list[str] = field(default_factory=list)
+    env: Mapping[str, str] | None = None
 
     @classmethod
     def with_empty_env(cls, program: str, *args: str) -> "Command":
@@ -49,7 +49,7 @@ class Command:
         return cls(program=ENV[0], args=[ENV[1], program, *args])
 
     @property
-    def argv(self) -> List[str]:
+    def argv(self) -> list[str]:
         """The command as one list, the form the exec layer and ``render`` consume."""
         return [self.program, *self.args]
 

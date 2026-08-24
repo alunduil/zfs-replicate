@@ -2,7 +2,6 @@
 
 import itertools
 import logging
-from typing import List, Tuple
 
 from .. import filesystem, optional, receive, send, snapshot
 from ..command import Command
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 def execute(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
-    tasks: List[Tuple[FileSystem, List[Task]]],
+    tasks: list[tuple[FileSystem, list[Task]]],
     *,
     ssh_command: Command,
     compression: Compression,
@@ -47,13 +46,13 @@ def execute(  # noqa: PLR0913 -- carries the full replication call surface
                 )
 
 
-def _create(tasks: List[Task], ssh_command: Command) -> None:
+def _create(tasks: list[Task], ssh_command: Command) -> None:
     for task in tasks:
         logger.info("creating filesystem %s", task.filesystem.name)
         filesystem.create(task.filesystem, ssh_command=ssh_command)
 
 
-def _destroy(tasks: List[Task], ssh_command: Command) -> None:
+def _destroy(tasks: list[Task], ssh_command: Command) -> None:
     for task in tasks:
         if task.snapshot is None:
             logger.info("destroying filesystem %s", task.filesystem.name)
@@ -69,7 +68,7 @@ def _destroy(tasks: List[Task], ssh_command: Command) -> None:
 
 def _send(  # noqa: PLR0913 -- carries the full replication call surface
     remote: FileSystem,
-    tasks: List[Task],
+    tasks: list[Task],
     *,
     ssh_command: Command,
     compression: Compression,

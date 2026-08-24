@@ -11,7 +11,8 @@ module owns how that output is presented, which is the command line's concern.
 
 import logging
 import sys
-from typing import Any, Callable, TypeVar
+from collections.abc import Callable
+from typing import Any, TypeVar
 
 import click_log
 
