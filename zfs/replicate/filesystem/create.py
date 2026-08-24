@@ -37,11 +37,7 @@ def create(filesystem: FileSystem, ssh_command: Command) -> None:
                 return  # Ignore this error.
 
             msg = f"unable to create remote dataset: '{filesystem.dataset}': {error!r}"
-            raise ZFSReplicateError(
-                msg,
-                filesystem,
-                error,
-            )
+            raise ZFSReplicateError(msg, filesystem, error)
 
 
 def _create(filesystem: str) -> Command:

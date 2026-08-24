@@ -94,11 +94,7 @@ def _raise_for_failure(current: Snapshot, returncode: int, error: bytes) -> None
         return
 
     msg = f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error!r}"
-    raise ZFSReplicateError(
-        msg,
-        current,
-        error,
-    )
+    raise ZFSReplicateError(msg, current, error)
 
 
 def _send(

@@ -15,11 +15,7 @@ def destroy(snapshot: Snapshot, ssh_command: Command) -> None:
         error = clean(result.stderr)
 
         msg = f"unable to destroy snapshot: '{snapshot.filesystem.name}@{snapshot.name}': {error!r}"
-        raise ZFSReplicateError(
-            msg,
-            snapshot,
-            error,
-        )
+        raise ZFSReplicateError(msg, snapshot, error)
 
 
 def _destroy(snapshot: Snapshot) -> Command:
