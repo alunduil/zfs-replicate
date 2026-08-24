@@ -130,12 +130,33 @@ jobs:
         with:
           python-version: "3.12"
       - name: poetry build
-        run: |
-          poetry build
-          tar -zvtf dist/zfs_replicate-*.tar.gz | grep zfs/replicate/
-          tar -zvtf dist/zfs_replicate-*.tar.gz | grep zfs_test/replicate_test/
+        run: poetry build
       - name: poetry check
         run: poetry check
+      # Catches a module or test file missing from `packages`: the suite runs
+      # against what the sdist ships, not the checkout.
+      - name: test the built sdist
+        run: |
+          # CI builds into an empty dist/, so the glob matches one archive.
+          archives=(dist/zfs_replicate-*.tar.gz)
+          sdist="${archives[0]}"
+          packaged_tests="${RUNNER_TEMP}/packaged-tests"
+
+          poetry install --only main,test --no-root
+          venv="$(poetry env info --path)"
+          # The groups above already hold poetry.lock's pins, and --no-deps
+          # leaves them there, so an upstream release inside the declared
+          # bounds cannot redden this job on its own.
+          "${venv}/bin/pip" install --no-deps "${sdist}"
+
+          # Extracting only the tests keeps the packaged sources out of the
+          # way, so `import zfs` resolves to the installed distribution.
+          mkdir --parents "${packaged_tests}"
+          tar --extract --gzip --file "${sdist}" --directory "${packaged_tests}" \
+            --strip-components=1 --wildcards '*/zfs_test/*' '*/pyproject.toml'
+
+          cd "${packaged_tests}"
+          "${venv}/bin/pytest"
 
   # Squash-merge lands the PR title as the commit message, so the title, not the
   # individual commits, is what release-please parses for version bumps. Keep
