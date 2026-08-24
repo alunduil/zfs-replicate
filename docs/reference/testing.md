@@ -120,3 +120,10 @@ A nightly job scores the suite by mutation testing, configured under
 survives is killed by a new test, recorded as an equivalent mutant in a comment
 at the code, or excluded with `# pragma: no mutate block` and the reason no test
 can reach it.
+
+`mutmut` runs the suite several times in one process, and `pytest` builds a
+fresh instance of a test class for each pass. Hypothesis reads those instances
+as a property test called from differing executors, so
+[`zfs_test/conftest.py`](../../zfs_test/conftest.py) suppresses that health
+check while `mutmut` drives the suite. A property test needs nothing of its own,
+and an ordinary `pytest` run leaves the check on.
