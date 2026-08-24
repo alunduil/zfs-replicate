@@ -1,6 +1,7 @@
 ---
 name: Work item
 description: Track planned development work with a definition of done.
+type: Task
 labels: [enhancement]
 body:
   - type: markdown
@@ -82,8 +83,9 @@ body:
     attributes:
       label: Related issues
       description: >-
-        List one issue per line, saying what each contributes rather than the
-        number alone.
+        Add a blocked-by relationship for anything this cannot ship without.
+        Use this field for what the relationship does not record: what each
+        issue contributes.
       placeholder: >-
         #679 settles the import alias, which has to land before a check for it
         can go on.
