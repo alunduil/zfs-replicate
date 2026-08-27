@@ -31,16 +31,17 @@ jobs:
 
   pypi:
     name: Publish to PyPI
+    # A separate build keeps `id-token: write` out of scope while the build
+    # backend and its dependencies run.
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    # PyPI pins the Trusted Publisher it accepts to repo + workflow file +
-    # environment, so the OIDC token this job mints is only valid from here.
+    # PyPI matches the Trusted Publisher against repo, workflow filename, and
+    # environment. Renaming this file or the environment stops publishing
+    # until the publisher on PyPI matches again.
     environment: pypi
     permissions:
-      # The build runs in a job of its own so that the token minted here is
-      # never in scope while the build backend and its dependencies execute.
-      # Nothing is checked out, so `contents` stays out of the block.
+      # This job checks nothing out, so `contents` is deliberately absent.
       id-token: write
     steps:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
