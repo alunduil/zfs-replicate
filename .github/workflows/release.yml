@@ -17,6 +17,12 @@ jobs:
     name: Publish to PyPI
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    # PyPI pins the Trusted Publisher it accepts to repo + workflow file +
+    # environment, so the OIDC token this job mints is only valid from here.
+    environment: pypi
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: install poetry
@@ -28,5 +34,5 @@ jobs:
           cache: poetry
       - name: poetry build
         run: poetry build
-      - name: poetry publish
-        run: poetry publish  --username __token__ --password=${{ secrets.PYPI_API_TOKEN }}
+      - name: publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
