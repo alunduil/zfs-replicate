@@ -13,26 +13,39 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
+  build:
+    name: Build the distribution
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-poetry
+        with:
+          python-version: "3.x"
+      - name: poetry build
+        run: poetry build
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dist
+          path: dist/
+
   pypi:
     name: Publish to PyPI
+    needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     # PyPI pins the Trusted Publisher it accepts to repo + workflow file +
     # environment, so the OIDC token this job mints is only valid from here.
     environment: pypi
     permissions:
-      contents: read
+      # The build runs in a job of its own so that the token minted here is
+      # never in scope while the build backend and its dependencies execute.
+      # Nothing is checked out, so `contents` stays out of the block.
       id-token: write
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - name: install poetry
-        run: pipx install 'poetry<3'
-      - name: setup python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          python-version: "3.x"
-          cache: poetry
-      - name: poetry build
-        run: poetry build
+          name: dist
+          path: dist/
       - name: publish to PyPI
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
