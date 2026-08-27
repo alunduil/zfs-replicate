@@ -13,20 +13,40 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  pypi:
-    name: Publish to PyPI
+  build:
+    name: Build the distribution
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - name: install poetry
-        run: pipx install 'poetry<3'
-      - name: setup python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
+      - uses: ./.github/actions/setup-poetry
         with:
           python-version: "3.x"
-          cache: poetry
       - name: poetry build
         run: poetry build
-      - name: poetry publish
-        run: poetry publish  --username __token__ --password=${{ secrets.PYPI_API_TOKEN }}
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    name: Publish to PyPI
+    # A separate build keeps `id-token: write` out of scope while the build
+    # backend and its dependencies run.
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    # PyPI matches the Trusted Publisher against repo, workflow filename, and
+    # environment. Renaming this file or the environment stops publishing
+    # until the publisher on PyPI matches again.
+    environment: pypi
+    permissions:
+      # This job checks nothing out, so `contents` is deliberately absent.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: dist
+          path: dist/
+      - name: publish to PyPI
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
