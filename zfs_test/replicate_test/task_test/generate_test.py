@@ -11,7 +11,7 @@ from zfs.replicate.filesystem import remote_filesystem
 from zfs.replicate.filesystem.type import FileSystem, filesystem
 from zfs.replicate.snapshot import Snapshot
 from zfs.replicate.task.generate import generate
-from zfs.replicate.task.type import Action
+from zfs.replicate.task.type import Action, Task
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 _REMOTE = filesystem("backup")
@@ -85,6 +85,32 @@ class TestGenerate:
             map(len, snapshots_by_fs.values()),
         )
         assert all(t.filesystem in snapshots_by_fs for t in result)
+
+    def test_empty_locals_remote_prefixed_filesystem(self) -> None:
+        """Destroy remote-only snapshots keyed by the remote filesystem name."""
+        remote = filesystem("backup")
+        remote_snapshot_filesystem = filesystem("backup/pool/filesystem")
+        snapshot = Snapshot(
+            filesystem=remote_snapshot_filesystem,
+            name="snapshot",
+            previous=None,
+            timestamp=0,
+        )
+
+        result = generate(remote, {}, {remote_snapshot_filesystem: [snapshot]})
+
+        assert result == [
+            Task(
+                action=Action.DESTROY,
+                filesystem=remote_snapshot_filesystem,
+                snapshot=snapshot,
+            ),
+            Task(
+                action=Action.DESTROY,
+                filesystem=remote_snapshot_filesystem,
+                snapshot=None,
+            ),
+        ]
 
     def test_diverged_destroys_before_sending(self) -> None:
         """Without a snapshot in common, the destroys precede the sends."""
