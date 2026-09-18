@@ -85,7 +85,7 @@ jobs:
       # A fork's pull request gets a read-only GITHUB_TOKEN, which downgrades
       # the id-token: write above and leaves OIDC nothing to present. Failing
       # here would block a contributor who cannot grant it, so skip instead.
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+      - uses: codecov/codecov-action@0b35c9ecc4f0529d0eb674914510c22f85b196b4 # v7.1.0
         if: github.event.pull_request.head.repo.fork != true
         with:
           use_oidc: true
