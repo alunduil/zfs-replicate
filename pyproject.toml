@@ -3,7 +3,7 @@ build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 
 [project]
-authors = [{name = "Alex Brandt", email = "alunduil@gmail.com"}]
+authors = [{ name = "Alex Brandt", email = "alunduil@gmail.com" }]
 description = "ZFS Snapshot Replicator"
 # classifiers and dependencies are dynamic so Poetry generates the Python-version
 # and license classifiers from the constraints and keeps its richer dependency syntax.
@@ -54,7 +54,7 @@ classifiers = [
   "Topic :: System :: Archiving",
   "Topic :: System :: Filesystems"
 ]
-packages = [{include = "zfs"}, {include = "zfs_test", format = "sdist"}]
+packages = [{ include = "zfs" }, { include = "zfs_test", format = "sdist" }]
 requires-poetry = ">=2.0"
 
 [tool.poetry.dependencies]
