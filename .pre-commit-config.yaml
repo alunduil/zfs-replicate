@@ -38,12 +38,18 @@ repos:
         # environment --ignore-missing-imports degrades every decorator they
         # export to Any, which strict mode then reports as an untyped
         # decorator at each of the ~25 call sites.
+        #
+        # Pinned to the versions poetry.lock resolves, so mypy reads the same
+        # annotations the suite runs against. language restates the hook's own,
+        # leaving the environment unchanged; Renovate extracts
+        # additional_dependencies only from an entry that declares one.
+        language: python
         additional_dependencies:
-          - click
-          - click-log
-          - hypothesis
-          - pytest
-          - pytest-mock
+          - click==8.4.2
+          - click-log==0.4.0
+          - hypothesis==6.165.10
+          - pytest==9.1.1
+          - pytest-mock==3.15.1
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.16
     hooks:
@@ -54,6 +60,13 @@ repos:
       - id: pretty-format-toml
         args: [--autofix]
         exclude: poetry\.lock
+        # The hook declares toml-sort>=0.22.0, so without a pin its formatting
+        # is whatever release the environment was built against, and a cache
+        # rebuild reformats pyproject.toml. language restates the hook's own so
+        # Renovate can see the pin.
+        language: python
+        additional_dependencies:
+          - toml-sort==0.25.0
   - repo: https://github.com/tweag/FawltyDeps
     rev: v0.20.0
     hooks:
