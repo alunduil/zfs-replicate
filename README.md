@@ -54,6 +54,7 @@ under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
          1. `send`
          1. `snapshot`
 1. A local ZFS filesystem and `zfs` command-line tools
+1. Python 3.10 or later on the local system
 
 _N.B., don't use the root user to access your remote system._
 
