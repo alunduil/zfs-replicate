@@ -1,5 +1,11 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+#
+# Renovate extracts a hook's additional_dependencies only when the entry
+# declares a language, so each pinned hook spells out language: python. The
+# declaration restates the hook's own and builds the same environment.
+# Hoisting it into a YAML merge key resolves for pre-commit and leaves
+# Renovate extracting nothing.
 default_install_hook_types:
   - pre-commit
   - commit-msg
@@ -38,12 +44,16 @@ repos:
         # environment --ignore-missing-imports degrades every decorator they
         # export to Any, which strict mode then reports as an untyped
         # decorator at each of the ~25 call sites.
+        #
+        # The pins are the versions poetry.lock resolves, so mypy reads the
+        # annotations the suite runs against.
+        language: python
         additional_dependencies:
-          - click
-          - click-log
-          - hypothesis
-          - pytest
-          - pytest-mock
+          - click==8.4.2
+          - click-log==0.4.0
+          - hypothesis==6.165.10
+          - pytest==9.1.1
+          - pytest-mock==3.15.1
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.16
     hooks:
@@ -54,6 +64,12 @@ repos:
       - id: pretty-format-toml
         args: [--autofix]
         exclude: poetry\.lock
+        # toml-sort's formatting changes between releases and the hook sets no
+        # upper bound, so without a pin a cache rebuild reformats
+        # pyproject.toml.
+        language: python
+        additional_dependencies:
+          - toml-sort==0.25.0
   - repo: https://github.com/tweag/FawltyDeps
     rev: v0.20.0
     hooks:
