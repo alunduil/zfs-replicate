@@ -1,5 +1,12 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
+#
+# A hook that pins additional_dependencies declares language: python. That
+# restates the hook's own language, so pre-commit builds the same environment
+# either way, but Renovate reads additional_dependencies only from an entry
+# declaring one. Write the declaration out at each hook: a YAML merge key
+# resolves for pre-commit and leaves Renovate extracting nothing, so the pins
+# would silently stop getting update pull requests.
 default_install_hook_types:
   - pre-commit
   - commit-msg
@@ -37,12 +44,9 @@ repos:
         # click and hypothesis ship py.typed. Without them in the hook's
         # environment --ignore-missing-imports degrades every decorator they
         # export to Any, which strict mode then reports as an untyped
-        # decorator at each of the ~25 call sites.
-        #
-        # Pinned to the versions poetry.lock resolves, so mypy reads the same
-        # annotations the suite runs against. language restates the hook's own,
-        # leaving the environment unchanged; Renovate extracts
-        # additional_dependencies only from an entry that declares one.
+        # decorator at each of the ~25 call sites. Pinned to the versions
+        # poetry.lock resolves, so mypy reads the annotations the suite runs
+        # against.
         language: python
         additional_dependencies:
           - click==8.4.2
@@ -62,8 +66,7 @@ repos:
         exclude: poetry\.lock
         # The hook declares toml-sort>=0.22.0, so without a pin its formatting
         # is whatever release the environment was built against, and a cache
-        # rebuild reformats pyproject.toml. language restates the hook's own so
-        # Renovate can see the pin.
+        # rebuild reformats pyproject.toml.
         language: python
         additional_dependencies:
           - toml-sort==0.25.0
