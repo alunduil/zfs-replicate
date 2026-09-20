@@ -40,7 +40,7 @@ class Replication:
 
 @dataclass(frozen=True)
 class CreateFilesystemTask:
-    """Create a filesystem on the remote."""
+    """A filesystem to create on the remote."""
 
     filesystem: FileSystem
     action: ClassVar[Action] = Action.CREATE
@@ -53,14 +53,14 @@ class CreateFilesystemTask:
 
 @dataclass(frozen=True)
 class SendSnapshotTask:
-    """Send a snapshot to the remote."""
+    """A snapshot to send to the remote."""
 
     filesystem: FileSystem
     snapshot: Snapshot
     action: ClassVar[Action] = Action.SEND
 
     def run(self, replication: Replication) -> None:
-        """Send the snapshot, resuming from its predecessor."""
+        """Send the snapshot, incremental from its predecessor when it has one."""
         logger.info("sending snapshot %s", self.snapshot)
         snapshot_ops.send(
             replication.remote,
@@ -76,7 +76,7 @@ class SendSnapshotTask:
 
 @dataclass(frozen=True)
 class DestroyFilesystemTask:
-    """Destroy a filesystem on the remote."""
+    """A filesystem to destroy on the remote."""
 
     filesystem: FileSystem
     action: ClassVar[Action] = Action.DESTROY
@@ -89,7 +89,7 @@ class DestroyFilesystemTask:
 
 @dataclass(frozen=True)
 class DestroySnapshotTask:
-    """Destroy a snapshot on the remote."""
+    """A snapshot to destroy on the remote."""
 
     filesystem: FileSystem
     snapshot: Snapshot
@@ -101,6 +101,6 @@ class DestroySnapshotTask:
         snapshot_ops.destroy(self.snapshot, ssh_command=replication.ssh_command)
 
 
-# Separate types let mypy reject reading a snapshot off a task that has none,
-# and a member without run() is rejected where execute() calls it.
+# Separate types let mypy reject reading a snapshot off a task that has none.
+# A member added without run() is rejected where execute() calls it.
 Task = CreateFilesystemTask | SendSnapshotTask | DestroyFilesystemTask | DestroySnapshotTask
