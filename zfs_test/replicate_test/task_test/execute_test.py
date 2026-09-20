@@ -22,7 +22,7 @@ class TestExecute:
         caplog: pytest.LogCaptureFixture,
         mocker: MockerFixture,
     ) -> None:
-        """Dispatching a SEND task logs the snapshot at INFO."""
+        """Dispatching a SendSnapshotTask logs the snapshot at INFO."""
         mocker.patch.object(snapshot, "send")
         # click_log.basic_config disables propagation on zfs.replicate, so caplog
         # (which captures via the root logger) sees nothing without this.

@@ -32,9 +32,8 @@ def _snapshot(task: Task) -> Snapshot | None:
 class _Level(Generic[Key]):
     """One grouping level of the report.
 
-    ``key`` buckets the tasks, ``limit`` is how many buckets the report
-    spells out before falling back to counts, and ``after`` is the level
-    those counts descend into.
+    ``limit`` is how many buckets this level spells out before falling back
+    to counts.  ``after`` is the level those counts descend into.
     """
 
     name: str

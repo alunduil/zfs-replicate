@@ -51,7 +51,7 @@ class TestGenerate:
 
     @given(lists(SNAPSHOTS))
     def test_empty_remotes(self, snapshots: list[Snapshot]) -> None:
-        """Generate with empty remotes."""
+        """With nothing on the remote, every filesystem is created and every snapshot sent."""
         snapshots_by_fs = _by_filesystem(snapshots)
 
         result = generate(filesystem(""), snapshots_by_fs, {})
