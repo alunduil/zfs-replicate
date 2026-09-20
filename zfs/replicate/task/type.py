@@ -1,6 +1,7 @@
 """Types for Tasks."""
 
 import logging
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import ClassVar
@@ -26,10 +27,21 @@ class Action(Enum):
 
 
 @dataclass(frozen=True)
-class CreateFilesystemTask:
-    """A filesystem to create on the remote."""
+class _BaseTask(ABC):
+    """A unit of replication work."""
 
     filesystem: FileSystem
+    action: ClassVar[Action]
+
+    @abstractmethod
+    def run(self, context: RunContext) -> None:
+        """Perform the task against the remote."""
+
+
+@dataclass(frozen=True)
+class CreateFilesystemTask(_BaseTask):
+    """A filesystem to create on the remote."""
+
     action: ClassVar[Action] = Action.CREATE
 
     def run(self, context: RunContext) -> None:
@@ -39,10 +51,9 @@ class CreateFilesystemTask:
 
 
 @dataclass(frozen=True)
-class SendSnapshotTask:
+class SendSnapshotTask(_BaseTask):
     """A snapshot to send to the remote."""
 
-    filesystem: FileSystem
     snapshot: Snapshot
     action: ClassVar[Action] = Action.SEND
 
@@ -62,10 +73,9 @@ class SendSnapshotTask:
 
 
 @dataclass(frozen=True)
-class DestroyFilesystemTask:
+class DestroyFilesystemTask(_BaseTask):
     """A filesystem to destroy on the remote."""
 
-    filesystem: FileSystem
     action: ClassVar[Action] = Action.DESTROY
 
     def run(self, context: RunContext) -> None:
@@ -75,10 +85,9 @@ class DestroyFilesystemTask:
 
 
 @dataclass(frozen=True)
-class DestroySnapshotTask:
+class DestroySnapshotTask(_BaseTask):
     """A snapshot to destroy on the remote."""
 
-    filesystem: FileSystem
     snapshot: Snapshot
     action: ClassVar[Action] = Action.DESTROY
 
@@ -88,6 +97,6 @@ class DestroySnapshotTask:
         snapshot_ops.destroy(self.snapshot, ssh_command=context.ssh_command)
 
 
-# Separate types let mypy reject reading a snapshot off a task that has none.
-# A member added without run() is rejected where execute() calls it.
+# Signatures take Task, never _BaseTask: only the union lets mypy reject
+# reading a snapshot off a task that has none.
 Task = CreateFilesystemTask | SendSnapshotTask | DestroyFilesystemTask | DestroySnapshotTask
