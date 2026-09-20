@@ -12,14 +12,6 @@ from .type import Action, DestroySnapshotTask, SendSnapshotTask, Task
 Key = TypeVar("Key")
 
 
-def _filesystem(task: Task) -> FileSystem:
-    return task.filesystem
-
-
-def _action(task: Task) -> Action:
-    return task.action
-
-
 def _snapshot(task: Task) -> Snapshot | None:
     match task:
         case SendSnapshotTask() | DestroySnapshotTask():
@@ -43,8 +35,8 @@ class _Level(Generic[Key]):
 
 
 _SNAPSHOTS = _Level(name="snapshot", limit=13, key=_snapshot)
-_ACTIONS = _Level(name="action", limit=4, key=_action, after=_SNAPSHOTS)
-_FILESYSTEMS = _Level(name="filesystem", limit=6, key=_filesystem, after=_ACTIONS)
+_ACTIONS = _Level(name="action", limit=4, key=lambda task: task.action, after=_SNAPSHOTS)
+_FILESYSTEMS = _Level(name="filesystem", limit=6, key=lambda task: task.filesystem, after=_ACTIONS)
 
 
 def report(tasks: list[Task]) -> str:
