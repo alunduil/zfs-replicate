@@ -70,6 +70,6 @@ class DestroySnapshot:
         snapshot.destroy(self.snapshot, ssh_command=context.ssh_command)
 
 
-# The union is the contract: execute() calls run() on it, so a member without
-# one is rejected there, and report._action stays total because the set closes.
+# execute() calls run() on the union, so a member lacking it is rejected there.
+# Closing the set is also what keeps the report's classification total.
 Task = CreateFilesystem | SendSnapshot | DestroyFilesystem | DestroySnapshot
