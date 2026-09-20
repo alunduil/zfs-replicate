@@ -11,8 +11,15 @@ from zfs.replicate.filesystem import remote_filesystem
 from zfs.replicate.filesystem.type import FileSystem, filesystem
 from zfs.replicate.snapshot import Snapshot
 from zfs.replicate.task.generate import generate
-from zfs.replicate.task.type import Action, CreateFilesystemTask, DestroySnapshotTask, SendSnapshotTask
+from zfs.replicate.task.type import (
+    CreateFilesystemTask,
+    DestroyFilesystemTask,
+    DestroySnapshotTask,
+    SendSnapshotTask,
+)
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
+
+_DESTROYS = (DestroyFilesystemTask, DestroySnapshotTask)
 
 _REMOTE = filesystem("backup")
 _LOCAL = filesystem("pool/filesystem")
@@ -66,10 +73,10 @@ class TestGenerate:
 
         result = generate(filesystem(""), {}, snapshots_by_fs)
 
-        assert len([t for t in result if t.action == Action.DESTROY]) == len(snapshots_by_fs) + sum(
+        assert len([t for t in result if isinstance(t, _DESTROYS)]) == len(snapshots_by_fs) + sum(
             map(len, snapshots_by_fs.values()),
         )
-        assert all(t.action == Action.DESTROY for t in result)
+        assert all(isinstance(t, _DESTROYS) for t in result)
 
     @given(lists(SNAPSHOTS))
     def test_empty_locals_remote_prefixed(self, snapshots: list[Snapshot]) -> None:
@@ -79,7 +86,7 @@ class TestGenerate:
 
         result = generate(remote, {}, snapshots_by_fs)
 
-        assert len([t for t in result if t.action == Action.DESTROY]) == len(snapshots_by_fs) + sum(
+        assert len([t for t in result if isinstance(t, _DESTROYS)]) == len(snapshots_by_fs) + sum(
             map(len, snapshots_by_fs.values()),
         )
         assert all(t.filesystem in snapshots_by_fs for t in result)

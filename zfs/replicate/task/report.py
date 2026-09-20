@@ -3,13 +3,38 @@
 import itertools
 from collections.abc import Callable
 from dataclasses import dataclass
+from enum import Enum, auto
 from typing import Any, Generic, TypeVar
 
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
-from .type import Action, DestroySnapshotTask, SendSnapshotTask, Task
+from .type import (
+    CreateFilesystemTask,
+    DestroyFilesystemTask,
+    DestroySnapshotTask,
+    SendSnapshotTask,
+    Task,
+)
 
 Key = TypeVar("Key")
+
+
+class Action(Enum):
+    """What a task does, coarse enough to group the two destroys together."""
+
+    CREATE = auto()
+    DESTROY = auto()
+    SEND = auto()
+
+
+def _action(task: Task) -> Action:
+    match task:
+        case CreateFilesystemTask():
+            return Action.CREATE
+        case SendSnapshotTask():
+            return Action.SEND
+        case DestroyFilesystemTask() | DestroySnapshotTask():
+            return Action.DESTROY
 
 
 def _snapshot(task: Task) -> Snapshot | None:
@@ -35,7 +60,7 @@ class _Level(Generic[Key]):
 
 
 _SNAPSHOTS = _Level(name="snapshot", limit=13, key=_snapshot)
-_ACTIONS = _Level(name="action", limit=4, key=lambda task: task.action, after=_SNAPSHOTS)
+_ACTIONS = _Level(name="action", limit=4, key=_action, after=_SNAPSHOTS)
 _FILESYSTEMS = _Level(name="filesystem", limit=6, key=lambda task: task.filesystem, after=_ACTIONS)
 
 

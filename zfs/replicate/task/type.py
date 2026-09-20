@@ -3,8 +3,6 @@
 import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from enum import Enum, auto
-from typing import ClassVar
 
 from .. import filesystem as filesystem_ops
 from .. import snapshot as snapshot_ops
@@ -15,23 +13,11 @@ from .context import RunContext
 logger = logging.getLogger(__name__)
 
 
-class Action(Enum):
-    """Task Action.
-
-    A grouping key for the report; dispatch goes through the task types.
-    """
-
-    CREATE = auto()
-    DESTROY = auto()
-    SEND = auto()
-
-
 @dataclass(frozen=True)
 class _BaseTask(ABC):
     """A unit of replication work."""
 
     filesystem: FileSystem
-    action: ClassVar[Action]
 
     @abstractmethod
     def run(self, context: RunContext) -> None:
@@ -41,8 +27,6 @@ class _BaseTask(ABC):
 @dataclass(frozen=True)
 class CreateFilesystemTask(_BaseTask):
     """A filesystem to create on the remote."""
-
-    action: ClassVar[Action] = Action.CREATE
 
     def run(self, context: RunContext) -> None:
         """Create the filesystem."""
@@ -55,7 +39,6 @@ class SendSnapshotTask(_BaseTask):
     """A snapshot to send to the remote."""
 
     snapshot: Snapshot
-    action: ClassVar[Action] = Action.SEND
 
     def run(self, context: RunContext) -> None:
         """Send the snapshot, incremental from its predecessor when it has one."""
@@ -76,8 +59,6 @@ class SendSnapshotTask(_BaseTask):
 class DestroyFilesystemTask(_BaseTask):
     """A filesystem to destroy on the remote."""
 
-    action: ClassVar[Action] = Action.DESTROY
-
     def run(self, context: RunContext) -> None:
         """Destroy the filesystem."""
         logger.info("destroying filesystem %s", self.filesystem.name)
@@ -89,7 +70,6 @@ class DestroySnapshotTask(_BaseTask):
     """A snapshot to destroy on the remote."""
 
     snapshot: Snapshot
-    action: ClassVar[Action] = Action.DESTROY
 
     def run(self, context: RunContext) -> None:
         """Destroy the snapshot."""
