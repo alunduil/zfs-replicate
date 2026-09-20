@@ -10,8 +10,9 @@ from zfs.replicate.command import Command
 from zfs.replicate.compress import Compression
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
+from zfs.replicate.task.context import RunContext
 from zfs.replicate.task.execute import execute
-from zfs.replicate.task.type import Replication, SendSnapshotTask
+from zfs.replicate.task.type import SendSnapshotTask
 
 
 class TestExecute:
@@ -35,7 +36,7 @@ class TestExecute:
         with caplog.at_level(logging.INFO, logger="zfs.replicate"):
             execute(
                 [task],
-                Replication(
+                RunContext(
                     remote=filesystem("backup"),
                     ssh_command=Command("ssh", ["backup.example.com"]),
                     compression=Compression.LZ4,

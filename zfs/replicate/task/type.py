@@ -6,12 +6,10 @@ from enum import Enum, auto
 from typing import ClassVar
 
 from .. import filesystem as filesystem_ops
-from .. import receive, send
 from .. import snapshot as snapshot_ops
-from ..command import Command
-from ..compress import Compression
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
+from .context import RunContext
 
 logger = logging.getLogger(__name__)
 
@@ -28,27 +26,16 @@ class Action(Enum):
 
 
 @dataclass(frozen=True)
-class Replication:
-    """What every task needs beyond itself to reach the remote."""
-
-    remote: FileSystem
-    ssh_command: Command
-    compression: Compression
-    send_options: send.Options
-    receive_options: receive.Options
-
-
-@dataclass(frozen=True)
 class CreateFilesystemTask:
     """A filesystem to create on the remote."""
 
     filesystem: FileSystem
     action: ClassVar[Action] = Action.CREATE
 
-    def run(self, replication: Replication) -> None:
+    def run(self, context: RunContext) -> None:
         """Create the filesystem."""
         logger.info("creating filesystem %s", self.filesystem.name)
-        filesystem_ops.create(self.filesystem, ssh_command=replication.ssh_command)
+        filesystem_ops.create(self.filesystem, ssh_command=context.ssh_command)
 
 
 @dataclass(frozen=True)
@@ -59,16 +46,16 @@ class SendSnapshotTask:
     snapshot: Snapshot
     action: ClassVar[Action] = Action.SEND
 
-    def run(self, replication: Replication) -> None:
+    def run(self, context: RunContext) -> None:
         """Send the snapshot, incremental from its predecessor when it has one."""
         logger.info("sending snapshot %s", self.snapshot)
         snapshot_ops.send(
-            replication.remote,
+            context.remote,
             self.snapshot,
-            ssh_command=replication.ssh_command,
-            compression=replication.compression,
-            send_options=replication.send_options,
-            receive_options=replication.receive_options,
+            ssh_command=context.ssh_command,
+            compression=context.compression,
+            send_options=context.send_options,
+            receive_options=context.receive_options,
             previous=self.snapshot.previous,
         )
         logger.debug("sent snapshot %s", self.snapshot)
@@ -81,10 +68,10 @@ class DestroyFilesystemTask:
     filesystem: FileSystem
     action: ClassVar[Action] = Action.DESTROY
 
-    def run(self, replication: Replication) -> None:
+    def run(self, context: RunContext) -> None:
         """Destroy the filesystem."""
         logger.info("destroying filesystem %s", self.filesystem.name)
-        filesystem_ops.destroy(self.filesystem, ssh_command=replication.ssh_command)
+        filesystem_ops.destroy(self.filesystem, ssh_command=context.ssh_command)
 
 
 @dataclass(frozen=True)
@@ -95,10 +82,10 @@ class DestroySnapshotTask:
     snapshot: Snapshot
     action: ClassVar[Action] = Action.DESTROY
 
-    def run(self, replication: Replication) -> None:
+    def run(self, context: RunContext) -> None:
         """Destroy the snapshot."""
         logger.info("destroying snapshot %s", self.snapshot)
-        snapshot_ops.destroy(self.snapshot, ssh_command=replication.ssh_command)
+        snapshot_ops.destroy(self.snapshot, ssh_command=context.ssh_command)
 
 
 # Separate types let mypy reject reading a snapshot off a task that has none.

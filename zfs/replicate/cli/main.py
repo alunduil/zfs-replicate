@@ -120,7 +120,7 @@ def main(  # noqa: PLR0913 -- CLI entry point; each argument is a distinct comma
     if not dry_run:
         task.execute(
             tasks,
-            task.Replication(
+            task.RunContext(
                 remote=remote_fs,
                 ssh_command=ssh_command,
                 compression=compression,
