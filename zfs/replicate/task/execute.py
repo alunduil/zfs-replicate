@@ -13,10 +13,11 @@ def execute(tasks: list[Task], context: RunContext) -> None:
 
 
 def _deepest_first(tasks: list[Task]) -> list[Task]:
-    """Tasks grouped by filesystem, deepest first.
+    """Tasks reordered so deeper filesystems run first.
 
-    zfs destroy is recursive, so taking a parent first would remove the
-    children while their own tasks are still queued.
+    zfs destroy is recursive, so taking a parent first would remove children
+    whose own tasks are still queued.  Each filesystem's tasks stay together,
+    in the order generate() produced them.
     """
     by_filesystem = [(fs, list(grouped)) for fs, grouped in itertools.groupby(tasks, key=lambda x: x.filesystem)]
 

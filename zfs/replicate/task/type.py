@@ -97,6 +97,6 @@ class DestroySnapshotTask(_BaseTask):
         snapshot_ops.destroy(self.snapshot, ssh_command=context.ssh_command)
 
 
-# Signatures take Task, never _BaseTask: only the union lets mypy reject
-# reading a snapshot off a task that has none.
+# Signatures take Task, never _BaseTask: the union is the closed set, so a
+# base-typed parameter accepts a task type nobody added here.
 Task = CreateFilesystemTask | SendSnapshotTask | DestroyFilesystemTask | DestroySnapshotTask
