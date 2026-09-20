@@ -12,8 +12,7 @@ for the test suite live in [testing.md](testing.md).
   crosses both (`ssh`, `compress`, `task`).
 - `type.py` holds the package's domain types and `command.py` its `Command`
   builders. Every other module is named for the operation it performs, matching
-  the `zfs` subcommand where there is one: `list.py`, `create.py`,
-  `destroy.py`, `send.py`.
+  the `zfs` subcommand where there is one.
 - `__init__.py` re-exports the package's public surface. `mypy` runs strict, so
   an implicit re-export fails: a name is either aliased to itself
   (`from .create import create as create`) or listed in `__all__`.
@@ -36,16 +35,14 @@ for the test suite live in [testing.md](testing.md).
   `Command.with_empty_env` and wrapped by `command.over_ssh` to run on the
   remote host. Nothing assembles a command as a shell string.
 - [`process.py`](../../zfs/replicate/process.py) is the only module that spawns
-  a process. Code that runs a command reaches for `open`, `pipeline`, or `run`
-  there rather than for `subprocess`.
+  a process, and the only one that imports `subprocess`.
 
 ## Errors
 
 A failure the operator has to see raises `ZFSReplicateError` from
 [`error.py`](../../zfs/replicate/error.py). It inherits `click.ClickException`,
-so `click` prints the message and exits nonzero with no traceback. The
-constructor takes that message followed by any context arguments, and shows the
-message alone.
+so `click` prints the message and exits nonzero with no traceback. Context
+arguments after the message are discarded.
 
 ## Output
 
@@ -54,13 +51,11 @@ message alone.
   [`cli/log.py`](../../zfs/replicate/cli/log.py) owns the `zfs.replicate`
   logger those propagate to.
 - `click.echo` carries a command's result to standard output and nothing else.
-  The `--dry-run` plan is its only use.
 
 ## Command-line options
 
 - A global option is a `click.option` decorator on `main` in
-  [`cli/main.py`](../../zfs/replicate/cli/main.py). Its `help=` text is what
-  `--help` prints.
+  [`cli/main.py`](../../zfs/replicate/cli/main.py).
 - An option over a closed set of values takes `EnumChoice` from
   [`cli/click.py`](../../zfs/replicate/cli/click.py), so the enum stays the
   only list of accepted values.
