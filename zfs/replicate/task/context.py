@@ -10,7 +10,7 @@ from ..filesystem import FileSystem
 
 @dataclass(frozen=True)
 class RunContext:
-    """What every task needs beyond itself to reach the remote."""
+    """Configuration for one replication, shared by every task."""
 
     remote: FileSystem
     ssh_command: Command
