@@ -27,6 +27,8 @@ class Action(Enum):
     SEND = auto()
 
 
+# No fallback arm: Task is closed, so mypy reports a missing return if a
+# member goes unhandled.  Adding one silently gives that up.
 def _action(task: Task) -> Action:
     match task:
         case CreateFilesystemTask():
