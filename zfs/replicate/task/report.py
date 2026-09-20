@@ -2,84 +2,16 @@
 
 import itertools
 from collections.abc import Callable
-from typing import Any
+from dataclasses import dataclass
+from typing import Any, Generic, TypeVar
 
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
 from .type import Action, DestroySnapshotTask, SendSnapshotTask, Task
 
-LIMITS = {"filesystem": 6, "action": 4, "snapshot": 13}
-
-AFTERS = {"filesystem": "action", "action": "snapshot"}
+Key = TypeVar("Key")
 
 
-def report(tasks: list[Task]) -> str:
-    """Pretty printed report on given Tasks."""
-    filesystems = [(filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=_filesystem)]
-
-    if len(filesystems) > LIMITS["filesystem"]:
-        return _counts("filesystem", tasks)
-
-    return _report_filesystem(filesystems)
-
-
-def _report_filesystem(filesystems: list[tuple[FileSystem, list[Task]]]) -> str:
-    output = ""
-
-    for filesystem, tasks in filesystems:
-        output += f"\nfilesystem: {filesystem.name}\n"
-
-        actions = [(action, list(tasks)) for action, tasks in itertools.groupby(tasks, key=_action)]
-
-        if len(actions) > LIMITS["action"]:
-            output += _counts("action", tasks, indentation="    ")
-        else:
-            output += _report_action(actions, indentation=" - ")
-
-    return output
-
-
-def _report_action(actions: list[tuple[Action, list[Task]]], indentation: str = "") -> str:
-    output = ""
-
-    for action, tasks in actions:
-        output += f"{indentation}action: {action}\n"
-
-        snapshots = [
-            (snapshot, list(tasks))
-            for snapshot, tasks in itertools.groupby(tasks, key=_snapshot)
-            if snapshot is not None
-        ]
-
-        if len(snapshots) > LIMITS["snapshot"]:
-            output += _counts("snapshot", tasks, indentation="   " + indentation)
-        else:
-            output += _report_snapshot(snapshots, indentation="   " + indentation)
-
-    return output
-
-
-def _report_snapshot(snapshots: list[tuple[Snapshot, list[Task]]], indentation: str = "") -> str:
-    output = "\n".join([f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s, _ in snapshots])
-
-    if output:
-        output += "\n"
-
-    return output
-
-
-def _counts(current: str, tasks: list[Task], indentation: str = "") -> str:
-    group = {KEYS[current](x) for x in tasks}
-
-    output = f"{indentation}{current}:{len(group)}\n"
-
-    if current in AFTERS:
-        output += _counts(AFTERS[current], tasks, indentation=indentation)
-
-    return output
-
-
-# Excising these makes typing happy.  Check if they can be injected.
 def _filesystem(task: Task) -> FileSystem:
     return task.filesystem
 
@@ -96,8 +28,87 @@ def _snapshot(task: Task) -> Snapshot | None:
             return None
 
 
-KEYS: dict[str, Callable[[Task], Any]] = {
-    "filesystem": _filesystem,
-    "action": _action,
-    "snapshot": _snapshot,
-}
+@dataclass(frozen=True)
+class _Level(Generic[Key]):
+    """One grouping level of the report.
+
+    ``key`` buckets the tasks, ``limit`` is how many buckets the report
+    spells out before falling back to counts, and ``after`` is the level
+    those counts descend into.
+    """
+
+    name: str
+    limit: int
+    key: Callable[[Task], Key]
+    after: "_Level[Any] | None" = None
+
+
+_SNAPSHOTS = _Level(name="snapshot", limit=13, key=_snapshot)
+_ACTIONS = _Level(name="action", limit=4, key=_action, after=_SNAPSHOTS)
+_FILESYSTEMS = _Level(name="filesystem", limit=6, key=_filesystem, after=_ACTIONS)
+
+
+def report(tasks: list[Task]) -> str:
+    """Pretty printed report on given Tasks."""
+    filesystems = [(filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=_FILESYSTEMS.key)]
+
+    if len(filesystems) > _FILESYSTEMS.limit:
+        return _counts(_FILESYSTEMS, tasks)
+
+    return _report_filesystem(filesystems)
+
+
+def _report_filesystem(filesystems: list[tuple[FileSystem, list[Task]]]) -> str:
+    output = ""
+
+    for filesystem, tasks in filesystems:
+        output += f"\nfilesystem: {filesystem.name}\n"
+
+        actions = [(action, list(tasks)) for action, tasks in itertools.groupby(tasks, key=_ACTIONS.key)]
+
+        if len(actions) > _ACTIONS.limit:
+            output += _counts(_ACTIONS, tasks, indentation="    ")
+        else:
+            output += _report_action(actions, indentation=" - ")
+
+    return output
+
+
+def _report_action(actions: list[tuple[Action, list[Task]]], indentation: str = "") -> str:
+    output = ""
+
+    for action, tasks in actions:
+        output += f"{indentation}action: {action}\n"
+
+        snapshots = [
+            (snapshot, list(tasks))
+            for snapshot, tasks in itertools.groupby(tasks, key=_SNAPSHOTS.key)
+            if snapshot is not None
+        ]
+
+        if len(snapshots) > _SNAPSHOTS.limit:
+            output += _counts(_SNAPSHOTS, tasks, indentation="   " + indentation)
+        else:
+            output += _report_snapshot(snapshots, indentation="   " + indentation)
+
+    return output
+
+
+def _report_snapshot(snapshots: list[tuple[Snapshot, list[Task]]], indentation: str = "") -> str:
+    output = "\n".join([f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s, _ in snapshots])
+
+    if output:
+        output += "\n"
+
+    return output
+
+
+def _counts(level: _Level[Any], tasks: list[Task], indentation: str = "") -> str:
+    group = {level.key(x) for x in tasks}
+
+    output = f"{indentation}{level.name}:{len(group)}\n"
+
+    if level.after is not None:
+        output += _counts(level.after, tasks, indentation=indentation)
+
+    return output
