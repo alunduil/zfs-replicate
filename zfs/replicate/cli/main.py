@@ -118,11 +118,8 @@ def main(  # noqa: PLR0913 -- CLI entry point; each argument is a distinct comma
         click.echo(task.report(tasks))
 
     if not dry_run:
-        filesystem_tasks = [
-            (filesystem, list(tasks)) for filesystem, tasks in itertools.groupby(tasks, key=lambda x: x.filesystem)
-        ]
         task.execute(
-            filesystem_tasks,
+            tasks,
             task.Replication(
                 remote=remote_fs,
                 ssh_command=ssh_command,

@@ -34,7 +34,7 @@ class TestExecute:
 
         with caplog.at_level(logging.INFO, logger="zfs.replicate"):
             execute(
-                [(local, [task])],
+                [task],
                 Replication(
                     remote=filesystem("backup"),
                     ssh_command=Command("ssh", ["backup.example.com"]),

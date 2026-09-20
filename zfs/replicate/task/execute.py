@@ -1,13 +1,14 @@
 """Task Execution."""
 
-from ..filesystem import FileSystem
+import itertools
+
 from .type import Replication, Task
 
 
-def execute(tasks: list[tuple[FileSystem, list[Task]]], replication: Replication) -> None:
+def execute(tasks: list[Task], replication: Replication) -> None:
     """Execute all tasks, deepest filesystem first."""
-    sorted_tasks = sorted(tasks, key=lambda x: len(x[0].name.split("/")), reverse=True)
+    by_filesystem = [(fs, list(grouped)) for fs, grouped in itertools.groupby(tasks, key=lambda x: x.filesystem)]
 
-    for _, filesystem_tasks in sorted_tasks:
+    for _, filesystem_tasks in sorted(by_filesystem, key=lambda x: len(x[0].name.split("/")), reverse=True):
         for task in filesystem_tasks:
             task.run(replication)

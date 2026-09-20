@@ -61,7 +61,7 @@ class SendSnapshotTask:
 
     def run(self, replication: Replication) -> None:
         """Send the snapshot, resuming from its predecessor."""
-        logger.info("sending snapshot %s@%s", self.snapshot.filesystem.name, self.snapshot.name)
+        logger.info("sending snapshot %s", self.snapshot)
         snapshot_ops.send(
             replication.remote,
             self.snapshot,
@@ -71,7 +71,7 @@ class SendSnapshotTask:
             receive_options=replication.receive_options,
             previous=self.snapshot.previous,
         )
-        logger.debug("sent snapshot %s@%s", self.snapshot.filesystem.name, self.snapshot.name)
+        logger.debug("sent snapshot %s", self.snapshot)
 
 
 @dataclass(frozen=True)
@@ -97,7 +97,7 @@ class DestroySnapshotTask:
 
     def run(self, replication: Replication) -> None:
         """Destroy the snapshot."""
-        logger.info("destroying snapshot %s@%s", self.snapshot.filesystem.name, self.snapshot.name)
+        logger.info("destroying snapshot %s", self.snapshot)
         snapshot_ops.destroy(self.snapshot, ssh_command=replication.ssh_command)
 
 

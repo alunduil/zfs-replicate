@@ -92,7 +92,7 @@ def _raise_for_failure(current: Snapshot, returncode: int, error: bytes) -> None
     if not returncode or _MOUNTPOINT_FAILURE in error:
         return
 
-    msg = f"failed to create snapshot: '{current.filesystem.name}@{current.name}': {error!r}"
+    msg = f"failed to create snapshot: '{current}': {error!r}"
     raise ZFSReplicateError(msg, current, error)
 
 
@@ -105,6 +105,6 @@ def _send(
     flags = options.to_flags()
 
     if previous is not None:
-        flags.extend(["-i", f"{previous.filesystem.name}@{previous.name}"])
+        flags.extend(["-i", str(previous)])
 
-    return Command.with_empty_env("zfs", "send", *flags, f"{current.filesystem.name}@{current.name}")
+    return Command.with_empty_env("zfs", "send", *flags, str(current))

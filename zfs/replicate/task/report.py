@@ -94,7 +94,7 @@ def _report_action(actions: list[tuple[Action, list[Task]]], indentation: str = 
 
 
 def _report_snapshot(snapshots: list[tuple[Snapshot, list[Task]]], indentation: str = "") -> str:
-    output = "\n".join([f"{indentation}snapshot: {s.filesystem.name}@{s.name}" for s, _ in snapshots])
+    output = "\n".join([f"{indentation}snapshot: {s}" for s, _ in snapshots])
 
     if output:
         output += "\n"
