@@ -11,8 +11,15 @@ from zfs.replicate.filesystem import remote_filesystem
 from zfs.replicate.filesystem.type import FileSystem, filesystem
 from zfs.replicate.snapshot import Snapshot
 from zfs.replicate.task.generate import generate
-from zfs.replicate.task.type import Action
+from zfs.replicate.task.type import (
+    CreateFilesystem,
+    DestroyFilesystem,
+    DestroySnapshot,
+    SendSnapshot,
+)
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
+
+_DESTROYS = (DestroyFilesystem, DestroySnapshot)
 
 _REMOTE = filesystem("backup")
 _LOCAL = filesystem("pool/filesystem")
@@ -51,15 +58,13 @@ class TestGenerate:
 
     @given(lists(SNAPSHOTS))
     def test_empty_remotes(self, snapshots: list[Snapshot]) -> None:
-        """Generate with empty remotes."""
+        """With nothing on the remote, every filesystem is created and every snapshot sent."""
         snapshots_by_fs = _by_filesystem(snapshots)
 
         result = generate(filesystem(""), snapshots_by_fs, {})
 
-        assert len([t for t in result if t.action == Action.CREATE and t.snapshot is None]) == len(snapshots_by_fs)
-        assert len([t for t in result if t.action == Action.SEND and t.snapshot is not None]) == sum(
-            map(len, snapshots_by_fs.values()),
-        )
+        assert len([t for t in result if isinstance(t, CreateFilesystem)]) == len(snapshots_by_fs)
+        assert len([t for t in result if isinstance(t, SendSnapshot)]) == sum(map(len, snapshots_by_fs.values()))
 
     @given(lists(SNAPSHOTS))
     def test_empty_locals(self, snapshots: list[Snapshot]) -> None:
@@ -68,10 +73,10 @@ class TestGenerate:
 
         result = generate(filesystem(""), {}, snapshots_by_fs)
 
-        assert len([t for t in result if t.action == Action.DESTROY]) == len(snapshots_by_fs) + sum(
+        assert len([t for t in result if isinstance(t, _DESTROYS)]) == len(snapshots_by_fs) + sum(
             map(len, snapshots_by_fs.values()),
         )
-        assert all(t.action == Action.DESTROY for t in result)
+        assert all(isinstance(t, _DESTROYS) for t in result)
 
     @given(lists(SNAPSHOTS))
     def test_empty_locals_remote_prefixed(self, snapshots: list[Snapshot]) -> None:
@@ -81,7 +86,7 @@ class TestGenerate:
 
         result = generate(remote, {}, snapshots_by_fs)
 
-        assert len([t for t in result if t.action == Action.DESTROY]) == len(snapshots_by_fs) + sum(
+        assert len([t for t in result if isinstance(t, _DESTROYS)]) == len(snapshots_by_fs) + sum(
             map(len, snapshots_by_fs.values()),
         )
         assert all(t.filesystem in snapshots_by_fs for t in result)
@@ -90,9 +95,9 @@ class TestGenerate:
         """Without a snapshot in common, the destroys precede the sends."""
         result = generate(_REMOTE, {_LOCAL: [_UNSENT]}, {_DESTINATION: [_STALE]})
 
-        assert [(t.action, t.snapshot) for t in result] == [
-            (Action.DESTROY, _STALE),
-            (Action.SEND, _UNSENT),
+        assert result == [
+            DestroySnapshot(filesystem=_DESTINATION, snapshot=_STALE),
+            SendSnapshot(filesystem=_REMOTE, snapshot=_UNSENT),
         ]
 
     def test_follow_delete_destroys_after_sending(self) -> None:
@@ -104,13 +109,13 @@ class TestGenerate:
             follow_delete=True,
         )
 
-        assert [(t.action, t.snapshot) for t in result] == [
-            (Action.SEND, _UNSENT),
-            (Action.DESTROY, _STALE),
+        assert result == [
+            SendSnapshot(filesystem=_REMOTE, snapshot=_UNSENT),
+            DestroySnapshot(filesystem=_DESTINATION, snapshot=_STALE),
         ]
 
     def test_common_snapshot_keeps_the_remote_without_follow_delete(self) -> None:
         """Without follow_delete, a snapshot missing locally survives on the remote."""
         result = generate(_REMOTE, {_LOCAL: [_SHARED, _UNSENT]}, {_DESTINATION: [_SHARED, _STALE]})
 
-        assert [(t.action, t.snapshot) for t in result] == [(Action.SEND, _UNSENT)]
+        assert result == [SendSnapshot(filesystem=_REMOTE, snapshot=_UNSENT)]

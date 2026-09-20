@@ -10,8 +10,9 @@ from zfs.replicate.command import Command
 from zfs.replicate.compress import Compression
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
+from zfs.replicate.task.context import RunContext
 from zfs.replicate.task.execute import execute
-from zfs.replicate.task.type import Action, Task
+from zfs.replicate.task.type import SendSnapshot
 
 
 class TestExecute:
@@ -22,7 +23,7 @@ class TestExecute:
         caplog: pytest.LogCaptureFixture,
         mocker: MockerFixture,
     ) -> None:
-        """Dispatching a SEND task logs the snapshot at INFO."""
+        """Dispatching a SendSnapshot logs the snapshot at INFO."""
         mocker.patch.object(snapshot, "send")
         # click_log.basic_config disables propagation on zfs.replicate, so caplog
         # (which captures via the root logger) sees nothing without this.
@@ -30,16 +31,18 @@ class TestExecute:
 
         local = filesystem("tank/data")
         snap = Snapshot(filesystem=local, name="snap1", previous=None, timestamp=0)
-        task = Task(action=Action.SEND, filesystem=local, snapshot=snap)
+        task = SendSnapshot(filesystem=local, snapshot=snap)
 
         with caplog.at_level(logging.INFO, logger="zfs.replicate"):
             execute(
-                filesystem("backup"),
-                [(local, [task])],
-                ssh_command=Command("ssh", ["backup.example.com"]),
-                compression=Compression.LZ4,
-                send_options=send.Options(large_block=False, raw=True, embed=False, compressed=False, props=False),
-                receive_options=receive.Options(force=True, no_mount=False, resume=False, properties={}),
+                [task],
+                RunContext(
+                    remote=filesystem("backup"),
+                    ssh_command=Command("ssh", ["backup.example.com"]),
+                    compression=Compression.LZ4,
+                    send_options=send.Options(large_block=False, raw=True, embed=False, compressed=False, props=False),
+                    receive_options=receive.Options(force=True, no_mount=False, resume=False, properties={}),
+                ),
             )
 
         # Assert on the snapshot identity, not the exact phrasing, so rewording the

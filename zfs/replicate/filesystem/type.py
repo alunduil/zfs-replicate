@@ -11,6 +11,11 @@ class FileSystem:
     name: str
     readonly: bool
 
+    @property
+    def depth(self) -> int:
+        """Number of names in the path, counting the pool."""
+        return len(self.name.split("/"))
+
 
 def filesystem(name: str, readonly: bool = False) -> FileSystem:
     """Create a FileSystem from a name."""

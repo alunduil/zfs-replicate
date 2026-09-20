@@ -14,6 +14,10 @@ class Snapshot:
     previous: "Snapshot | None"
     timestamp: int
 
+    def __str__(self) -> str:
+        """Name zfs knows the snapshot by, ``filesystem@name``."""
+        return f"{self.filesystem.name}@{self.name}"
+
     def __eq__(self, other: object) -> bool:
         """Equality of Snapshots."""
         if other is None:
