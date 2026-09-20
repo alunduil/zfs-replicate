@@ -5,15 +5,15 @@ from collections.abc import Iterable
 from ..filesystem import FileSystem, remote_filesystem
 from ..list import venn
 from ..snapshot import Snapshot
-from .type import Action, Task
+from .type import CreateFilesystemTask, DestroyFilesystemTask, DestroySnapshotTask, SendSnapshotTask, Task
 
 
 def _destroy_snapshots(destination: FileSystem, snapshots: Iterable[Snapshot]) -> list[Task]:
-    return [Task(action=Action.DESTROY, filesystem=destination, snapshot=s) for s in snapshots]
+    return [DestroySnapshotTask(filesystem=destination, snapshot=s) for s in snapshots]
 
 
 def _send_snapshots(remote: FileSystem, snapshots: Iterable[Snapshot]) -> list[Task]:
-    return [Task(action=Action.SEND, filesystem=remote, snapshot=s) for s in snapshots]
+    return [SendSnapshotTask(filesystem=remote, snapshot=s) for s in snapshots]
 
 
 def generate(
@@ -23,7 +23,7 @@ def generate(
     follow_delete: bool = False,
 ) -> list[Task]:
     """Generate Tasks for replicating local snapshots to remote snapshots."""
-    tasks = []
+    tasks: list[Task] = []
 
     # zfs list reports remote filesystems prefixed with the remote's name.
     local_snaps_by_destination = {
@@ -32,7 +32,7 @@ def generate(
 
     for destination, local_snaps in local_snaps_by_destination.items():
         if destination not in remote_snapshots:
-            tasks.append(Task(action=Action.CREATE, filesystem=destination, snapshot=None))
+            tasks.append(CreateFilesystemTask(filesystem=destination))
             tasks.extend(_send_snapshots(remote, local_snaps))
             continue
 
@@ -55,6 +55,6 @@ def generate(
     for destination, remote_snaps in remote_snapshots.items():
         if destination not in local_snaps_by_destination:
             tasks.extend(_destroy_snapshots(destination, remote_snaps))
-            tasks.append(Task(action=Action.DESTROY, filesystem=destination, snapshot=None))
+            tasks.append(DestroyFilesystemTask(filesystem=destination))
 
     return tasks

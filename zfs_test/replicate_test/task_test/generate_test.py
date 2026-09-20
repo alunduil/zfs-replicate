@@ -11,7 +11,7 @@ from zfs.replicate.filesystem import remote_filesystem
 from zfs.replicate.filesystem.type import FileSystem, filesystem
 from zfs.replicate.snapshot import Snapshot
 from zfs.replicate.task.generate import generate
-from zfs.replicate.task.type import Action
+from zfs.replicate.task.type import Action, CreateFilesystemTask, DestroySnapshotTask, SendSnapshotTask
 from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 _REMOTE = filesystem("backup")
@@ -56,10 +56,8 @@ class TestGenerate:
 
         result = generate(filesystem(""), snapshots_by_fs, {})
 
-        assert len([t for t in result if t.action == Action.CREATE and t.snapshot is None]) == len(snapshots_by_fs)
-        assert len([t for t in result if t.action == Action.SEND and t.snapshot is not None]) == sum(
-            map(len, snapshots_by_fs.values()),
-        )
+        assert len([t for t in result if isinstance(t, CreateFilesystemTask)]) == len(snapshots_by_fs)
+        assert len([t for t in result if isinstance(t, SendSnapshotTask)]) == sum(map(len, snapshots_by_fs.values()))
 
     @given(lists(SNAPSHOTS))
     def test_empty_locals(self, snapshots: list[Snapshot]) -> None:
@@ -90,9 +88,9 @@ class TestGenerate:
         """Without a snapshot in common, the destroys precede the sends."""
         result = generate(_REMOTE, {_LOCAL: [_UNSENT]}, {_DESTINATION: [_STALE]})
 
-        assert [(t.action, t.snapshot) for t in result] == [
-            (Action.DESTROY, _STALE),
-            (Action.SEND, _UNSENT),
+        assert result == [
+            DestroySnapshotTask(filesystem=_DESTINATION, snapshot=_STALE),
+            SendSnapshotTask(filesystem=_REMOTE, snapshot=_UNSENT),
         ]
 
     def test_follow_delete_destroys_after_sending(self) -> None:
@@ -104,13 +102,13 @@ class TestGenerate:
             follow_delete=True,
         )
 
-        assert [(t.action, t.snapshot) for t in result] == [
-            (Action.SEND, _UNSENT),
-            (Action.DESTROY, _STALE),
+        assert result == [
+            SendSnapshotTask(filesystem=_REMOTE, snapshot=_UNSENT),
+            DestroySnapshotTask(filesystem=_DESTINATION, snapshot=_STALE),
         ]
 
     def test_common_snapshot_keeps_the_remote_without_follow_delete(self) -> None:
         """Without follow_delete, a snapshot missing locally survives on the remote."""
         result = generate(_REMOTE, {_LOCAL: [_SHARED, _UNSENT]}, {_DESTINATION: [_SHARED, _STALE]})
 
-        assert [(t.action, t.snapshot) for t in result] == [(Action.SEND, _UNSENT)]
+        assert result == [SendSnapshotTask(filesystem=_REMOTE, snapshot=_UNSENT)]

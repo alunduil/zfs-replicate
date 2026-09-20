@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from .. import compress, filesystem, optional, process, receive
+from .. import compress, filesystem, process, receive
 from ..command import Command, over_ssh
 from ..compress import Compression
 from ..error import ZFSReplicateError
@@ -29,7 +29,7 @@ class Pipeline:
     @property
     def stages(self) -> list[Command]:
         """The commands to run, in pipeline order."""
-        return optional.values(self.send, self.compress, self.receive)
+        return [stage for stage in (self.send, self.compress, self.receive) if stage is not None]
 
 
 def send(  # noqa: PLR0913 -- carries the full replication call surface

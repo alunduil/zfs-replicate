@@ -11,7 +11,7 @@ from zfs.replicate.compress import Compression
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 from zfs.replicate.task.execute import execute
-from zfs.replicate.task.type import Action, Task
+from zfs.replicate.task.type import SendSnapshotTask
 
 
 class TestExecute:
@@ -30,7 +30,7 @@ class TestExecute:
 
         local = filesystem("tank/data")
         snap = Snapshot(filesystem=local, name="snap1", previous=None, timestamp=0)
-        task = Task(action=Action.SEND, filesystem=local, snapshot=snap)
+        task = SendSnapshotTask(filesystem=local, snapshot=snap)
 
         with caplog.at_level(logging.INFO, logger="zfs.replicate"):
             execute(
