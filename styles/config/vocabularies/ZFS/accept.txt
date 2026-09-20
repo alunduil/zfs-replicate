@@ -1,10 +1,14 @@
 Amdahl
 argparse
+dataclass
 docstring
+enum
 MADR
 nixpkgs
 Nygard
 release-please
 semver
+subcommand
 subprocess
+traceback
 Zettabyte

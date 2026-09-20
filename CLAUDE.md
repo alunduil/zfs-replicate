@@ -17,6 +17,10 @@ request, or a one-off `Bash` helper.
   writing code. `pre-commit run --all-files` is the canonical
   local check, and `.pre-commit-config.yaml` lists everything
   else it gates.
+- **Conventions those tools leave open:** package layout, the
+  `Command` and process boundary, the error type, and the split
+  between logging and `click.echo` live in
+  [docs/reference/code-conventions.md](docs/reference/code-conventions.md).
 - **Entry point:** `zfs.replicate.cli.main:main`, installed as
   `zfs-replicate`.
 - **Session setup:** a `SessionStart` hook already ran `poetry
