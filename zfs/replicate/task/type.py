@@ -1,7 +1,6 @@
 """Types for Tasks."""
 
 import logging
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from .. import filesystem, snapshot
@@ -13,19 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
-class _BaseTask(ABC):
-    """A unit of replication work."""
+class CreateFilesystem:
+    """A filesystem to create on the remote."""
 
     filesystem: FileSystem
-
-    @abstractmethod
-    def run(self, context: RunContext) -> None:
-        """Perform the task against the remote."""
-
-
-@dataclass(frozen=True)
-class CreateFilesystem(_BaseTask):
-    """A filesystem to create on the remote."""
 
     def run(self, context: RunContext) -> None:
         """Create the filesystem."""
@@ -34,9 +24,10 @@ class CreateFilesystem(_BaseTask):
 
 
 @dataclass(frozen=True)
-class SendSnapshot(_BaseTask):
+class SendSnapshot:
     """A snapshot to send to the remote."""
 
+    filesystem: FileSystem
     snapshot: Snapshot
 
     def run(self, context: RunContext) -> None:
@@ -55,8 +46,10 @@ class SendSnapshot(_BaseTask):
 
 
 @dataclass(frozen=True)
-class DestroyFilesystem(_BaseTask):
+class DestroyFilesystem:
     """A filesystem to destroy on the remote."""
+
+    filesystem: FileSystem
 
     def run(self, context: RunContext) -> None:
         """Destroy the filesystem."""
@@ -65,9 +58,10 @@ class DestroyFilesystem(_BaseTask):
 
 
 @dataclass(frozen=True)
-class DestroySnapshot(_BaseTask):
+class DestroySnapshot:
     """A snapshot to destroy on the remote."""
 
+    filesystem: FileSystem
     snapshot: Snapshot
 
     def run(self, context: RunContext) -> None:
@@ -76,6 +70,6 @@ class DestroySnapshot(_BaseTask):
         snapshot.destroy(self.snapshot, ssh_command=context.ssh_command)
 
 
-# Signatures take Task, never _BaseTask: the union is the closed set, so a
-# base-typed parameter accepts a task type nobody added here.
+# The union is the contract: execute() calls run() on it, so a member without
+# one is rejected there, and report._action stays total because the set closes.
 Task = CreateFilesystem | SendSnapshot | DestroyFilesystem | DestroySnapshot
