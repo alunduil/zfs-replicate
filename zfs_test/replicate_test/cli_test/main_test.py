@@ -62,7 +62,7 @@ class TestMain:
         )
         assert result.exit_code == 0, result.output
 
-        assert execute.call_args.kwargs["send_options"] == send.Options(
+        assert execute.call_args.args[1].send_options == send.Options(
             large_block=True, raw=False, embed=True, compressed=True, props=True
         )
 
@@ -83,7 +83,7 @@ class TestMain:
         )
         assert result.exit_code == 0, result.output
 
-        assert execute.call_args.kwargs["receive_options"] == receive.Options(
+        assert execute.call_args.args[1].receive_options == receive.Options(
             force=False, no_mount=True, resume=True, properties={"readonly": "on"}
         )
 

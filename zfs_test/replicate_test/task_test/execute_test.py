@@ -11,7 +11,7 @@ from zfs.replicate.compress import Compression
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 from zfs.replicate.task.execute import execute
-from zfs.replicate.task.type import SendSnapshotTask
+from zfs.replicate.task.type import Replication, SendSnapshotTask
 
 
 class TestExecute:
@@ -34,12 +34,14 @@ class TestExecute:
 
         with caplog.at_level(logging.INFO, logger="zfs.replicate"):
             execute(
-                filesystem("backup"),
                 [(local, [task])],
-                ssh_command=Command("ssh", ["backup.example.com"]),
-                compression=Compression.LZ4,
-                send_options=send.Options(large_block=False, raw=True, embed=False, compressed=False, props=False),
-                receive_options=receive.Options(force=True, no_mount=False, resume=False, properties={}),
+                Replication(
+                    remote=filesystem("backup"),
+                    ssh_command=Command("ssh", ["backup.example.com"]),
+                    compression=Compression.LZ4,
+                    send_options=send.Options(large_block=False, raw=True, embed=False, compressed=False, props=False),
+                    receive_options=receive.Options(force=True, no_mount=False, resume=False, properties={}),
+                ),
             )
 
         # Assert on the snapshot identity, not the exact phrasing, so rewording the
