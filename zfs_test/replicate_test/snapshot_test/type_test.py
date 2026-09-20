@@ -33,6 +33,23 @@ class TestSnapshotEq:
         )
         assert local == remote
 
+    def test_ignores_non_snapshot(self) -> None:
+        """An unrelated object never equals a snapshot; see #694."""
+        snapshot = Snapshot(filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0)
+        assert snapshot != "snap"
+        assert not (snapshot == "snap")
+
+    def test_membership_skips_non_snapshots(self) -> None:
+        """Membership over mixed sequences never raises; see #694."""
+        snapshot = Snapshot(filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0)
+        assert snapshot not in ["snap", 42]
+
+    def test_ignores_none(self) -> None:
+        """None never equals a snapshot, without a dedicated guard; see #694."""
+        snapshot = Snapshot(filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0)
+        nothing: object = None
+        assert snapshot != nothing
+
 
 class TestSnapshotHash:
     """``Snapshot.__hash__`` holds equal Snapshots to one hash."""
