@@ -1,10 +1,9 @@
 # Code conventions
 
 The conventions the `zfs/` package follows where `ruff` and `mypy` leave the
-choice open. Formatting, import order, and typing style are settled by the
-configuration in [`pyproject.toml`](../../pyproject.toml) and reported by
-`pre-commit run --all-files`, so they're out of scope here. Conventions for the
-test suite live in [testing.md](testing.md).
+choice open. Those two settle formatting, import order, and typing style from
+[`pyproject.toml`](../../pyproject.toml), so this page skips them. Conventions
+for the test suite live in [testing.md](testing.md).
 
 ## Package layout
 
@@ -29,22 +28,16 @@ test suite live in [testing.md](testing.md).
   `type.py`. A helper type used by one module sits in that module, as
   `Pipeline` does in
   [`snapshot/send.py`](../../zfs/replicate/snapshot/send.py).
-- A closed set of choices is an `Enum`. `EnumChoice` in
-  [`cli/click.py`](../../zfs/replicate/cli/click.py) puts one on the command
-  line, so the enum stays the only list of accepted values.
+- A closed set of choices is an `Enum`.
 
 ## Commands and processes
 
-- A command is a [`Command`](../../zfs/replicate/command.py): a program and its
-  argument list, built through `Command.with_empty_env`. A command is never
-  assembled as a shell string.
+- A command is a [`Command`](../../zfs/replicate/command.py), built through
+  `Command.with_empty_env` and wrapped by `command.over_ssh` to run on the
+  remote host. Nothing assembles a command as a shell string.
 - [`process.py`](../../zfs/replicate/process.py) is the only module that spawns
-  a process, through `open` for streaming, `pipeline` for chaining stages, or
-  `run` for a command that runs to completion. Each one execs the argument list
-  with `shell=False`.
-- `Command.render` quotes a command into a string with `shlex.join`, for the
-  remote login shell that `ssh` hands its arguments to. `command.over_ssh`,
-  which wraps commands to run through `ssh`, is its only caller.
+  a process. Code that runs a command reaches for `open`, `pipeline`, or `run`
+  there rather than for `subprocess`.
 
 ## Errors
 
@@ -57,10 +50,9 @@ message alone.
 ## Output
 
 - Operational progress goes to the logger, which writes to standard error. A
-  library module emits through `logging.getLogger(__name__)`;
+  library module emits through `logging.getLogger(__name__)`, and
   [`cli/log.py`](../../zfs/replicate/cli/log.py) owns the `zfs.replicate`
-  logger those propagate to, along with the `--verbosity` option and the
-  formatting.
+  logger those propagate to.
 - `click.echo` carries a command's result to standard output and nothing else.
   The `--dry-run` plan is its only use.
 
@@ -69,6 +61,9 @@ message alone.
 - A global option is a `click.option` decorator on `main` in
   [`cli/main.py`](../../zfs/replicate/cli/main.py). Its `help=` text is what
   `--help` prints.
+- An option over a closed set of values takes `EnumChoice` from
+  [`cli/click.py`](../../zfs/replicate/cli/click.py), so the enum stays the
+  only list of accepted values.
 - The `--send-*` and `--receive-*` flags belong to the `send_group` and
   `receive_group` decorators in
   [`cli/options.py`](../../zfs/replicate/cli/options.py), which collapse each

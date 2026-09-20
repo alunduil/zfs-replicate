@@ -88,10 +88,10 @@ class TestList:
 
 ## The process boundary
 
-[`zfs/replicate/process.py`](../../zfs/replicate/process.py) is the sole place
-the project spawns a process: `process.open` for streaming, `process.pipeline`
-for chaining one command's output into the next, and `process.run` for
-run-to-completion. Tests never spawn real `zfs` or `ssh`.
+The project spawns every process through
+[`zfs/replicate/process.py`](../../zfs/replicate/process.py), covered in
+[code-conventions.md](code-conventions.md). Tests never spawn real `zfs` or
+`ssh`.
 
 - Command *builders* (`*/command.py`) construct a `Command` and spawn nothing.
   Their tests assert on `Command.argv` and `Command.render()` directly.
