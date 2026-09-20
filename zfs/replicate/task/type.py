@@ -4,8 +4,7 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from .. import filesystem as filesystem_ops
-from .. import snapshot as snapshot_ops
+from .. import filesystem, snapshot
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
 from .context import RunContext
@@ -31,7 +30,7 @@ class CreateFilesystemTask(_BaseTask):
     def run(self, context: RunContext) -> None:
         """Create the filesystem."""
         logger.info("creating filesystem %s", self.filesystem.name)
-        filesystem_ops.create(self.filesystem, ssh_command=context.ssh_command)
+        filesystem.create(self.filesystem, ssh_command=context.ssh_command)
 
 
 @dataclass(frozen=True)
@@ -43,7 +42,7 @@ class SendSnapshotTask(_BaseTask):
     def run(self, context: RunContext) -> None:
         """Send the snapshot, incremental from its predecessor when it has one."""
         logger.info("sending snapshot %s", self.snapshot)
-        snapshot_ops.send(
+        snapshot.send(
             context.remote,
             self.snapshot,
             ssh_command=context.ssh_command,
@@ -62,7 +61,7 @@ class DestroyFilesystemTask(_BaseTask):
     def run(self, context: RunContext) -> None:
         """Destroy the filesystem."""
         logger.info("destroying filesystem %s", self.filesystem.name)
-        filesystem_ops.destroy(self.filesystem, ssh_command=context.ssh_command)
+        filesystem.destroy(self.filesystem, ssh_command=context.ssh_command)
 
 
 @dataclass(frozen=True)
@@ -74,7 +73,7 @@ class DestroySnapshotTask(_BaseTask):
     def run(self, context: RunContext) -> None:
         """Destroy the snapshot."""
         logger.info("destroying snapshot %s", self.snapshot)
-        snapshot_ops.destroy(self.snapshot, ssh_command=context.ssh_command)
+        snapshot.destroy(self.snapshot, ssh_command=context.ssh_command)
 
 
 # Signatures take Task, never _BaseTask: the union is the closed set, so a
