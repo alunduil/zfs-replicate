@@ -9,10 +9,10 @@ from typing import Any, Generic, TypeVar
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
 from .type import (
-    CreateFilesystemTask,
-    DestroyFilesystemTask,
-    DestroySnapshotTask,
-    SendSnapshotTask,
+    CreateFilesystem,
+    DestroyFilesystem,
+    DestroySnapshot,
+    SendSnapshot,
     Task,
 )
 
@@ -31,17 +31,17 @@ class Action(Enum):
 # member goes unhandled.  Adding one silently gives that up.
 def _action(task: Task) -> Action:
     match task:
-        case CreateFilesystemTask():
+        case CreateFilesystem():
             return Action.CREATE
-        case SendSnapshotTask():
+        case SendSnapshot():
             return Action.SEND
-        case DestroyFilesystemTask() | DestroySnapshotTask():
+        case DestroyFilesystem() | DestroySnapshot():
             return Action.DESTROY
 
 
 def _snapshot(task: Task) -> Snapshot | None:
     match task:
-        case SendSnapshotTask() | DestroySnapshotTask():
+        case SendSnapshot() | DestroySnapshot():
             return task.snapshot
         case _:
             return None

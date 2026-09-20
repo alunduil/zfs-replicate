@@ -12,7 +12,7 @@ from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 from zfs.replicate.task.context import RunContext
 from zfs.replicate.task.execute import execute
-from zfs.replicate.task.type import SendSnapshotTask
+from zfs.replicate.task.type import SendSnapshot
 
 
 class TestExecute:
@@ -23,7 +23,7 @@ class TestExecute:
         caplog: pytest.LogCaptureFixture,
         mocker: MockerFixture,
     ) -> None:
-        """Dispatching a SendSnapshotTask logs the snapshot at INFO."""
+        """Dispatching a SendSnapshot logs the snapshot at INFO."""
         mocker.patch.object(snapshot, "send")
         # click_log.basic_config disables propagation on zfs.replicate, so caplog
         # (which captures via the root logger) sees nothing without this.
@@ -31,7 +31,7 @@ class TestExecute:
 
         local = filesystem("tank/data")
         snap = Snapshot(filesystem=local, name="snap1", previous=None, timestamp=0)
-        task = SendSnapshotTask(filesystem=local, snapshot=snap)
+        task = SendSnapshot(filesystem=local, snapshot=snap)
 
         with caplog.at_level(logging.INFO, logger="zfs.replicate"):
             execute(

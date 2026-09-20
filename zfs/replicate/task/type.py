@@ -24,7 +24,7 @@ class _BaseTask(ABC):
 
 
 @dataclass(frozen=True)
-class CreateFilesystemTask(_BaseTask):
+class CreateFilesystem(_BaseTask):
     """A filesystem to create on the remote."""
 
     def run(self, context: RunContext) -> None:
@@ -34,7 +34,7 @@ class CreateFilesystemTask(_BaseTask):
 
 
 @dataclass(frozen=True)
-class SendSnapshotTask(_BaseTask):
+class SendSnapshot(_BaseTask):
     """A snapshot to send to the remote."""
 
     snapshot: Snapshot
@@ -55,7 +55,7 @@ class SendSnapshotTask(_BaseTask):
 
 
 @dataclass(frozen=True)
-class DestroyFilesystemTask(_BaseTask):
+class DestroyFilesystem(_BaseTask):
     """A filesystem to destroy on the remote."""
 
     def run(self, context: RunContext) -> None:
@@ -65,7 +65,7 @@ class DestroyFilesystemTask(_BaseTask):
 
 
 @dataclass(frozen=True)
-class DestroySnapshotTask(_BaseTask):
+class DestroySnapshot(_BaseTask):
     """A snapshot to destroy on the remote."""
 
     snapshot: Snapshot
@@ -78,4 +78,4 @@ class DestroySnapshotTask(_BaseTask):
 
 # Signatures take Task, never _BaseTask: the union is the closed set, so a
 # base-typed parameter accepts a task type nobody added here.
-Task = CreateFilesystemTask | SendSnapshotTask | DestroyFilesystemTask | DestroySnapshotTask
+Task = CreateFilesystem | SendSnapshot | DestroyFilesystem | DestroySnapshot

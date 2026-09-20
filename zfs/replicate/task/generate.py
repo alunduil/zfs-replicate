@@ -5,15 +5,15 @@ from collections.abc import Iterable
 from ..filesystem import FileSystem, remote_filesystem
 from ..list import venn
 from ..snapshot import Snapshot
-from .type import CreateFilesystemTask, DestroyFilesystemTask, DestroySnapshotTask, SendSnapshotTask, Task
+from .type import CreateFilesystem, DestroyFilesystem, DestroySnapshot, SendSnapshot, Task
 
 
 def _destroy_snapshots(destination: FileSystem, snapshots: Iterable[Snapshot]) -> list[Task]:
-    return [DestroySnapshotTask(filesystem=destination, snapshot=s) for s in snapshots]
+    return [DestroySnapshot(filesystem=destination, snapshot=s) for s in snapshots]
 
 
 def _send_snapshots(remote: FileSystem, snapshots: Iterable[Snapshot]) -> list[Task]:
-    return [SendSnapshotTask(filesystem=remote, snapshot=s) for s in snapshots]
+    return [SendSnapshot(filesystem=remote, snapshot=s) for s in snapshots]
 
 
 def generate(
@@ -32,7 +32,7 @@ def generate(
 
     for destination, local_snaps in local_snaps_by_destination.items():
         if destination not in remote_snapshots:
-            tasks.append(CreateFilesystemTask(filesystem=destination))
+            tasks.append(CreateFilesystem(filesystem=destination))
             tasks.extend(_send_snapshots(remote, local_snaps))
             continue
 
@@ -55,6 +55,6 @@ def generate(
     for destination, remote_snaps in remote_snapshots.items():
         if destination not in local_snaps_by_destination:
             tasks.extend(_destroy_snapshots(destination, remote_snaps))
-            tasks.append(DestroyFilesystemTask(filesystem=destination))
+            tasks.append(DestroyFilesystem(filesystem=destination))
 
     return tasks

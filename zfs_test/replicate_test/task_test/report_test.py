@@ -5,18 +5,18 @@ from hypothesis.strategies import builds, lists, one_of
 
 from zfs.replicate.task import report
 from zfs.replicate.task.type import (
-    CreateFilesystemTask,
-    DestroyFilesystemTask,
-    DestroySnapshotTask,
-    SendSnapshotTask,
+    CreateFilesystem,
+    DestroyFilesystem,
+    DestroySnapshot,
+    SendSnapshot,
     Task,
 )
 
 TASKS = one_of(
-    builds(CreateFilesystemTask),
-    builds(SendSnapshotTask),
-    builds(DestroyFilesystemTask),
-    builds(DestroySnapshotTask),
+    builds(CreateFilesystem),
+    builds(SendSnapshot),
+    builds(DestroyFilesystem),
+    builds(DestroySnapshot),
 )
 
 
