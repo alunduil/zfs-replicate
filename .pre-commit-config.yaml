@@ -49,7 +49,7 @@ repos:
         # annotations the suite runs against.
         language: python
         additional_dependencies:
-          - click==8.4.2
+          - click==8.5.0
           - click-log==0.4.0
           - hypothesis==6.165.10
           - pytest==9.1.1
