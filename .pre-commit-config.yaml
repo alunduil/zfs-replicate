@@ -51,7 +51,7 @@ repos:
         additional_dependencies:
           - click==8.4.2
           - click-log==0.4.0
-          - hypothesis==6.165.10
+          - hypothesis==6.168.1
           - pytest==9.1.1
           - pytest-mock==3.15.1
   - repo: https://github.com/jendrikseipp/vulture
