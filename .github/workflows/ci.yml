@@ -66,9 +66,6 @@ jobs:
     name: Report coverage
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    env:
-      # renovate: datasource=python-version depName=python versioning=npm
-      PYTHON_VERSION: "3.12"
     permissions:
       # A job-level block replaces the workflow-level one rather than
       # merging, so the checkout needs `contents` named again here.
@@ -79,8 +76,6 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
       - name: poetry install
         run: poetry install
       - name: poetry run pytest --cov
@@ -127,14 +122,9 @@ jobs:
     name: Build the distribution
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    env:
-      # renovate: datasource=python-version depName=python versioning=npm
-      PYTHON_VERSION: "3.12"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
       - name: poetry build
         run: poetry build
       - name: poetry check

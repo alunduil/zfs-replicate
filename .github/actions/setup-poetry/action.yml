@@ -8,8 +8,11 @@ description: Install Poetry and Python for a given version, with Poetry's downlo
 # callers run actions/checkout before invoking it.
 inputs:
   python-version:
-    description: Python version passed to actions/setup-python.
-    required: true
+    description: >-
+      Python version passed to actions/setup-python. Omit it to use
+      .github/.python-version, the single pin that Renovate's pyenv manager
+      keeps current.
+    required: false
 
 runs:
   using: composite
@@ -17,8 +20,11 @@ runs:
     - name: install poetry
       shell: bash
       run: pipx install 'poetry<3'
-    - name: setup python-${{ inputs.python-version }}
+    - name: setup python
       uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
       with:
         python-version: ${{ inputs.python-version }}
+        # setup-python warns when both inputs are set, so name the file only
+        # when no version was passed.
+        python-version-file: ${{ inputs.python-version == '' && '.github/.python-version' || '' }}
         cache: poetry
