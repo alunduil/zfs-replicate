@@ -90,8 +90,6 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
-        with:
-          python-version: "3.12"
       - name: poetry install --with mutation
         run: poetry install --with mutation
       # Serial keeps the verdicts reproducible: the parallel runner

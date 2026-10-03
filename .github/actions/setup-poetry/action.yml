@@ -8,8 +8,10 @@ description: Install Poetry and Python for a given version, with Poetry's downlo
 # callers run actions/checkout before invoking it.
 inputs:
   python-version:
-    description: Python version passed to actions/setup-python.
-    required: true
+    description: >-
+      Defaults to .github/.python-version, which sits outside the repository
+      root so that uv and pyenv leave local shells unpinned.
+    required: false
 
 runs:
   using: composite
@@ -17,8 +19,10 @@ runs:
     - name: install poetry
       shell: bash
       run: pipx install 'poetry<3'
-    - name: setup python-${{ inputs.python-version }}
+    - name: setup python
       uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
       with:
         python-version: ${{ inputs.python-version }}
+        # setup-python warns when it receives both inputs.
+        python-version-file: ${{ inputs.python-version == '' && '.github/.python-version' || '' }}
         cache: poetry
