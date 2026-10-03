@@ -17,11 +17,14 @@ jobs:
     name: Build the distribution
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    env:
+      # renovate: datasource=python-version depName=python versioning=npm
+      PYTHON_VERSION: "3.12"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
         with:
-          python-version: "3.x"
+          python-version: ${{ env.PYTHON_VERSION }}
       - name: poetry build
         run: poetry build
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
