@@ -485,22 +485,22 @@ files = [
 
 [[package]]
 name = "mutmut"
-version = "3.7.0"
+version = "3.8.0"
 description = "mutation testing for Python 3"
 optional = false
 python-versions = ">=3.10"
 groups = ["mutation"]
 files = [
-    {file = "mutmut-3.7.0-py3-none-any.whl", hash = "sha256:1d2f9a1bfa4a474b2213df6b17223150b492bf4a85af0eda4fb322297337fb32"},
-    {file = "mutmut-3.7.0.tar.gz", hash = "sha256:dc93260fabb3a6fd3693aa8d1746825885cb6f9e66c7f9cc1a0f34fc6388e14a"},
+    {file = "mutmut-3.8.0-py3-none-any.whl", hash = "sha256:4c0abcef6b8d1116f2adfaad19df12e1c621e4a402d4367ef15bf8cba497b91d"},
+    {file = "mutmut-3.8.0.tar.gz", hash = "sha256:bc670276518f893ab356f1d28826c49b7e606e7cf89c300e3888c0b52fc1d2ed"},
 ]
 
 [package.dependencies]
-click = ">=8.0.0"
+click = ">=8.4.2"
 coverage = ">=7.3.0"
-libcst = ">=1.8.5"
+libcst = ">=1.9.0"
 pytest = ">=6.2.5"
-setproctitle = ">=1.1.0"
+setproctitle = ">=1.3.7"
 textual = ">=1.0.0"
 toml = {version = ">=0.10.2", markers = "python_full_version < \"3.11.0\""}
 
@@ -1014,4 +1014,4 @@ test = ["coverage", "pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.10"
-content-hash = "f1b95230859e1e2155fda82841267d44e8211e94059e75a161c0f73a4368a815"
+content-hash = "6689dded5c35a046709e62184c1c5b24bab10b4ddb5a8e1c10d03a6344498766"
