@@ -88,6 +88,10 @@ repos:
           - shell
           - toml
           - yaml
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
   - repo: https://github.com/renovatebot/pre-commit-hooks
     rev: 44.35.3
     hooks:
