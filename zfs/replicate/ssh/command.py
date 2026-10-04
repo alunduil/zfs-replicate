@@ -3,12 +3,17 @@
 from ..command import Command
 from .cipher import Cipher
 
-# A peer that stops answering without closing the socket would otherwise block
-# communicate() forever. ssh drops it once _SERVER_ALIVE_COUNT_MAX probes sent
-# _SERVER_ALIVE_INTERVAL seconds apart go unanswered: about a minute. Setting
-# the count overrides ssh_config so that window holds.
-_SERVER_ALIVE_INTERVAL = 15
-_SERVER_ALIVE_COUNT_MAX = 4
+_OPTIONS: dict[str, str | int] = {
+    "BatchMode": "yes",
+    "StrictHostKeyChecking": "yes",
+    "ConnectTimeout": 7,
+    # A peer that stops answering without closing the socket would otherwise
+    # block communicate() forever. ssh drops it once ServerAliveCountMax probes
+    # sent ServerAliveInterval seconds apart go unanswered: about a minute.
+    # Setting the count overrides ssh_config so that window holds.
+    "ServerAliveInterval": 15,
+    "ServerAliveCountMax": 4,
+}
 
 
 def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> Command:
@@ -25,15 +30,8 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
     elif cipher == Cipher.DISABLED:
         options.extend([*_option("noneenabled", "yes"), *_option("noneswitch", "yes")])
 
-    options.extend(
-        [
-            *_option("BatchMode", "yes"),
-            *_option("StrictHostKeyChecking", "yes"),
-            *_option("ConnectTimeout", 7),
-            *_option("ServerAliveInterval", _SERVER_ALIVE_INTERVAL),
-            *_option("ServerAliveCountMax", _SERVER_ALIVE_COUNT_MAX),
-        ]
-    )
+    for name, value in _OPTIONS.items():
+        options.extend(_option(name, value))
 
     options.extend(["-i", key_file])
 
