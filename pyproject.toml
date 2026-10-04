@@ -29,7 +29,7 @@ relative_files = true
 source = ["zfs"]
 
 [tool.fawltydeps]
-ignore_unused = ["mutmut", "pytest-cov", "pytest-randomly", "vale"]
+ignore_unused = ["mutmut", "pytest-cov", "pytest-randomly"]
 
 [tool.mutmut]
 # mutmut runs pytest from a copy of the tree under mutants/, so testpaths only
