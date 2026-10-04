@@ -28,6 +28,14 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
             "StrictHostKeyChecking=yes",
             "-o",
             "ConnectTimeout=7",
+            # A peer that stops answering without closing the socket would
+            # otherwise block communicate() forever; these drop it after about
+            # a minute (15s x 4 unanswered probes). Pinning the count overrides
+            # ssh_config so that window holds.
+            "-o",
+            "ServerAliveInterval=15",
+            "-o",
+            "ServerAliveCountMax=4",
         ]
     )
 
