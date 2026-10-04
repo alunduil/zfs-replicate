@@ -115,3 +115,61 @@ jobs:
         with:
           filename: mutation-score-issue.md
           update_existing: true
+
+  # A release inside the declared ranges can turn this red with no change here,
+  # so it runs on a schedule rather than gating unrelated pull requests.
+  dependency-ceiling:
+    name: Test the newest dependency releases
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      # A job-level block replaces the workflow-level one rather than
+      # merging, so the checkout needs `contents` named again here.
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-poetry
+      # Resolves every range in pyproject.toml afresh rather than from
+      # poetry.lock, and logs each version that moves off the lock.
+      - name: poetry update
+        run: poetry update
+      - name: poetry run pytest
+        id: pytest
+        run: poetry run pytest
+
+      # Only a test failure files the issue, so an index outage during the
+      # update reddens the run without claiming a dependency broke the suite.
+      - name: Render the failure
+        if: failure() && steps.pytest.outcome == 'failure'
+        run: |
+          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          {
+            echo "---"
+            echo "title: Newest dependency releases fail the suite"
+            echo "labels:"
+            echo "  - dependencies"
+            echo "---"
+            echo "The nightly \`Test the newest dependency releases\` job failed"
+            echo "against the newest runtime releases pyproject.toml allows:"
+            echo
+            echo '```text'
+            poetry show --only main --top-level
+            echo '```'
+            echo
+            echo "See [the failing run]($run_url). Fix the incompatibility, or"
+            echo "lower the ceiling in pyproject.toml if the release drops"
+            echo "something this project needs."
+          } > dependency-ceiling-issue.md
+
+      # Title and labels come from the file's front matter, not from `with`.
+      # Updating one issue keeps the latest failure in place instead of accruing
+      # one issue per night.
+      - name: File or refresh the failure issue
+        if: failure() && steps.pytest.outcome == 'failure'
+        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          filename: dependency-ceiling-issue.md
+          update_existing: true
