@@ -3,6 +3,13 @@
 from ..command import Command
 from .cipher import Cipher
 
+# A peer that stops answering without closing the socket would otherwise block
+# communicate() forever. ssh drops it once _SERVER_ALIVE_COUNT_MAX probes sent
+# _SERVER_ALIVE_INTERVAL seconds apart go unanswered: about a minute. Setting
+# the count overrides ssh_config so that window holds.
+_SERVER_ALIVE_INTERVAL = 15
+_SERVER_ALIVE_COUNT_MAX = 4
+
 
 def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> Command:
     """Generate ssh commandline invocation."""
@@ -28,14 +35,10 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
             "StrictHostKeyChecking=yes",
             "-o",
             "ConnectTimeout=7",
-            # A peer that stops answering without closing the socket would
-            # otherwise block communicate() forever; these drop it after about
-            # a minute (15s x 4 unanswered probes). Pinning the count overrides
-            # ssh_config so that window holds.
             "-o",
-            "ServerAliveInterval=15",
+            f"ServerAliveInterval={_SERVER_ALIVE_INTERVAL}",
             "-o",
-            "ServerAliveCountMax=4",
+            f"ServerAliveCountMax={_SERVER_ALIVE_COUNT_MAX}",
         ]
     )
 
