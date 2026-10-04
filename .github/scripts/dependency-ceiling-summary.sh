@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 # Render a failed dependency-ceiling run as a create-an-issue body.
 #
-# Fills $ISSUE_FILE, whose front matter carries the title create-an-issue
-# matches on, with the runtime versions Poetry resolved and a link to the run.
-# The path takes an override. Run from the repository root after
-# `poetry update`.
+# Run after `poetry update`. Before it, `poetry show` reports the locked
+# versions, not the ones that failed.
 set -euo pipefail
 
 : "${ISSUE_FILE:=dependency-ceiling-issue.md}"

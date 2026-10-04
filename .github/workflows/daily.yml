@@ -130,23 +130,21 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
-      # Resolves every range in pyproject.toml afresh rather than from
-      # poetry.lock, and logs each version that moves off the lock.
+      # Installers and downstream packagers never see poetry.lock, so this
+      # resolves the ranges without it.
       - name: poetry update
         run: poetry update
       - name: poetry run pytest
         id: pytest
         run: poetry run pytest
 
-      # Only a test failure files the issue, so an index outage during the
-      # update reddens the run without claiming a dependency broke the suite.
+      # A failed update is usually an index outage, so it reddens the run
+      # without filing an issue that blames a dependency.
       - name: Render the failure
         if: failure() && steps.pytest.outcome == 'failure'
         run: .github/scripts/dependency-ceiling-summary.sh
 
       # Title and labels come from the file's front matter, not from `with`.
-      # Updating one issue keeps the latest failure in place instead of accruing
-      # one issue per night.
       - name: File or refresh the failure issue
         if: failure() && steps.pytest.outcome == 'failure'
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
