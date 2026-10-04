@@ -7,10 +7,8 @@ _OPTIONS: dict[str, str | int] = {
     "BatchMode": "yes",
     "StrictHostKeyChecking": "yes",
     "ConnectTimeout": 7,
-    # A peer that stops answering without closing the socket would otherwise
-    # block communicate() forever. ssh drops it once ServerAliveCountMax probes
-    # sent ServerAliveInterval seconds apart go unanswered: about a minute.
-    # Setting the count overrides ssh_config so that window holds.
+    # A peer that goes silent without closing the socket fails the transfer
+    # after about a minute instead of hanging it.
     "ServerAliveInterval": 15,
     "ServerAliveCountMax": 4,
 }
@@ -44,5 +42,4 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
 
 
 def _option(name: str, value: str | int) -> list[str]:
-    """Spell ``name=value`` as an ``-o`` override."""
     return ["-o", f"{name}={value}"]
