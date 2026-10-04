@@ -142,25 +142,7 @@ jobs:
       # update reddens the run without claiming a dependency broke the suite.
       - name: Render the failure
         if: failure() && steps.pytest.outcome == 'failure'
-        run: |
-          run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
-          {
-            echo "---"
-            echo "title: Newest dependency releases fail the suite"
-            echo "labels:"
-            echo "  - dependencies"
-            echo "---"
-            echo "The nightly \`Test the newest dependency releases\` job failed"
-            echo "against the newest runtime releases pyproject.toml allows:"
-            echo
-            echo '```text'
-            poetry show --only main --top-level
-            echo '```'
-            echo
-            echo "See [the failing run]($run_url). Fix the incompatibility, or"
-            echo "lower the ceiling in pyproject.toml if the release drops"
-            echo "something this project needs."
-          } > dependency-ceiling-issue.md
+        run: .github/scripts/dependency-ceiling-summary.sh
 
       # Title and labels come from the file's front matter, not from `with`.
       # Updating one issue keeps the latest failure in place instead of accruing
