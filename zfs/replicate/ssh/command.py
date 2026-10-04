@@ -23,22 +23,17 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
             ]
         )
     elif cipher == Cipher.DISABLED:
-        options.extend(["-o", "noneenabled=yes", "-o", "noneswitch=yes"])
+        options.extend([*_option("noneenabled", "yes"), *_option("noneswitch", "yes")])
 
     options.extend(
         [
             "-i",
             key_file,
-            "-o",
-            "BatchMode=yes",
-            "-o",
-            "StrictHostKeyChecking=yes",
-            "-o",
-            "ConnectTimeout=7",
-            "-o",
-            f"ServerAliveInterval={_SERVER_ALIVE_INTERVAL}",
-            "-o",
-            f"ServerAliveCountMax={_SERVER_ALIVE_COUNT_MAX}",
+            *_option("BatchMode", "yes"),
+            *_option("StrictHostKeyChecking", "yes"),
+            *_option("ConnectTimeout", 7),
+            *_option("ServerAliveInterval", _SERVER_ALIVE_INTERVAL),
+            *_option("ServerAliveCountMax", _SERVER_ALIVE_COUNT_MAX),
         ]
     )
 
@@ -48,3 +43,8 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
     options.extend(["-p", str(port), host])
 
     return Command.with_empty_env("ssh", *options)
+
+
+def _option(name: str, value: str | int) -> list[str]:
+    """Spell ``name=value`` as an ``-o`` override."""
+    return ["-o", f"{name}={value}"]
