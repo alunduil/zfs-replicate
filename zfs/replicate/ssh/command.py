@@ -27,8 +27,6 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
 
     options.extend(
         [
-            "-i",
-            key_file,
             *_option("BatchMode", "yes"),
             *_option("StrictHostKeyChecking", "yes"),
             *_option("ConnectTimeout", 7),
@@ -36,6 +34,8 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
             *_option("ServerAliveCountMax", _SERVER_ALIVE_COUNT_MAX),
         ]
     )
+
+    options.extend(["-i", key_file])
 
     if user:
         options.extend(["-l", user])
