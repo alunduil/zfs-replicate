@@ -2,6 +2,10 @@
 # zfs-replicate
 <!-- vale RedHat.Headings = YES -->
 
+[![Licence](https://img.shields.io/github/license/alunduil/zfs-replicate)][LICENSE]
+[![Coverage](https://img.shields.io/codecov/c/github/alunduil/zfs-replicate)][Codecov]
+[![Python versions](https://img.shields.io/pypi/pyversions/zfs-replicate)][PyPI]
+
 <https://github.com/alunduil/zfs-replicate>
 
 By Alex Brandt <alunduil@gmail.com>
@@ -23,62 +27,63 @@ zfs-replicate relates to several other projects, which fit other niches:
 1. [znapzend]: Another scheduling and replicating system.
 1. [zrep]: A SH script with several control commands for snapshot replication.
 
-## Terms of use
-
-You are free to copy, change, and distribute zfs-replicate with attribution
-under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
-
 ## Prerequisites
 
-1. A remote system with a ZFS filesystem and the `zfs` command-line tools
-1. If using lz4 compression, local and remote systems must have lz4 in their environments
-1. SSH access to that remote system
-1. If you're not using the root user remotely:
-   1. Ensure the user can mount filesystems
-      1. [FreeBSD]: `sysctl -w vfs.usermount=1`
-   1. Add ZFS permissions
-      1. Command: `zfs allow ${USER} ${PERMISSIONS} ${BACKUP_DATASET}`
-      1. Permissions
-         1. `clone`
-         1. `create`
-         1. `destroy`
-         1. `hold`
-         1. `mount`
-         1. `promote`
-         1. `quota`
-         1. `readonly`
-         1. `receive`
-         1. `rename`
-         1. `reservation`
-         1. `rollback`
-         1. `send`
-         1. `snapshot`
 1. A local ZFS filesystem and `zfs` command-line tools
 1. Python 3.10 or later on the local system
+1. A remote system with a ZFS filesystem and the `zfs` command-line tools
+1. SSH access to that remote system
+1. If using lz4 compression, local and remote systems must have lz4 in their environments
 
-_N.B., don't use the root user to access your remote system._
+Don't use the root user to access your remote system. Instead, let the remote
+user mount filesystems and delegate the ZFS permissions replication needs on
+the backup data set:
+
+```sh
+# FreeBSD only: allow non-root users to mount filesystems.
+sysctl -w vfs.usermount=1
+
+zfs allow "${USER}" clone,create,destroy,hold,mount,promote,quota,readonly,receive,rename,reservation,rollback,send,snapshot "${BACKUP_DATASET}"
+```
+
+## Install zfs-replicate
+
+Install zfs-replicate from [PyPI] with `pipx`, which keeps it in an isolated
+environment:
+
+```sh
+pipx install zfs-replicate
+```
+
+`pip install zfs-replicate` works as well, into an environment you manage.
+
+Nix and NixOS users install the `zfs-replicate` package from [nixpkgs]. NixOS
+also provides a `services.zfs.autoReplication` module that runs replication as
+a system service.
+
+To work on zfs-replicate itself, follow [CONTRIBUTING] to install it from a
+clone.
 
 ## How to use zfs-replicate
 
-1. `poetry install`
-1. `poetry run -- zfs-replicate --help`
+Replicate the snapshots of `LOCAL_FS` to `REMOTE_FS` on `HOST`:
 
-To tune the send stream or set properties on the replica, see
+```sh
+zfs-replicate --user "${USER}" --identity-file ~/.ssh/id_ed25519 HOST REMOTE_FS LOCAL_FS
+```
+
+`zfs-replicate --help` lists every option. To tune the send stream or set
+properties on the replica, see
 [How to tune the send and receive streams][stream tuning].
-
-Nix and NixOS users install the `zfs-replicate` package from [nixpkgs] rather
-than building from this repository. NixOS also provides a
-`services.zfs.autoReplication` module that runs replication as a system
-service.
 
 ## Documentation
 
 * `zfs-replicate --help`: Help for zfs-replicate.
-* [LICENSE]: Licence file explaining usage of zfs-replicate.
 * [How to replicate an encrypted data set][encrypted replication]: Replicate
   without decrypting, then load the replica's key on the destination.
 * [How to tune the send and receive streams][stream tuning]: Control what the
   send stream carries and set properties on the replica.
+* [CHANGELOG]: Changes in each release.
 * [Survey of ZFS Replication Tools][survey]: Overview of various ZFS replication
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
@@ -93,15 +98,30 @@ service.
 
 * [GitHub issues]: Report any problems or features requests to GitHub issues.
 
+## Contributing
+
+Contributions are welcome as issues or pull requests. [CONTRIBUTING] explains
+how to set up a development environment and what a pull request needs.
+Everyone taking part follows the [Code of Conduct].
+
+## Licence
+
+You are free to copy, change, and distribute zfs-replicate with attribution
+under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
+
 [autorepl.py]: https://github.com/freenas/freenas/blob/master/gui/tools/autorepl.py
-[encrypted replication]: ./docs/how-to/replicate-an-encrypted-data-set.md
-[FreeBSD]: https://www.freebsd.org/
+[CHANGELOG]: https://github.com/alunduil/zfs-replicate/blob/master/CHANGELOG.md
+[Code of Conduct]: https://github.com/alunduil/zfs-replicate/blob/master/CODE_OF_CONDUCT.md
+[Codecov]: https://app.codecov.io/gh/alunduil/zfs-replicate
+[CONTRIBUTING]: https://github.com/alunduil/zfs-replicate/blob/master/CONTRIBUTING.md
+[encrypted replication]: https://github.com/alunduil/zfs-replicate/blob/master/docs/how-to/replicate-an-encrypted-data-set.md
 [`FreeNAS`]: http://www.freenas.org/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
-[LICENSE]: ./LICENSE
+[LICENSE]: https://github.com/alunduil/zfs-replicate/blob/master/LICENSE
 [nixpkgs]: https://search.nixos.org/packages?show=zfs-replicate
+[PyPI]: https://pypi.org/project/zfs-replicate/
 [sanoid]: https://github.com/jimsalterjrs/sanoid
-[stream tuning]: ./docs/how-to/tune-the-send-and-receive-streams.md
+[stream tuning]: https://github.com/alunduil/zfs-replicate/blob/master/docs/how-to/tune-the-send-and-receive-streams.md
 [survey]: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 [Working With Oracle Solaris ZFS Snapshots and Clones]: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc
 [ZFS REMOTE REPLICATION SCRIPT WITH REPORTING]: https://techblog.jeppson.org/2014/10/zfs-remote-replication-script-with-reporting/
