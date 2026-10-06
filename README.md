@@ -78,7 +78,6 @@ properties on the replica, see
 
 ## Documentation
 
-* `zfs-replicate --help`: Help for zfs-replicate.
 * [How to replicate an encrypted data set][encrypted replication]: Replicate
   without decrypting, then load the replica's key on the destination.
 * [How to tune the send and receive streams][stream tuning]: Control what the
@@ -109,13 +108,13 @@ Everyone taking part follows the [Code of Conduct].
 You are free to copy, change, and distribute zfs-replicate with attribution
 under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
 
-[autorepl.py]: https://github.com/freenas/freenas/blob/master/gui/tools/autorepl.py
+[autorepl.py]: https://github.com/truenas/middleware/blob/9cebb519bf4c6dc0c76b9ef00a82a9e82a54d724/gui/tools/autorepl.py
 [CHANGELOG]: https://github.com/alunduil/zfs-replicate/blob/master/CHANGELOG.md
 [Code of Conduct]: https://github.com/alunduil/zfs-replicate/blob/master/CODE_OF_CONDUCT.md
 [Codecov]: https://app.codecov.io/gh/alunduil/zfs-replicate
 [CONTRIBUTING]: https://github.com/alunduil/zfs-replicate/blob/master/CONTRIBUTING.md
 [encrypted replication]: https://github.com/alunduil/zfs-replicate/blob/master/docs/how-to/replicate-an-encrypted-data-set.md
-[`FreeNAS`]: http://www.freenas.org/
+[`FreeNAS`]: https://www.truenas.com/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
 [LICENSE]: https://github.com/alunduil/zfs-replicate/blob/master/LICENSE
 [nixpkgs]: https://search.nixos.org/packages?show=zfs-replicate
@@ -125,7 +124,7 @@ under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
 [survey]: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 [Working With Oracle Solaris ZFS Snapshots and Clones]: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc
 [ZFS REMOTE REPLICATION SCRIPT WITH REPORTING]: https://techblog.jeppson.org/2014/10/zfs-remote-replication-script-with-reporting/
-[zfs-replicate (BASH)]: https://github.com/leprechau/zfs-replicate
-[ZFS replication without using Root user]: https://forums.freenas.org/index.php?threads/zfs-replication-without-using-root-user.21731/
+[zfs-replicate (BASH)]: https://github.com/aaronhurt/zfs-replicate
+[ZFS replication without using Root user]: https://www.truenas.com/community/threads/zfs-replication-without-using-root-user.21731/
 [znapzend]: http://www.znapzend.org/
 [zrep]: http://www.bolthole.com/solaris/zrep/
