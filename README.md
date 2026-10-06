@@ -95,6 +95,10 @@ Everyone taking part follows the [Code of Conduct].
 You are free to copy, change, and distribute zfs-replicate with attribution
 under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
 
+zfs-replicate began as a fork of FreeNAS's [autorepl.py], so the LICENSE
+carries the iXsystems, Inc. copyright.
+
+[autorepl.py]: https://github.com/truenas/middleware/blob/9cebb519bf4c6dc0c76b9ef00a82a9e82a54d724/gui/tools/autorepl.py
 [CHANGELOG]: https://github.com/alunduil/zfs-replicate/blob/master/CHANGELOG.md
 [Code of Conduct]: https://github.com/alunduil/zfs-replicate/blob/master/CODE_OF_CONDUCT.md
 [Codecov]: https://app.codecov.io/gh/alunduil/zfs-replicate
