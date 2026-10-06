@@ -12,8 +12,9 @@ By Alex Brandt <alunduil@gmail.com>
 
 ## Description
 
-zfs-replicate sends all Zettabyte File System (ZFS) snapshots to a remote host by SSH.  zfs-replicate
-does **not** create ZFS snapshots.
+zfs-replicate backs up Zettabyte File System (ZFS) data sets to a remote host
+by sending their snapshots over SSH. It does **not** create snapshots, so pair
+it with a tool that does.
 
 zfs-replicate forks [autorepl.py] used by [`FreeNAS`].
 
@@ -80,15 +81,10 @@ properties on the replica, see
   tools and their uses.
 * [Working With Oracle Solaris ZFS Snapshots and Clones]: Oracle's guide to
   working with ZFS snapshots.
-<!-- vale RedHat.Definitions = NO -->
-* [ZFS REMOTE REPLICATION SCRIPT WITH REPORTING]
-<!-- vale RedHat.Definitions = YES -->
-* [ZFS replication without using Root user]: How to configure ZFS replication
-  for a non-root user.
 
 ## Getting support
 
-* [GitHub issues]: Report any problems or features requests to GitHub issues.
+* [GitHub issues]: Report any problems or feature requests to GitHub issues.
 
 ## Contributing
 
@@ -116,8 +112,6 @@ under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
 [stream tuning]: https://github.com/alunduil/zfs-replicate/blob/master/docs/how-to/tune-the-send-and-receive-streams.md
 [survey]: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 [Working With Oracle Solaris ZFS Snapshots and Clones]: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc
-[ZFS REMOTE REPLICATION SCRIPT WITH REPORTING]: https://techblog.jeppson.org/2014/10/zfs-remote-replication-script-with-reporting/
 [zfs-replicate (BASH)]: https://github.com/aaronhurt/zfs-replicate
-[ZFS replication without using Root user]: https://www.truenas.com/community/threads/zfs-replication-without-using-root-user.21731/
 [znapzend]: http://www.znapzend.org/
 [zrep]: http://www.bolthole.com/solaris/zrep/
