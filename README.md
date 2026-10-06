@@ -33,14 +33,13 @@ zfs-replicate relates to several other projects, which fit other niches:
 1. Python 3.10 or later on the local system
 1. A remote system with a ZFS filesystem and the `zfs` command-line tools
 1. SSH access to that remote system
-1. If using lz4 compression, local and remote systems must have lz4 in their environments
+1. `lz4` on both systems, unless you pass `--compression off`
 
-Don't use the root user to access your remote system. Instead, let the remote
-user mount filesystems and delegate the ZFS permissions replication needs on
-the backup data set:
+Don't use the root user on the remote system. Delegate the ZFS permissions
+replication needs on the backup data set to a regular user instead:
 
 ```sh
-# FreeBSD only: allow non-root users to mount filesystems.
+# FreeBSD only: let non-root users mount filesystems.
 sysctl -w vfs.usermount=1
 
 zfs allow "${USER}" clone,create,destroy,hold,mount,promote,quota,readonly,receive,rename,reservation,rollback,send,snapshot "${BACKUP_DATASET}"
@@ -48,21 +47,15 @@ zfs allow "${USER}" clone,create,destroy,hold,mount,promote,quota,readonly,recei
 
 ## Install zfs-replicate
 
-Install zfs-replicate from [PyPI] with `pipx`, which keeps it in an isolated
-environment:
+Install zfs-replicate from [PyPI]:
 
 ```sh
 pipx install zfs-replicate
 ```
 
-`pip install zfs-replicate` works as well, into an environment you manage.
-
 Nix and NixOS users install the `zfs-replicate` package from [nixpkgs]. NixOS
 also provides a `services.zfs.autoReplication` module that runs replication as
 a system service.
-
-To work on zfs-replicate itself, follow [CONTRIBUTING] to install it from a
-clone.
 
 ## How to use zfs-replicate
 
