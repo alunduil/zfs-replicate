@@ -16,8 +16,6 @@ zfs-replicate backs up Zettabyte File System (ZFS) data sets to a remote host
 by sending their snapshots over SSH. It does **not** create snapshots, so pair
 it with a tool that does.
 
-zfs-replicate forks [autorepl.py] used by [`FreeNAS`].
-
 zfs-replicate relates to several other projects, which fit other niches:
 
 1. [sanoid]: A full snapshot management system. Its companion,
@@ -97,13 +95,11 @@ Everyone taking part follows the [Code of Conduct].
 You are free to copy, change, and distribute zfs-replicate with attribution
 under the terms of the `BSD-2-Clause` licence. See the [LICENSE] for details.
 
-[autorepl.py]: https://github.com/truenas/middleware/blob/9cebb519bf4c6dc0c76b9ef00a82a9e82a54d724/gui/tools/autorepl.py
 [CHANGELOG]: https://github.com/alunduil/zfs-replicate/blob/master/CHANGELOG.md
 [Code of Conduct]: https://github.com/alunduil/zfs-replicate/blob/master/CODE_OF_CONDUCT.md
 [Codecov]: https://app.codecov.io/gh/alunduil/zfs-replicate
 [CONTRIBUTING]: https://github.com/alunduil/zfs-replicate/blob/master/CONTRIBUTING.md
 [encrypted replication]: https://github.com/alunduil/zfs-replicate/blob/master/docs/how-to/replicate-an-encrypted-data-set.md
-[`FreeNAS`]: https://www.truenas.com/
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
 [LICENSE]: https://github.com/alunduil/zfs-replicate/blob/master/LICENSE
 [nixpkgs]: https://search.nixos.org/packages?show=zfs-replicate
