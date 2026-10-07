@@ -86,7 +86,10 @@ pytest-randomly = "==4.1.0"
 # Coverage is off here so the version matrix and mutmut's per-mutant runs
 # don't pay for it. The callers that want it pass --cov on the command line.
 addopts = "--doctest-modules"
-testpaths = ["zfs_test"]
+# zfs/ has no __init__.py. Without this, pytest imports the doctest modules a
+# second time as a top-level replicate package, apart from zfs.replicate.
+consider_namespace_packages = true
+testpaths = ["zfs", "zfs_test"]
 
 [tool.ruff]
 # target-version is intentionally unset: ruff infers it from the project's
