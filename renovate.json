@@ -30,6 +30,25 @@
       "description": "Poetry resolves the newest release in range rather than the version Renovate targeted, so an in-range update writes a lockfile Renovate then rejects. :pinDevDependencies does not reach these groups: it matches the devDependencies, dev-dependencies, and dev depTypes, and a Poetry group's depType is its name",
       "matchDepTypes": ["mutation", "test"],
       "rangeStrategy": "pin"
+    },
+    {
+      "description": "Automerge pre-commit hook updates below a major: they change development tooling, never the published package",
+      "matchManagers": ["pre-commit"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge GitHub Actions digest, pin, and sub-major updates: they run only in CI",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["digest", "pin", "pinDigest", "minor", "patch"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge sub-major updates to the Poetry groups that never ship in the published package",
+      "matchManagers": ["poetry"],
+      "matchDepTypes": ["mutation", "test"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
     }
   ],
   "customManagers": [
