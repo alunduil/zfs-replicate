@@ -1,8 +1,12 @@
 """zfs.replicate.task.execute tests."""
 
 import logging
+from contextlib import ExitStack
+from unittest import mock
 
 import pytest
+from hypothesis import example, given
+from hypothesis.strategies import lists
 from pytest_mock import MockerFixture
 
 from zfs.replicate import receive, send, snapshot
@@ -12,11 +16,46 @@ from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 from zfs.replicate.task.context import RunContext
 from zfs.replicate.task.execute import execute
-from zfs.replicate.task.type import SendSnapshot
+from zfs.replicate.task.type import CreateFilesystem, DestroyFilesystem, DestroySnapshot, SendSnapshot, Task
+from zfs_test.replicate_test.task_test.strategies import LOCAL, TASKS
 
 
 class TestExecute:
-    """Dispatching a task reports it through the ``zfs.replicate`` logger."""
+    """Every task runs once, in order within its filesystem, and logs its dispatch."""
+
+    @given(lists(TASKS))
+    @example(
+        [
+            DestroySnapshot(
+                filesystem=LOCAL, snapshot=Snapshot(filesystem=LOCAL, name="s1", previous=None, timestamp=0)
+            ),
+            CreateFilesystem(filesystem=LOCAL),
+            DestroySnapshot(
+                filesystem=LOCAL, snapshot=Snapshot(filesystem=LOCAL, name="s2", previous=None, timestamp=1)
+            ),
+        ]
+    )
+    def test_runs_every_task_in_order(self, tasks: list[Task]) -> None:
+        """Runs one filesystem's tasks as given, even when an action recurs after another; see #653."""
+        ran: list[Task] = []
+        with ExitStack() as stack:
+            for kind in (CreateFilesystem, SendSnapshot, DestroyFilesystem, DestroySnapshot):
+                stack.enter_context(
+                    mock.patch.object(kind, "run", autospec=True, side_effect=lambda task, _: ran.append(task))
+                )
+
+            execute(
+                tasks,
+                RunContext(
+                    remote=filesystem("backup"),
+                    ssh_command=Command("ssh", ["backup.example.com"]),
+                    compression=Compression.LZ4,
+                    send_options=send.Options(large_block=False, raw=True, embed=False, compressed=False, props=False),
+                    receive_options=receive.Options(force=True, no_mount=False, resume=False, properties={}),
+                ),
+            )
+
+        assert ran == tasks
 
     def test_send_dispatch_logs(
         self,
