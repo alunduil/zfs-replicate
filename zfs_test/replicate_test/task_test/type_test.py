@@ -3,22 +3,12 @@
 from pytest_mock import MockerFixture
 
 import zfs.replicate.task.type as sut
-from zfs.replicate import filesystem, receive, send, snapshot
-from zfs.replicate.command import Command
-from zfs.replicate.compress import Compression
+from zfs.replicate import filesystem, snapshot
 from zfs.replicate.snapshot.type import Snapshot
-from zfs.replicate.task.context import RunContext
+from zfs_test.replicate_test.task_test.context import CONTEXT
 
 _FILESYSTEM = filesystem.filesystem("tank/data")
 _PREVIOUS = Snapshot(filesystem=_FILESYSTEM, name="snap0", previous=None, timestamp=0)
-
-_CONTEXT = RunContext(
-    remote=filesystem.filesystem("backup"),
-    ssh_command=Command("ssh", ["backup.example.com"]),
-    compression=Compression.LZ4,
-    send_options=send.Options(large_block=False, raw=True, embed=False, compressed=False, props=False),
-    receive_options=receive.Options(force=True, no_mount=False, resume=False, properties={}),
-)
 
 
 class TestCreateFilesystem:
@@ -28,9 +18,9 @@ class TestCreateFilesystem:
         """run() passes the task's filesystem and the context's ssh command."""
         create = mocker.patch.object(filesystem, "create")
 
-        sut.CreateFilesystem(filesystem=_FILESYSTEM).run(_CONTEXT)
+        sut.CreateFilesystem(filesystem=_FILESYSTEM).run(CONTEXT)
 
-        create.assert_called_once_with(_FILESYSTEM, ssh_command=_CONTEXT.ssh_command)
+        create.assert_called_once_with(_FILESYSTEM, ssh_command=CONTEXT.ssh_command)
 
 
 class TestDestroyFilesystem:
@@ -40,9 +30,9 @@ class TestDestroyFilesystem:
         """run() passes the task's filesystem and the context's ssh command."""
         destroy = mocker.patch.object(filesystem, "destroy")
 
-        sut.DestroyFilesystem(filesystem=_FILESYSTEM).run(_CONTEXT)
+        sut.DestroyFilesystem(filesystem=_FILESYSTEM).run(CONTEXT)
 
-        destroy.assert_called_once_with(_FILESYSTEM, ssh_command=_CONTEXT.ssh_command)
+        destroy.assert_called_once_with(_FILESYSTEM, ssh_command=CONTEXT.ssh_command)
 
 
 class TestDestroySnapshot:
@@ -53,9 +43,9 @@ class TestDestroySnapshot:
         destroy_snapshot = mocker.patch.object(snapshot, "destroy")
         destroy_filesystem = mocker.patch.object(filesystem, "destroy")
 
-        sut.DestroySnapshot(filesystem=_FILESYSTEM, snapshot=_PREVIOUS).run(_CONTEXT)
+        sut.DestroySnapshot(filesystem=_FILESYSTEM, snapshot=_PREVIOUS).run(CONTEXT)
 
-        destroy_snapshot.assert_called_once_with(_PREVIOUS, ssh_command=_CONTEXT.ssh_command)
+        destroy_snapshot.assert_called_once_with(_PREVIOUS, ssh_command=CONTEXT.ssh_command)
         destroy_filesystem.assert_not_called()
 
 
@@ -67,14 +57,14 @@ class TestSendSnapshot:
         send_snapshot = mocker.patch.object(snapshot, "send")
         current = Snapshot(filesystem=_FILESYSTEM, name="snap1", previous=_PREVIOUS, timestamp=1)
 
-        sut.SendSnapshot(filesystem=_FILESYSTEM, snapshot=current).run(_CONTEXT)
+        sut.SendSnapshot(filesystem=_FILESYSTEM, snapshot=current).run(CONTEXT)
 
         send_snapshot.assert_called_once_with(
-            _CONTEXT.remote,
+            CONTEXT.remote,
             current,
-            ssh_command=_CONTEXT.ssh_command,
-            compression=_CONTEXT.compression,
-            send_options=_CONTEXT.send_options,
-            receive_options=_CONTEXT.receive_options,
+            ssh_command=CONTEXT.ssh_command,
+            compression=CONTEXT.compression,
+            send_options=CONTEXT.send_options,
+            receive_options=CONTEXT.receive_options,
             previous=_PREVIOUS,
         )
