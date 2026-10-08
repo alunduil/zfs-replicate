@@ -32,21 +32,15 @@
       "rangeStrategy": "pin"
     },
     {
-      "description": "Neither group ships in the published package",
-      "matchDepTypes": ["mutation", "test"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    },
-    {
-      "description": "Hooks are development tooling and never ship in the published package",
-      "matchManagers": ["pre-commit"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    },
-    {
-      "description": "Actions run only in CI and never ship in the published package",
-      "matchManagers": ["github-actions"],
-      "matchUpdateTypes": ["digest", "pin", "pinDigest", "minor", "patch"],
+      "description": "None of these update types promises a breaking change, so the required checks are the whole review",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+        "pin",
+        "pinDigest",
+        "lockFileMaintenance"
+      ],
       "automerge": true
     }
   ],
