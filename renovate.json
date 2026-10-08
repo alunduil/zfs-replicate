@@ -32,6 +32,12 @@
       "rangeStrategy": "pin"
     },
     {
+      "description": "Automerge sub-major updates to the Poetry groups that never ship in the published package",
+      "matchDepTypes": ["mutation", "test"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
       "description": "Automerge pre-commit hook updates below a major: they change development tooling, never the published package",
       "matchManagers": ["pre-commit"],
       "matchUpdateTypes": ["minor", "patch"],
@@ -41,13 +47,6 @@
       "description": "Automerge GitHub Actions digest, pin, and sub-major updates: they run only in CI",
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["digest", "pin", "pinDigest", "minor", "patch"],
-      "automerge": true
-    },
-    {
-      "description": "Automerge sub-major updates to the Poetry groups that never ship in the published package",
-      "matchManagers": ["poetry"],
-      "matchDepTypes": ["mutation", "test"],
-      "matchUpdateTypes": ["minor", "patch"],
       "automerge": true
     }
   ],
