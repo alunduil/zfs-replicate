@@ -20,11 +20,8 @@ class Snapshot:
 
     def __eq__(self, other: object) -> bool:
         """Equality of Snapshots."""
-        if other is None:
-            return False
-
         if not isinstance(other, Snapshot):
-            raise NotImplementedError
+            return NotImplemented
 
         return same_filesystem(self.filesystem, other.filesystem) and self._key() == other._key()
 
