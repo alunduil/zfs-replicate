@@ -44,7 +44,7 @@ jobs:
           - "3.12"  # EOL 2028-10
           - "3.13"  # EOL 2029-10
           - "3.14"  # EOL 2030-10
-    steps:
+    steps: &python-tests-steps
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
         with:
@@ -58,19 +58,14 @@ jobs:
   # `needs`. Inside the matrix, what `needs.<job>.result` reports for a
   # failing continue-on-error cell is not worth depending on.
   python-tests-next:
-    name: Test python 3.x
+    name: Test python ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     continue-on-error: true
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: ./.github/actions/setup-poetry
-        with:
-          python-version: 3.x
-      - name: poetry install
-        run: poetry install
-      - name: poetry run pytest
-        run: poetry run pytest
+    strategy:
+      matrix:
+        python-version: [3.x]
+    steps: *python-tests-steps
 
   # Coverage measures which lines ran, so every matrix leg would upload the
   # same report. A job of its own also keeps a Codecov outage out of a check
@@ -116,7 +111,7 @@ jobs:
           - "3.12"  # EOL 2028-10
           - "3.13"  # EOL 2029-10
           - "3.14"  # EOL 2030-10
-    steps:
+    steps: &cli-entry-point-steps
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
         with:
@@ -127,19 +122,14 @@ jobs:
         run: poetry run -- zfs-replicate --help
 
   cli-entry-point-next:
-    name: Check CLI entry point 3.x
+    name: Check CLI entry point ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     continue-on-error: true
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: ./.github/actions/setup-poetry
-        with:
-          python-version: 3.x
-      - name: poetry install
-        run: poetry install
-      - name: zfs-replicate --help
-        run: poetry run -- zfs-replicate --help
+    strategy:
+      matrix:
+        python-version: [3.x]
+    steps: *cli-entry-point-steps
 
   build:
     name: Build the distribution
