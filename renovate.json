@@ -3,7 +3,9 @@
   "extends": [
     "config:best-practices",
     "security:openssf-scorecard",
-    "customManagers:githubActionsVersions"
+    "customManagers:githubActionsVersions",
+    ":automergeMinor",
+    ":automergeDigest"
   ],
   "timezone": "Europe/London",
   "reviewers": ["alunduil"],
