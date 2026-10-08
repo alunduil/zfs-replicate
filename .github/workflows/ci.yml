@@ -31,7 +31,6 @@ jobs:
     name: Test python ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
@@ -45,15 +44,29 @@ jobs:
           - "3.12"  # EOL 2028-10
           - "3.13"  # EOL 2029-10
           - "3.14"  # EOL 2030-10
-        experimental: [false]
-        include:
-          - python-version: 3.x
-            experimental: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
         with:
           python-version: ${{ matrix.python-version }}
+      - name: poetry install
+        run: poetry install
+      - name: poetry run pytest
+        run: poetry run pytest
+
+  # The newest CPython warns ahead of the matrix and stays out of the gate's
+  # `needs`. Inside the matrix, what `needs.<job>.result` reports for a
+  # failing continue-on-error cell is not worth depending on.
+  python-tests-next:
+    name: Test python 3.x
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-poetry
+        with:
+          python-version: 3.x
       - name: poetry install
         run: poetry install
       - name: poetry run pytest
@@ -94,7 +107,6 @@ jobs:
     name: Check CLI entry point ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
@@ -104,15 +116,26 @@ jobs:
           - "3.12"  # EOL 2028-10
           - "3.13"  # EOL 2029-10
           - "3.14"  # EOL 2030-10
-        experimental: [false]
-        include:
-          - python-version: 3.x
-            experimental: true
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry
         with:
           python-version: ${{ matrix.python-version }}
+      - name: poetry install
+        run: poetry install
+      - name: zfs-replicate --help
+        run: poetry run -- zfs-replicate --help
+
+  cli-entry-point-next:
+    name: Check CLI entry point 3.x
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-poetry
+        with:
+          python-version: 3.x
       - name: poetry install
         run: poetry install
       - name: zfs-replicate --help
@@ -192,3 +215,29 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
+
+  # The stable check name the default-branch ruleset pins: renaming this job
+  # breaks the merge gate. Requiring the matrix legs directly would block
+  # merges once a Python version ages out and its check stops reporting.
+  results:
+    name: Check CI results
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    needs:
+      - pre-commit
+      - python-tests
+      - coverage
+      - cli-entry-point
+      - build
+      - pr-title
+      - dependency-review
+    if: always()
+    steps:
+      # The pull-request-only jobs skip on a push to master, so a skip fails
+      # the gate only on a pull request.
+      - name: Fail when any job did not succeed
+        if: >-
+          contains(needs.*.result, 'failure')
+          || contains(needs.*.result, 'cancelled')
+          || (github.event_name == 'pull_request' && contains(needs.*.result, 'skipped'))
+        run: exit 1

@@ -37,7 +37,7 @@ supported_releases() {
     | sort -V
 }
 
-# The `3.x` leg sits under `include:`, so yq leaves it out. It tracks
+# The `3.x` legs run as jobs of their own, so yq leaves them out. They track
 # whatever ships next by design and would always read as drift.
 matrix_versions() {
   yq ".jobs.\"$1\".strategy.matrix.python-version[]" "$CI_WORKFLOW" | sort -V
