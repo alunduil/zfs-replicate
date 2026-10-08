@@ -3,7 +3,7 @@
 import string
 from dataclasses import replace
 
-from hypothesis.strategies import builds, integers, none, text, tuples
+from hypothesis.strategies import builds, integers, none, text
 
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
@@ -18,22 +18,18 @@ def _non_empty_name(suffix: str) -> str:
 
 _NAMES = text(_ROUND_TRIP_SAFE).map(_non_empty_name)
 
-_FILESYSTEMS = _NAMES.map(filesystem)
-
 SNAPSHOTS = builds(
     Snapshot,
-    filesystem=_FILESYSTEMS,
+    filesystem=_NAMES.map(filesystem),
     name=text(_ROUND_TRIP_SAFE),
     timestamp=integers(),
     previous=none(),
 )
 
 
-def _rebase(drawn: tuple[Snapshot, str]) -> tuple[Snapshot, Snapshot]:
-    snapshot, parent = drawn
-
+def _rebase(snapshot: Snapshot, parent: str) -> tuple[Snapshot, Snapshot]:
     return snapshot, replace(snapshot, filesystem=filesystem(f"{parent}/{snapshot.filesystem.name}"))
 
 
 # Pairs whose fields differ but which Snapshot equality treats as one.
-REBASED_SNAPSHOTS = tuples(SNAPSHOTS, _NAMES).map(_rebase)
+REBASED_SNAPSHOTS = builds(_rebase, SNAPSHOTS, _NAMES)
