@@ -43,10 +43,7 @@ class TestExecute:
                     mock.patch.object(kind, "run", autospec=True, side_effect=lambda task, _: ran.append(task))
                 )
 
-            execute(
-                tasks,
-                CONTEXT,
-            )
+            execute(tasks, CONTEXT)
 
         assert ran == tasks
 
@@ -66,10 +63,7 @@ class TestExecute:
         task = SendSnapshot(filesystem=local, snapshot=snap)
 
         with caplog.at_level(logging.INFO, logger="zfs.replicate"):
-            execute(
-                [task],
-                CONTEXT,
-            )
+            execute([task], CONTEXT)
 
         # Assert on the snapshot identity, not the exact phrasing, so rewording the
         # progress message doesn't fail this.
