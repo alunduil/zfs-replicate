@@ -2,6 +2,7 @@
 
 import logging
 from contextlib import ExitStack
+from typing import get_args
 from unittest import mock
 
 import pytest
@@ -13,7 +14,7 @@ from zfs.replicate import snapshot
 from zfs.replicate.filesystem.type import filesystem
 from zfs.replicate.snapshot.type import Snapshot
 from zfs.replicate.task.execute import execute
-from zfs.replicate.task.type import CreateFilesystem, DestroyFilesystem, DestroySnapshot, SendSnapshot, Task
+from zfs.replicate.task.type import CreateFilesystem, DestroySnapshot, SendSnapshot, Task
 from zfs_test.replicate_test.task_test.context import CONTEXT
 from zfs_test.replicate_test.task_test.strategies import LOCAL, TASKS
 
@@ -37,7 +38,7 @@ class TestExecute:
         """Runs one filesystem's tasks as given, even when an action recurs after another; see #653."""
         ran: list[Task] = []
         with ExitStack() as stack:
-            for kind in (CreateFilesystem, SendSnapshot, DestroyFilesystem, DestroySnapshot):
+            for kind in get_args(Task):
                 stack.enter_context(
                     mock.patch.object(kind, "run", autospec=True, side_effect=lambda task, _: ran.append(task))
                 )
