@@ -35,7 +35,7 @@ class TestExecute:
         ]
     )
     def test_runs_every_task_in_order(self, tasks: list[Task]) -> None:
-        """Runs one filesystem's tasks as given, even when an action recurs after another; see #653."""
+        """Runs each task once in the order given, even when a task type recurs; see #653."""
         ran: list[Task] = []
         with ExitStack() as stack:
             for kind in get_args(Task):

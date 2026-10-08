@@ -8,7 +8,7 @@ from zfs_test.replicate_test.snapshot_test.strategies import SNAPSHOTS
 
 LOCAL = filesystem("tank/data")
 
-# Every task shape on one filesystem, so a list of them is a single group to execute().
+# One filesystem, so execute()'s deepest-first sort leaves a drawn list in order.
 TASKS = one_of(
     just(CreateFilesystem(filesystem=LOCAL)),
     just(DestroyFilesystem(filesystem=LOCAL)),
