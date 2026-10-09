@@ -71,7 +71,7 @@ python = "^3.10"
 optional = true
 
 [tool.poetry.group.mutation.dependencies]
-mutmut = "==3.7.0"
+mutmut = "==3.8.0"
 
 [tool.poetry.group.test.dependencies]
 hypothesis = "6.165.10"
