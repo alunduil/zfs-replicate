@@ -91,6 +91,24 @@ class TestGenerate:
         )
         assert all(t.filesystem in snapshots_by_fs for t in result)
 
+    def test_empty_locals_remote_prefixed_filesystem(self) -> None:
+        """Destroy remote-only snapshots keyed by the remote filesystem name."""
+        remote = filesystem("backup")
+        remote_snapshot_filesystem = filesystem("backup/pool/filesystem")
+        snapshot = Snapshot(
+            filesystem=remote_snapshot_filesystem,
+            name="snapshot",
+            previous=None,
+            timestamp=0,
+        )
+
+        result = generate(remote, {}, {remote_snapshot_filesystem: [snapshot]})
+
+        assert result == [
+            DestroySnapshot(filesystem=remote_snapshot_filesystem, snapshot=snapshot),
+            DestroyFilesystem(filesystem=remote_snapshot_filesystem),
+        ]
+
     def test_diverged_destroys_before_sending(self) -> None:
         """Without a snapshot in common, the destroys precede the sends."""
         result = generate(_REMOTE, {_LOCAL: [_UNSENT]}, {_DESTINATION: [_STALE]})
