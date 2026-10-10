@@ -56,13 +56,13 @@ log.configure()
     "--cipher",
     type=EnumChoice(Cipher),
     default=Cipher.STANDARD,
-    help="One of: disable (no ciphers), fast (only fast ciphers), or standard (default ciphers).",
+    help="One of: disabled (no ciphers), fast (only fast ciphers), or standard (default ciphers).",
 )
 @click.option(
     "--compression",
     type=EnumChoice(Compression),
     default=Compression.LZ4,
-    help="One of: off (no compression), lz4 (fastest), pigz (all rounder), or plzip (best compression).",
+    help="One of: off (no compression) or lz4 (fastest).",
 )
 @options.send_group
 @options.receive_group
