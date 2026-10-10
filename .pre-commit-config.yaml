@@ -30,14 +30,14 @@ repos:
       - id: check-vcs-permalinks
       - id: check-toml
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.16.3
+    rev: v0.16.10
     hooks:
       - id: ruff-check
         args:
           - --fix
       - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.3.1
+    rev: v2.4.0
     hooks:
       - id: mypy
         # click and hypothesis ship py.typed. Without them in the hook's
@@ -49,11 +49,11 @@ repos:
         # annotations the suite runs against.
         language: python
         additional_dependencies:
-          - click==8.4.2
+          - click==8.5.0
           - click-log==0.4.0
-          - hypothesis==6.165.10
+          - hypothesis==6.168.5
           - pytest==9.1.1
-          - pytest-mock==3.15.1
+          - pytest-mock==3.16.0
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.16
     hooks:
