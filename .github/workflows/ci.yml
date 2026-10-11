@@ -53,7 +53,7 @@ jobs:
         run: poetry install
       - name: poetry run pytest
         run: poetry run pytest
-      - name: zfs-replicate --help
+      - name: poetry run zfs-replicate --help
         run: poetry run -- zfs-replicate --help
 
   # A failure on the newest CPython warns ahead of the matrix without blocking

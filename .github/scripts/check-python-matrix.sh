@@ -57,11 +57,11 @@ as_list() {
 supported=$(supported_releases)
 require_versions "endoflife.date" "$supported"
 
-floor=$(python_floor)
-[ -n "$floor" ] || die "could not read requires-python from $PYPROJECT"
-
 tested=$(matrix_versions)
 require_versions "$CI_WORKFLOW job $MATRIX_JOB" "$tested"
+
+floor=$(python_floor)
+[ -n "$floor" ] || die "could not read requires-python from $PYPROJECT"
 
 drift=false
 [ "$supported" = "$tested" ] || drift=true
