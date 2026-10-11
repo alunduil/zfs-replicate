@@ -12,8 +12,7 @@ set -euo pipefail
 # would mean date arithmetic against the runner clock.
 readonly ENDOFLIFE_API="https://endoflife.date/api/v1/products/python"
 
-# ci.yml duplicates the matrix across these jobs (#616).
-readonly MATRIX_JOBS=(python-tests cli-entry-point)
+readonly MATRIX_JOB="python-tests"
 
 readonly CI_WORKFLOW=".github/workflows/ci.yml"
 readonly PYPROJECT="pyproject.toml"
@@ -37,10 +36,10 @@ supported_releases() {
     | sort -V
 }
 
-# The `3.x` jobs track whatever ships next, so comparing them would always
+# The `3.x` job tracks whatever ships next, so comparing it would always
 # report drift.
 matrix_versions() {
-  yq ".jobs.\"$1\".strategy.matrix.python-version[]" "$CI_WORKFLOW" | sort -V
+  yq ".jobs.\"$MATRIX_JOB\".strategy.matrix.python-version[]" "$CI_WORKFLOW" | sort -V
 }
 
 # The floor is reported for context, never compared: raising it drops users,
@@ -58,16 +57,14 @@ as_list() {
 supported=$(supported_releases)
 require_versions "endoflife.date" "$supported"
 
+tested=$(matrix_versions)
+require_versions "$CI_WORKFLOW job $MATRIX_JOB" "$tested"
+
 floor=$(python_floor)
 [ -n "$floor" ] || die "could not read requires-python from $PYPROJECT"
 
-declare -A tested
 drift=false
-for job in "${MATRIX_JOBS[@]}"; do
-  tested[$job]=$(matrix_versions "$job")
-  require_versions "$CI_WORKFLOW job $job" "${tested[$job]}"
-  [ "$supported" = "${tested[$job]}" ] || drift=true
-done
+[ "$supported" = "$tested" ] || drift=true
 
 echo "drift=$drift" >> "$GITHUB_OUTPUT"
 
@@ -78,18 +75,14 @@ echo "drift=$drift" >> "$GITHUB_OUTPUT"
   echo "labels:"
   echo "  - python"
   echo "---"
-  echo "The CI matrices should name every CPython release upstream"
+  echo "The CI matrix should name every CPython release upstream"
   echo "still supports, per the comment above the matrix in"
   echo "\`$CI_WORKFLOW\`."
   echo
   echo "| Source | Versions |"
   echo "| --- | --- |"
   echo "| Expected (endoflife.date, not end-of-life) | $(as_list "$supported") |"
-  for job in "${MATRIX_JOBS[@]}"; do
-    echo "| \`$job\` matrix | $(as_list "${tested[$job]}") |"
-  done
-  echo
-  echo "Update both matrices in the same \`ci\` change."
+  echo "| \`$MATRIX_JOB\` matrix | $(as_list "$tested") |"
   echo
   echo "\`requires-python\` currently floors at $floor. Raising it drops"
   echo "users still on that release, so it is breaking and belongs to"

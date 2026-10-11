@@ -53,6 +53,8 @@ jobs:
         run: poetry install
       - name: poetry run pytest
         run: poetry run pytest
+      - name: poetry run zfs-replicate --help
+        run: poetry run -- zfs-replicate --help
 
   # A failure on the newest CPython warns ahead of the matrix without blocking
   # a merge.
@@ -96,39 +98,6 @@ jobs:
           use_oidc: true
           files: coverage.xml
           fail_ci_if_error: true
-
-  cli-entry-point:
-    name: Check CLI entry point ${{ matrix.python-version }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version:
-          - "3.10"  # EOL 2026-10
-          - "3.11"  # EOL 2027-10
-          - "3.12"  # EOL 2028-10
-          - "3.13"  # EOL 2029-10
-          - "3.14"  # EOL 2030-10
-    steps: &cli-entry-point-steps
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: ./.github/actions/setup-poetry
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: poetry install
-        run: poetry install
-      - name: zfs-replicate --help
-        run: poetry run -- zfs-replicate --help
-
-  cli-entry-point-next:
-    name: Check CLI entry point ${{ matrix.python-version }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    continue-on-error: true
-    strategy:
-      matrix:
-        python-version: [3.x]
-    steps: *cli-entry-point-steps
 
   build:
     name: Build the distribution
@@ -215,7 +184,6 @@ jobs:
       - pre-commit
       - python-tests
       - coverage
-      - cli-entry-point
       - build
       - pr-title
       - dependency-review
