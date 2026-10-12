@@ -92,7 +92,7 @@ class TestGenerate:
         assert all(t.filesystem in snapshots_by_fs for t in result)
 
     def test_empty_locals_remote_prefixed_filesystem(self) -> None:
-        """Destroy remote-only snapshots keyed by the remote filesystem name."""
+        """Pin the exact generated task order for a snapshot filesystem carrying the remote prefix reported by zfs list."""
         remote = filesystem("backup")
         remote_snapshot_filesystem = filesystem("backup/pool/filesystem")
         snapshot = Snapshot(
