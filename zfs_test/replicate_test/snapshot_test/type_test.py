@@ -33,6 +33,11 @@ class TestSnapshotEq:
         )
         assert local == remote
 
+    def test_ignores_non_snapshot(self) -> None:
+        """An unrelated object never equals a snapshot; see #694."""
+        snapshot = Snapshot(filesystem=filesystem("pool/data"), name="snap", previous=None, timestamp=0)
+        assert snapshot != "snap"
+
 
 class TestSnapshotHash:
     """``Snapshot.__hash__`` holds equal Snapshots to one hash."""
