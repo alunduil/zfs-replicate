@@ -3,6 +3,16 @@
 from ..command import Command
 from .cipher import Cipher
 
+_OPTIONS: dict[str, str | int] = {
+    "BatchMode": "yes",
+    "StrictHostKeyChecking": "yes",
+    "ConnectTimeout": 7,
+    # A peer that goes silent without closing the socket fails the transfer
+    # after about a minute instead of hanging it.
+    "ServerAliveInterval": 15,
+    "ServerAliveCountMax": 4,
+}
+
 
 def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> Command:
     """Generate ssh commandline invocation."""
@@ -16,20 +26,12 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
             ]
         )
     elif cipher == Cipher.DISABLED:
-        options.extend(["-o", "noneenabled=yes", "-o", "noneswitch=yes"])
+        options.extend([*_option("noneenabled", "yes"), *_option("noneswitch", "yes")])
 
-    options.extend(
-        [
-            "-i",
-            key_file,
-            "-o",
-            "BatchMode=yes",
-            "-o",
-            "StrictHostKeyChecking=yes",
-            "-o",
-            "ConnectTimeout=7",
-        ]
-    )
+    for name, value in _OPTIONS.items():
+        options.extend(_option(name, value))
+
+    options.extend(["-i", key_file])
 
     if user:
         options.extend(["-l", user])
@@ -37,3 +39,7 @@ def command(cipher: Cipher, user: str, key_file: str, port: int, host: str) -> C
     options.extend(["-p", str(port), host])
 
     return Command.with_empty_env("ssh", *options)
+
+
+def _option(name: str, value: str | int) -> list[str]:
+    return ["-o", f"{name}={value}"]
