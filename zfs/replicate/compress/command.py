@@ -1,6 +1,7 @@
 """ZFS Replication Compression Command Mapping."""
 
 from dataclasses import dataclass
+from typing import assert_never
 
 from ..command import Command
 from .type import Compression
@@ -24,14 +25,13 @@ def command(compression: Compression) -> Commands | None:
 
     ``OFF`` yields ``None`` -- no compression stage.
     """
-    if compression == Compression.LZ4:
-        return Commands(
-            compress=Command.with_empty_env("lz4"),
-            decompress=Command.with_empty_env("lz4", "-d"),
-        )
-
-    if compression == Compression.OFF:
-        return None
-
-    msg = f"invalid compression: '{compression}'"
-    raise ValueError(msg, compression)
+    match compression:
+        case Compression.LZ4:
+            return Commands(
+                compress=Command.with_empty_env("lz4"),
+                decompress=Command.with_empty_env("lz4", "-d"),
+            )
+        case Compression.OFF:
+            return None
+        case _:
+            assert_never(compression)
