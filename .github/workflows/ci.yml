@@ -35,9 +35,9 @@ jobs:
       fail-fast: false
       matrix:
         # Every non-EOL CPython release, per
-        # https://devguide.python.org/versions/. The oldest entry is the
-        # requires-python floor in pyproject.toml, so removing an aged-out
-        # entry raises that floor, which drops users and is breaking.
+        # https://devguide.python.org/versions/. The oldest entry matches the
+        # requires-python floor in pyproject.toml, so removing it raises the
+        # floor: a breaking change.
         python-version:
           - "3.11"  # EOL 2027-10
           - "3.12"  # EOL 2028-10

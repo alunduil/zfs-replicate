@@ -22,8 +22,7 @@ zfs-replicate = "zfs.replicate.cli.main:main"
 repository = "https://github.com/alunduil/zfs-replicate"
 
 [tool.coverage.report]
-# mypy proves an assert_never arm unreachable, so running it would itself be
-# the bug.
+# mypy proves an assert_never arm unreachable, so no test can run it.
 exclude_also = ["case _:\\n\\s*assert_never\\("]
 
 [tool.coverage.run]

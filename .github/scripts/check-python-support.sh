@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Report whether ci.yml still tests every CPython release upstream supports,
-# and whether requires-python still floors at the oldest of them.
+# Report whether ci.yml tests every CPython release upstream supports and
+# requires-python floors at the oldest of them.
 #
 # Writes `drift=<bool>` to $GITHUB_OUTPUT and a create-an-issue body to
 # $ISSUE_FILE. Run from the repository root.
@@ -89,6 +89,6 @@ echo "drift=$drift" >> "$GITHUB_OUTPUT"
   echo "| \`$MATRIX_JOB\` matrix | $(as_list "$tested") |"
   echo "| \`requires-python\` floor | $floor |"
   echo
-  echo "Raising the floor drops users still on that release, so the"
-  echo "pull request that does it is a breaking change."
+  echo "Raising the floor drops users on that release, so it ships as a"
+  echo "breaking change."
 } > "$ISSUE_FILE"
