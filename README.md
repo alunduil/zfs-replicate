@@ -29,7 +29,7 @@ zfs-replicate relates to several other projects, which fit other niches:
 ## Prerequisites
 
 1. A local ZFS filesystem and `zfs` command-line tools
-1. Python 3.10 or later on the local system
+1. Python 3.11 or later on the local system
 1. A remote system with a ZFS filesystem and the `zfs` command-line tools
 1. SSH access to that remote system
 1. `lz4` on both systems, unless you pass `--compression off`

@@ -16,6 +16,7 @@ hand-placed quotes.
 import shlex
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from typing import Self
 
 # Prefix that empties the environment before exec, kept in one place.
 ENV: tuple[str, str] = ("/usr/bin/env", "-")
@@ -37,7 +38,7 @@ class Command:
     env: Mapping[str, str] | None = None
 
     @classmethod
-    def with_empty_env(cls, program: str, *args: str) -> "Command":
+    def with_empty_env(cls, program: str, *args: str) -> Self:
         """Build a command that runs ``program`` with an emptied environment.
 
         Prepends the :data:`ENV` prefix (``/usr/bin/env -``) here, so no call

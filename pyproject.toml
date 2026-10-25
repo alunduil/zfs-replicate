@@ -12,7 +12,7 @@ keywords = ["zfs", "replication", "backup", "remote"]
 license = "BSD-2-Clause"
 name = "zfs-replicate"
 readme = "README.md"
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.11,<4.0"
 version = "4.1.0"
 
 [project.scripts]
@@ -20,6 +20,10 @@ zfs-replicate = "zfs.replicate.cli.main:main"
 
 [project.urls]
 repository = "https://github.com/alunduil/zfs-replicate"
+
+[tool.coverage.report]
+# mypy proves an assert_never arm unreachable, so no test can run it.
+exclude_also = ["case _:\\n\\s*assert_never\\("]
 
 [tool.coverage.run]
 # relative_files keeps the XML report's <source> from being the runner's
@@ -63,7 +67,7 @@ requires-poetry = ">=2.0"
 # dormant upstream, so a major bump on either side has no upstream fix.
 click = ">=8.2,<9"
 click-log = ">=0.4.0,<0.5"
-python = "^3.10"
+python = "^3.11"
 
 [tool.poetry.group.mutation]
 # Optional so the pull request test legs skip mutmut and the libcst and textual

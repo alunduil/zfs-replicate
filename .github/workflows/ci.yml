@@ -35,15 +35,15 @@ jobs:
       fail-fast: false
       matrix:
         # Every non-EOL CPython release, per
-        # https://devguide.python.org/versions/. Removing an aged-out entry
-        # leaves the pyproject.toml floor alone. Raising that floor drops
-        # users and is breaking.
+        # https://devguide.python.org/versions/. The oldest entry matches the
+        # requires-python floor in pyproject.toml, so removing it raises the
+        # floor: a breaking change.
         python-version:
-          - "3.10"  # EOL 2026-10
           - "3.11"  # EOL 2027-10
           - "3.12"  # EOL 2028-10
           - "3.13"  # EOL 2029-10
           - "3.14"  # EOL 2030-10
+          - "3.15"  # EOL 2031-10
     steps: &python-tests-steps
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: ./.github/actions/setup-poetry

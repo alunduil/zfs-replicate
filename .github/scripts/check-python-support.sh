@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Report whether ci.yml still tests every CPython release upstream supports.
+# Report whether ci.yml tests every CPython release upstream supports and
+# requires-python floors at the oldest of them.
 #
 # Writes `drift=<bool>` to $GITHUB_OUTPUT and a create-an-issue body to
 # $ISSUE_FILE. Run from the repository root.
@@ -42,9 +43,8 @@ matrix_versions() {
   yq ".jobs.\"$MATRIX_JOB\".strategy.matrix.python-version[]" "$CI_WORKFLOW" | sort -V
 }
 
-# The floor is reported for context, never compared: raising it drops users,
-# so it cannot be part of the `ci` fix this check asks for. requires-python
-# is PEP 621, so reading it survives a change of packaging tool.
+# requires-python is PEP 621, so reading it survives a change of packaging
+# tool.
 python_floor() {
   grep -oE '^requires-python = ">=[0-9]+\.[0-9]+' "$PYPROJECT" \
     | grep -oE '[0-9]+\.[0-9]+$'
@@ -63,28 +63,32 @@ require_versions "$CI_WORKFLOW job $MATRIX_JOB" "$tested"
 floor=$(python_floor)
 [ -n "$floor" ] || die "could not read requires-python from $PYPROJECT"
 
+oldest=$(head -n 1 <<< "$supported")
+
 drift=false
 [ "$supported" = "$tested" ] || drift=true
+[ "$floor" = "$oldest" ] || drift=true
 
 echo "drift=$drift" >> "$GITHUB_OUTPUT"
 
 # create-an-issue reads the title and labels from front matter.
 {
   echo "---"
-  echo "title: Python version matrix out of date"
+  echo "title: Supported Python versions out of date"
   echo "labels:"
   echo "  - python"
   echo "---"
   echo "The CI matrix should name every CPython release upstream"
-  echo "still supports, per the comment above the matrix in"
+  echo "still supports, and \`requires-python\` should floor at the"
+  echo "oldest of them, per the comment above the matrix in"
   echo "\`$CI_WORKFLOW\`."
   echo
   echo "| Source | Versions |"
   echo "| --- | --- |"
   echo "| Expected (endoflife.date, not end-of-life) | $(as_list "$supported") |"
   echo "| \`$MATRIX_JOB\` matrix | $(as_list "$tested") |"
+  echo "| \`requires-python\` floor | $floor |"
   echo
-  echo "\`requires-python\` currently floors at $floor. Raising it drops"
-  echo "users still on that release, so it is breaking and belongs to"
-  echo "#398, not here."
+  echo "Raising the floor drops users on that release, so it ships as a"
+  echo "breaking change."
 } > "$ISSUE_FILE"

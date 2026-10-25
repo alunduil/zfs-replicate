@@ -4,7 +4,7 @@ import itertools
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar, assert_never
 
 from ..filesystem import FileSystem
 from ..snapshot import Snapshot
@@ -27,8 +27,6 @@ class Action(Enum):
     SEND = auto()
 
 
-# No fallback arm: Task is closed, so mypy reports a missing return if a
-# member goes unhandled.  Adding one silently gives that up.
 def _action(task: Task) -> Action:
     match task:
         case CreateFilesystem():
@@ -37,6 +35,8 @@ def _action(task: Task) -> Action:
             return Action.SEND
         case DestroyFilesystem() | DestroySnapshot():
             return Action.DESTROY
+        case _:
+            assert_never(task)
 
 
 def _snapshot(task: Task) -> Snapshot | None:

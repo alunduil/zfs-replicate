@@ -15,6 +15,7 @@
 
 ### Removed
 
+- Support for Python 3.10, which reached upstream end of life in October 2026. The floor is now Python 3.11 (#727).
 - Support for Python 3.9, which reached upstream end of life in October 2025. The floor is now Python 3.10, which the patched releases of `urllib3`, `requests`, and `pytest` all require (#398).
 
 ## 4.1.0 -- 2026-05-09
