@@ -48,8 +48,8 @@ jobs:
             itself, and nothing is lost: the branch stays where it is, so
             comment here if you want to pick it back up and I'll reopen it.
 
-  python-matrix:
-    name: Check Python matrix drift
+  python-support:
+    name: Check supported Python drift
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -61,7 +61,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Detect drift
         id: check
-        run: .github/scripts/check-python-matrix.sh
+        run: .github/scripts/check-python-support.sh
 
       # Title and labels come from the file's front matter, not from `with`.
       # Updating one issue keeps its table current instead of accruing one
