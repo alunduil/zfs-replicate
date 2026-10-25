@@ -21,6 +21,11 @@ zfs-replicate = "zfs.replicate.cli.main:main"
 [project.urls]
 repository = "https://github.com/alunduil/zfs-replicate"
 
+[tool.coverage.report]
+# mypy proves an assert_never arm unreachable, so running it would itself be
+# the bug.
+exclude_also = ["case _:\\n\\s*assert_never\\("]
+
 [tool.coverage.run]
 # relative_files keeps the XML report's <source> from being the runner's
 # absolute checkout path, which Codecov would have to strip before the
