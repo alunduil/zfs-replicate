@@ -78,7 +78,7 @@ optional = true
 mutmut = "==3.8.0"
 
 [tool.poetry.group.test.dependencies]
-hypothesis = "6.170.11"
+hypothesis = "6.170.12"
 # The floor is the first release past GHSA-6w46-j5rx-g56g (tmpdir handling);
 # anything older resolves into the advisory range and fails dependency review.
 pytest = "==9.1.1"
