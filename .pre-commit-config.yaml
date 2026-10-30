@@ -52,7 +52,7 @@ repos:
           - click==8.5.0
           - click-log==0.4.0
           - hypothesis==6.170.12
-          - pytest==9.1.1
+          - pytest==9.2.0
           - pytest-mock==3.17.0
   - repo: https://github.com/jendrikseipp/vulture
     rev: v2.16

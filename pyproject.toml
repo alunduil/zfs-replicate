@@ -81,7 +81,7 @@ mutmut = "==3.8.0"
 hypothesis = "6.170.12"
 # The floor is the first release past GHSA-6w46-j5rx-g56g (tmpdir handling);
 # anything older resolves into the advisory range and fails dependency review.
-pytest = "==9.1.1"
+pytest = "==9.2.0"
 pytest-cov = "==7.1.0"
 pytest-mock = "==3.17.0"
 pytest-randomly = "==5.0.0"
