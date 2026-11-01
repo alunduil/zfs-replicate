@@ -7,7 +7,7 @@
   ],
   "packageRules": [
     {
-      "description": "Poetry resolves the newest release in range rather than the version Renovate targeted, so an in-range update writes a lockfile Renovate then rejects. :pinDevDependencies does not reach these groups: it matches the devDependencies, dev-dependencies, and dev depTypes, and a Poetry group's depType is its name",
+      "description": "Poetry locks the newest in-range release, not the one Renovate targeted, so Renovate rejects the lockfile an in-range update writes. :pinDevDependencies misses these groups because a Poetry group's depType is its name",
       "matchDepTypes": ["mutation", "test"],
       "rangeStrategy": "pin"
     }
