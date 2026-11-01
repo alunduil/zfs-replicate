@@ -16,9 +16,9 @@ inputs:
 runs:
   using: composite
   steps:
+    # Before setup-python: its poetry cache asks Poetry for the cache path.
     - name: install poetry
-      shell: bash
-      run: pipx install 'poetry<3'
+      uses: jdx/mise-action@6612f0ef07ed2a736cd1e00a94a065522dd41195 # v5.2.5
     - name: setup python
       uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:

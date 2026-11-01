@@ -1,0 +1,14 @@
+# Per-tool python needs 2026.10.12.
+min_version = "2026.10.12"
+
+[settings]
+locked = true
+lockfile_platforms = ["linux-x64"]
+
+[tools]
+# mise has no aqua or core backend for Poetry. pypi: resolves through uv, so
+# mise.lock carries a uv.lock sidecar with Poetry's dependency hashes. That
+# graph installs only under a mise-managed interpreter; this one stays private
+# to Poetry, and project venvs still take the python on PATH.
+"pypi:poetry" = { version = "2.5.1", python = "3.14" }
+uv = "0.13.6"
