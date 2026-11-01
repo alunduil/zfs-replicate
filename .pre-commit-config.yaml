@@ -11,6 +11,9 @@ default_install_hook_types:
   - commit-msg
 ci:
   autofix_prs: false
+# mise lock generates these files. mise.lock records each sidecar's digest, so
+# a hook that rewrites one breaks the locked install.
+exclude: ^(mise\.lock|\.mise/)
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
