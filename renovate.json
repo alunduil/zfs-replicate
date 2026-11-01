@@ -1,33 +1,11 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:best-practices",
-    "security:openssf-scorecard",
-    "customManagers:githubActionsVersions",
+    "github>alunduil/renovate-config",
     ":automergeMinor",
     ":automergeDigest"
   ],
-  "timezone": "Europe/London",
-  "reviewers": ["alunduil"],
-  "labels": ["dependencies"],
-  "pre-commit": {"enabled": true},
-  "minimumReleaseAge": "3 days",
-  "osvVulnerabilityAlerts": true,
   "packageRules": [
-    {
-      "description": "Exempt update types that carry no release timestamp from the minimum release-age bake, so their renovate/stability-days check can resolve under internalChecksFilter:strict",
-      "matchUpdateTypes": [
-        "pin",
-        "pinDigest",
-        "digest",
-        "lockFileMaintenance",
-        "lockfileUpdate",
-        "rollback",
-        "bump",
-        "replacement"
-      ],
-      "minimumReleaseAge": null
-    },
     {
       "description": "Poetry resolves the newest release in range rather than the version Renovate targeted, so an in-range update writes a lockfile Renovate then rejects. :pinDevDependencies does not reach these groups: it matches the devDependencies, dev-dependencies, and dev depTypes, and a Poetry group's depType is its name",
       "matchDepTypes": ["mutation", "test"],
