@@ -10,4 +10,4 @@ locked = true
 # private to Poetry. Project venvs still use the python on PATH.
 "pypi:poetry" = { version = "2.5.1", python = "3.14" }
 # pypi: tools get a locked dependency graph only when uv installs them.
-uv = "0.13.6"
+uv = "0.13.7"
