@@ -18,7 +18,7 @@ concurrency:
 jobs:
   stale-pull-requests:
     name: Prune stale pull requests
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       # `actions: write` is omitted: it covers only the resume cache, so a
@@ -50,7 +50,7 @@ jobs:
 
   python-support:
     name: Check supported Python drift
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       # A job-level block replaces the workflow-level one rather than
@@ -79,7 +79,7 @@ jobs:
   # on in its own change.
   mutation-score:
     name: Score mutant detection
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     # The sweep runs serially, so the cap is headroom for a slow runner.
     timeout-minutes: 120
     permissions:
@@ -120,7 +120,7 @@ jobs:
   # so it runs on a schedule rather than gating unrelated pull requests.
   dependency-ceiling:
     name: Test the newest dependency releases
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       # A job-level block replaces the workflow-level one rather than
