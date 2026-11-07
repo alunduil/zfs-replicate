@@ -18,7 +18,7 @@ log.configure()
 @click.command()
 @log.option
 @click.option(
-    '--dry-run',
+    "--dry-run",
     is_flag=True,
     help="Generate replication tasks but do not execute them.",
 )
