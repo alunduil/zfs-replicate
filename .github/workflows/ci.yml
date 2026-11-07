@@ -15,7 +15,7 @@ concurrency:
 jobs:
   pre-commit:
     name: Run pre-commit hooks
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     env:
       # Unpinned, mypy and vulture would target the newest CPython that
@@ -29,7 +29,7 @@ jobs:
     # Matrix jobs take the explicit name verbatim, so interpolate the version
     # or every leg collides on one check name.
     name: Test python ${{ matrix.python-version }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -60,7 +60,7 @@ jobs:
   # a merge.
   python-tests-next:
     name: Test python ${{ matrix.python-version }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     continue-on-error: true
     strategy:
@@ -73,7 +73,7 @@ jobs:
   # named for a Python version.
   coverage:
     name: Report coverage
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     permissions:
       # A job-level block replaces the workflow-level one rather than
@@ -101,7 +101,7 @@ jobs:
 
   build:
     name: Build the distribution
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -144,7 +144,7 @@ jobs:
   pr-title:
     name: Validate PR title
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     permissions:
       pull-requests: read
@@ -168,7 +168,7 @@ jobs:
   dependency-review:
     name: Review dependencies
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -178,7 +178,7 @@ jobs:
   # job breaks the merge gate.
   results:
     name: Check CI results
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 5
     needs:
       - pre-commit
