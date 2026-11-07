@@ -23,7 +23,7 @@ jobs:
       UV_PYTHON: "3.12"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: tox-dev/action-pre-commit-uv@ae5b217f46f65d48b20a76b902d7950c745171af # v1.1.1
+      - uses: tox-dev/action-pre-commit-uv@9316eafda3550b0365575c60b9f53725a81d0cfd # v1.1.2
 
   python-tests:
     # Matrix jobs take the explicit name verbatim, so interpolate the version
