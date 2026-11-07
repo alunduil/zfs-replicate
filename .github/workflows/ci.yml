@@ -25,7 +25,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: tox-dev/action-pre-commit-uv@9316eafda3550b0365575c60b9f53725a81d0cfd # v1.1.2
 
-  # Every fixing hook installs itself, so the hooks need no `setup`.
   fix-renovate-hooks:
     name: Fix hooks on the Renovate branch
     uses: alunduil/renovate-config/.github/workflows/fix-renovate-hooks.yml@1b88d89996aefce883fc1583d3f173ec65f4bbca # main
