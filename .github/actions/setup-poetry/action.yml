@@ -19,7 +19,7 @@ runs:
     # setup-python's poetry cache asks Poetry for its cache path, so Poetry
     # installs first.
     - name: install poetry
-      uses: jdx/mise-action@f5be966e4a917d54244728e6a5fdcd1d93a35e6c # v5.2.6
+      uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
     - name: setup python
       uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:
