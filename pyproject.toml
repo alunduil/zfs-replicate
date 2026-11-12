@@ -84,7 +84,7 @@ hypothesis = "6.170.15"
 pytest = "==9.2.0"
 pytest-cov = "==7.1.0"
 pytest-mock = "==3.17.0"
-pytest-randomly = "==5.0.0"
+pytest-randomly = "==5.1.0"
 
 [tool.pytest.ini_options]
 # Coverage is off here so the version matrix and mutmut's per-mutant runs
