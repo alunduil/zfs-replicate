@@ -91,10 +91,21 @@ repos:
           - shell
           - toml
           - yaml
-  - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.12
+  - repo: local
     hooks:
-      - id: actionlint
+      # The PyPI wheel ships a prebuilt binary. jactionlint checks `run:`
+      # scripts only when shellcheck is on PATH.
+      #
+      # No file matcher: run without arguments, jactionlint finds the files
+      # it lints.
+      - id: jactionlint
+        name: jactionlint
+        entry: jactionlint
+        language: python
+        additional_dependencies:
+          - jactionlint==2.6.0
+          - shellcheck-py==0.11.0.1
+        pass_filenames: false
   - repo: https://github.com/renovatebot/pre-commit-hooks
     rev: 44.229.0
     hooks:
