@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     name: Build the distribution
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -32,7 +32,7 @@ jobs:
     # A separate build keeps `id-token: write` out of scope while the build
     # backend and its dependencies run.
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     timeout-minutes: 10
     # PyPI matches the Trusted Publisher against repo, workflow filename, and
     # environment. Renaming this file or the environment stops publishing
