@@ -3,7 +3,8 @@
   "extends": [
     "github>alunduil/renovate-config",
     ":automergeMinor",
-    ":automergeDigest"
+    ":automergeDigest",
+    ":rebaseStalePrs"
   ],
   "packageRules": [
     {
