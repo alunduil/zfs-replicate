@@ -1,0 +1,6 @@
+---
+# GitHub hosts ubuntu-26.04, but actionlint doesn't list it yet
+# (rhysd/actionlint#682). Delete this file once a release does.
+self-hosted-runner:
+  labels:
+    - ubuntu-26.04
