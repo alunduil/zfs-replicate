@@ -239,14 +239,14 @@ jobs:
       # skips on a pull request that leaves daily.yml alone.
       - name: Fail when any job did not succeed
         env:
-          EVENT: ${{ github.event_name }}
           NEEDS: ${{ toJSON(needs) }}
         run: |
-          jq --exit-status --arg event "$EVENT" '
+          jq --exit-status '
             (.["daily-changes"].outputs.changed == "false") as $daily_unchanged
-            | all(to_entries[];
-                .value.result == "success"
-                or (.value.result == "skipped"
-                    and ($event != "pull_request"
-                         or (.key == "dry-run-daily" and $daily_unchanged))))
+            | def may_skip:
+                $ENV.GITHUB_EVENT_NAME != "pull_request"
+                or (.key == "dry-run-daily" and $daily_unchanged);
+            all(to_entries[];
+              .value.result == "success"
+              or (.value.result == "skipped" and may_skip))
           ' <<<"$NEEDS"
