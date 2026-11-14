@@ -6,6 +6,13 @@ on:
     - cron: '47 6 * * *'
       timezone: Europe/London
   workflow_dispatch:
+  # Lets CI test a change to this file before merge.
+  workflow_call:
+    inputs:
+      dry-run:
+        description: Skip every write and cap the mutation sweep.
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -13,7 +20,10 @@ permissions:
 concurrency:
   # No cancel-in-progress: a truncated sweep loses the operations-per-run
   # resume cache and restarts from the first pull request.
-  group: ${{ github.workflow }}
+  #
+  # A called workflow inherits its caller's github.workflow and github.ref, so
+  # those two alone would collide with ci.yml's own group.
+  group: daily-${{ github.ref }}
 
 jobs:
   stale-pull-requests:
@@ -30,6 +40,7 @@ jobs:
       # closing.
       - uses: actions/stale@4391f3da665fdf50b6810c1a66712fb9ba21aa93 # v11
         with:
+          debug-only: ${{ inputs.dry-run == true }}
           days-before-issue-stale: -1
           days-before-issue-close: -1
           days-before-pr-stale: 30
@@ -67,7 +78,7 @@ jobs:
       # Updating one issue keeps its table current instead of accruing one
       # issue per run.
       - name: File or refresh drift issue
-        if: steps.check.outputs.drift == 'true'
+        if: steps.check.outputs.drift == 'true' && !inputs.dry-run
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -96,7 +107,11 @@ jobs:
       # mis-attributes child exit codes here, so the same mutant reports killed
       # on one run and survived on the next.
       - name: poetry run mutmut run
-        run: poetry run mutmut run --max-children 1
+        env:
+          # The first mutant of each function exercises every step below at a
+          # fraction of the full sweep's runtime.
+          MUTANTS: ${{ inputs.dry-run && 'zfs.*__mutmut_1' || '' }}
+        run: poetry run mutmut run --max-children 1 ${MUTANTS:+"$MUTANTS"}
       # No `if: always()`: a sweep that died partway exports a partial tally,
       # and the issue is better left holding the last number a full run
       # produced.
@@ -109,6 +124,7 @@ jobs:
       # issue keeps the current score in place instead of accruing one issue
       # per night.
       - name: File or refresh the score issue
+        if: ${{ !inputs.dry-run }}
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -146,7 +162,7 @@ jobs:
 
       # Title and labels come from the file's front matter, not from `with`.
       - name: File or refresh the failure issue
-        if: failure() && steps.pytest.outcome == 'failure'
+        if: failure() && steps.pytest.outcome == 'failure' && !inputs.dry-run
         uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
         env:
           GITHUB_TOKEN: ${{ github.token }}
