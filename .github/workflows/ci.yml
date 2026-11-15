@@ -181,6 +181,43 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
 
+  # No other job executes daily.yml, so the dry run is the only test of a
+  # runner image or action update to it before merge.
+  daily-changes:
+    name: Detect daily.yml changes
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    outputs:
+      changed: ${{ steps.files.outputs.changed }}
+    steps:
+      - id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          files=$(gh api --paginate "repos/$REPO/pulls/$NUMBER/files" \
+            --jq '.[].filename | select(. == ".github/workflows/daily.yml")')
+          echo "changed=$([[ -n $files ]] && echo true || echo false)" >>"${GITHUB_OUTPUT}"
+
+  # A called workflow can only narrow the grant it receives, so this grant
+  # matches daily.yml's jobs; a permission added there belongs here too. The
+  # dry-run input skips the writes.
+  dry-run-daily:
+    name: Dry-run Daily
+    needs: daily-changes
+    if: needs.daily-changes.outputs.changed == 'true'
+    uses: ./.github/workflows/daily.yml
+    with:
+      dry-run: true
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
   # The default-branch ruleset requires this check by name, so renaming the
   # job breaks the merge gate.
   results:
@@ -194,12 +231,22 @@ jobs:
       - build
       - pr-title
       - dependency-review
+      - daily-changes
+      - dry-run-daily
     if: always()
     steps:
-      # Pull-request-only jobs skip on a push to master.
+      # Pull-request-only jobs skip on a push to master, and the Daily dry run
+      # skips on a pull request that leaves daily.yml alone.
       - name: Fail when any job did not succeed
-        if: >-
-          contains(needs.*.result, 'failure')
-          || contains(needs.*.result, 'cancelled')
-          || (github.event_name == 'pull_request' && contains(needs.*.result, 'skipped'))
-        run: exit 1
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          jq --exit-status '
+            (.["daily-changes"].outputs.changed == "false") as $daily_unchanged
+            | def may_skip:
+                $ENV.GITHUB_EVENT_NAME != "pull_request"
+                or (.key == "dry-run-daily" and $daily_unchanged);
+            all(to_entries[];
+              .value.result == "success"
+              or (.value.result == "skipped" and may_skip))
+          ' <<<"$NEEDS"
