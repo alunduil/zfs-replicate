@@ -203,9 +203,9 @@ jobs:
             --jq '.[].filename | select(. == ".github/workflows/daily.yml")')
           echo "changed=$([[ -n $files ]] && echo true || echo false)" >>"${GITHUB_OUTPUT}"
 
-  # A called workflow can only narrow the grant it receives, so this matches
-  # what daily.yml's jobs declare, and a permission added there needs adding
-  # here too. The dry-run input is what keeps those writes from happening.
+  # A called workflow can only narrow the grant it receives, so this grant
+  # matches daily.yml's jobs; a permission added there belongs here too. The
+  # dry-run input skips the writes.
   dry-run-daily:
     name: Dry-run Daily
     needs: daily-changes

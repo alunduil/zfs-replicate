@@ -21,8 +21,9 @@ concurrency:
   # No cancel-in-progress: a truncated sweep loses the operations-per-run
   # resume cache and restarts from the first pull request.
   #
-  # A called workflow inherits its caller's github.workflow and github.ref, so
-  # those two alone would collide with ci.yml's own group.
+  # A called workflow sees its caller's github.workflow, so the group names
+  # Daily literally. The ref keeps one pull request's dry run from queuing
+  # behind another's.
   group: daily-${{ github.ref }}
 
 jobs:
