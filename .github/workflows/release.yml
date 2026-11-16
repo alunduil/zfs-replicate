@@ -27,11 +27,27 @@ jobs:
           name: dist
           path: dist/
 
+  # Tests the downloaded artifact rather than build's dist/, so the bytes
+  # under test are the bytes pypi uploads.
+  test-distribution:
+    name: Test the distribution
+    needs: build
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: ./.github/actions/setup-poetry
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dist
+          path: dist/
+      - uses: ./.github/actions/test-distribution
+
   pypi:
     name: Publish to PyPI
     # A separate build keeps `id-token: write` out of scope while the build
     # backend and its dependencies run.
-    needs: build
+    needs: test-distribution
     runs-on: ubuntu-26.04
     timeout-minutes: 10
     # PyPI matches the Trusted Publisher against repo, workflow filename, and
