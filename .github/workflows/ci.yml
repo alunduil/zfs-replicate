@@ -235,8 +235,8 @@ jobs:
       - dry-run-daily
     if: always()
     steps:
-      # Pull-request-only jobs skip on a push to main, and the Daily dry run
-      # skips on a pull request that leaves daily.yml alone.
+      # Pull-request-only jobs skip on a push, and the Daily dry run skips on
+      # a pull request that leaves daily.yml alone.
       - name: Fail when any job did not succeed
         env:
           NEEDS: ${{ toJSON(needs) }}
