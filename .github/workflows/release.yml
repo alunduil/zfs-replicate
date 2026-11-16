@@ -27,8 +27,7 @@ jobs:
           name: dist
           path: dist/
 
-  # Tests the downloaded artifact rather than build's dist/, so the bytes
-  # under test are the bytes pypi uploads.
+  # Tests the downloaded artifact, the same files pypi uploads.
   test-distribution:
     name: Test the distribution
     needs: build
