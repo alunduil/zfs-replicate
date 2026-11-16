@@ -99,17 +99,17 @@ zfs-replicate began as a fork of FreeNAS's [autorepl.py], so the LICENSE
 carries the iXsystems, Inc. copyright.
 
 [autorepl.py]: https://github.com/truenas/middleware/blob/9cebb519bf4c6dc0c76b9ef00a82a9e82a54d724/gui/tools/autorepl.py
-[CHANGELOG]: https://github.com/alunduil/zfs-replicate/blob/master/CHANGELOG.md
-[Code of Conduct]: https://github.com/alunduil/zfs-replicate/blob/master/CODE_OF_CONDUCT.md
+[CHANGELOG]: https://github.com/alunduil/zfs-replicate/blob/main/CHANGELOG.md
+[Code of Conduct]: https://github.com/alunduil/zfs-replicate/blob/main/CODE_OF_CONDUCT.md
 [Codecov]: https://app.codecov.io/gh/alunduil/zfs-replicate
-[CONTRIBUTING]: https://github.com/alunduil/zfs-replicate/blob/master/CONTRIBUTING.md
-[encrypted replication]: https://github.com/alunduil/zfs-replicate/blob/master/docs/how-to/replicate-an-encrypted-data-set.md
+[CONTRIBUTING]: https://github.com/alunduil/zfs-replicate/blob/main/CONTRIBUTING.md
+[encrypted replication]: https://github.com/alunduil/zfs-replicate/blob/main/docs/how-to/replicate-an-encrypted-data-set.md
 [GitHub issues]: https://github.com/alunduil/zfs-replicate/issues
-[LICENSE]: https://github.com/alunduil/zfs-replicate/blob/master/LICENSE
+[LICENSE]: https://github.com/alunduil/zfs-replicate/blob/main/LICENSE
 [nixpkgs]: https://search.nixos.org/packages?show=zfs-replicate
 [PyPI]: https://pypi.org/project/zfs-replicate/
 [sanoid]: https://github.com/jimsalterjrs/sanoid
-[stream tuning]: https://github.com/alunduil/zfs-replicate/blob/master/docs/how-to/tune-the-send-and-receive-streams.md
+[stream tuning]: https://github.com/alunduil/zfs-replicate/blob/main/docs/how-to/tune-the-send-and-receive-streams.md
 [survey]: https://www.reddit.com/r/zfs/comments/7fqu1y/a_small_survey_of_zfs_remote_replication_tools/
 [Working With Oracle Solaris ZFS Snapshots and Clones]: https://docs.oracle.com/cd/E26505_01/html/E37384/gavvx.html#scrolltoc
 [zfs-replicate (BASH)]: https://github.com/aaronhurt/zfs-replicate
