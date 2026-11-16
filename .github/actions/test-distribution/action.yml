@@ -13,21 +13,21 @@ runs:
       shell: bash
       run: |
         # The build writes into an empty dist/, so each glob matches one file.
-        # An unmatched glob stays literal, and pip fails on the missing path.
+        # An unmatched glob stays literal, so the first command to read the
+        # path fails.
         wheels=(dist/zfs_replicate-*.whl)
         sdists=(dist/zfs_replicate-*.tar.gz)
-        packaged_tests="${RUNNER_TEMP}/packaged-tests"
-
-        poetry install --only main,test --no-root
-        venv="$(poetry env info --path)"
 
         # The wheel ships no tests, so both runs take the suite from the
         # sdist. Extracting only the tests keeps the packaged sources out of
         # the way, so `import zfs` resolves to the installed distribution.
+        packaged_tests="${RUNNER_TEMP}/packaged-tests"
         mkdir --parents "${packaged_tests}"
         tar --extract --gzip --file "${sdists[0]}" --directory "${packaged_tests}" \
           --strip-components=1 --wildcards '*/zfs_test/*' '*/pyproject.toml'
 
+        poetry install --only main,test --no-root
+        venv="$(poetry env info --path)"
         for distribution in "${wheels[0]}" "${sdists[0]}"; do
           # The groups above already hold poetry.lock's pins, and --no-deps
           # leaves them there, so an upstream release inside the declared
