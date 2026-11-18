@@ -70,7 +70,7 @@ repos:
         # pyproject.toml.
         language: python
         additional_dependencies:
-          - toml-sort==0.25.0
+          - toml-sort==0.26.0
   - repo: https://github.com/tweag/FawltyDeps
     rev: v0.20.0
     hooks:
