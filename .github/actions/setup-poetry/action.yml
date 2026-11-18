@@ -1,5 +1,5 @@
 name: Set up Poetry
-description: Install Poetry and Python for a given version, with Poetry's download cache.
+description: Install Poetry and Python for a given version, cached unless asked not to.
 
 # No `poetry install`: callers that run project code install the environment
 # themselves, so callers that only build or inspect skip the cost.
@@ -12,6 +12,13 @@ inputs:
       Defaults to .github/.python-version, which sits outside the repository
       root so that uv and pyenv leave local shells unpinned.
     required: false
+  cache:
+    description: >-
+      Restore and save the mise tool cache and Poetry's download cache.
+      Release jobs pass false so that a cache entry written by another run
+      cannot reach a published distribution.
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -20,10 +27,12 @@ runs:
     # installs first.
     - name: install poetry
       uses: jdx/mise-action@d5574b52816a478f9d4e6529a3f6ff17a8a36785 # v5.2.8
+      with:
+        cache: ${{ inputs.cache }}
     - name: setup python
       uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:
         python-version: ${{ inputs.python-version }}
         # setup-python warns when it receives both inputs.
         python-version-file: ${{ inputs.python-version == '' && '.github/.python-version' || '' }}
-        cache: poetry
+        cache: ${{ inputs.cache == 'true' && 'poetry' || '' }}
