@@ -12,6 +12,9 @@ permissions:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
 
+# Jobs here pass `cache: false` to setup-poetry. Any default-branch run can
+# write those caches, so a restored entry could reach the published
+# distribution.
 jobs:
   build:
     name: Build the distribution

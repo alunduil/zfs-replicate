@@ -1,5 +1,5 @@
 name: Set up Poetry
-description: Install Poetry and Python for a given version, cached unless asked not to.
+description: Install Poetry and Python for a given version, with optional tool and download caches.
 
 # No `poetry install`: callers that run project code install the environment
 # themselves, so callers that only build or inspect skip the cost.
@@ -13,10 +13,7 @@ inputs:
       root so that uv and pyenv leave local shells unpinned.
     required: false
   cache:
-    description: >-
-      Restore and save the mise tool cache and Poetry's download cache.
-      Release jobs pass false so that a cache entry written by another run
-      cannot reach a published distribution.
+    description: Restore and save the mise tool cache and Poetry's download cache.
     required: false
     default: "true"
 
