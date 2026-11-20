@@ -7,7 +7,22 @@
 		"ghcr.io/devcontainers-extra/features/pre-commit:2": {},
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
-		"ghcr.io/devcontainers/features/python:1": {}
+		"ghcr.io/devcontainers/features/python:1": {},
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+	},
+	// One volume per workspace keeps Claude's conversations across rebuilds
+	// so `claude --continue` resumes them.
+	"mounts": [
+		"source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+	],
+	"containerEnv": {
+		"CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+	},
+	// Signs Claude in without the browser OAuth flow; unset falls back to the
+	// normal login.
+	"remoteEnv": {
+		"CLAUDE_CODE_OAUTH_TOKEN": "${localEnv:CLAUDE_CODE_OAUTH_TOKEN}"
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],

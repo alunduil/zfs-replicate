@@ -4,6 +4,10 @@
 # unmaintained ghcr.io/shinepukur/devcontainer-features/vale feature).
 set -euo pipefail
 
+# 0) Docker creates the Claude config volume root-owned because the image has
+#    no ~/.claude to copy ownership from.
+sudo chown "$(id -u):$(id -g)" "$CLAUDE_CONFIG_DIR"
+
 # 1) Project Python dependencies.
 poetry install
 
