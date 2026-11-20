@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 # Post-create hook for the dev container. Installs Python deps,
 # pre-commit hooks, and Vale (the linter previously provided by the
-# unmaintained ghcr.io/shinepukur/devcontainer-features/vale feature),
-# then hands the Claude config volume to the remote user.
+# unmaintained ghcr.io/shinepukur/devcontainer-features/vale feature).
 set -euo pipefail
 
 # 1) Project Python dependencies.
