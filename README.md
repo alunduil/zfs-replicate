@@ -13,7 +13,7 @@ By Alex Brandt <alunduil@gmail.com>
 ## Description
 
 zfs-replicate backs up Zettabyte File System (ZFS) data sets to a remote host
-by sending their snapshots over SSH. It does **not** create snapshots, so pair
+by sending their snapshots over SSH. It doesn't **create** snapshots, so pair
 it with a tool that does.
 
 zfs-replicate relates to several other projects, which fit other niches:
