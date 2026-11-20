@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 # Post-create hook for the dev container. Installs Python deps,
 # pre-commit hooks, and Vale (the linter previously provided by the
-# unmaintained ghcr.io/shinepukur/devcontainer-features/vale feature).
+# unmaintained ghcr.io/shinepukur/devcontainer-features/vale feature),
+# then hands the Claude config volume to the remote user.
 set -euo pipefail
-
-# 0) Docker creates the Claude config volume root-owned because the image has
-#    no ~/.claude to copy ownership from.
-sudo chown "$(id -u):$(id -g)" "$CLAUDE_CONFIG_DIR"
 
 # 1) Project Python dependencies.
 poetry install
@@ -30,3 +27,7 @@ if ! command -v vale >/dev/null 2>&1; then
     sudo mv "$tmp/vale" /usr/local/bin/vale
     sudo chmod +x /usr/local/bin/vale
 fi
+
+# 4) Docker creates the Claude config volume root-owned because the image has
+#    no ~/.claude to copy ownership from.
+sudo chown "$(id -u):$(id -g)" "$CLAUDE_CONFIG_DIR"
