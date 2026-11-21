@@ -9,9 +9,7 @@ import click
 class EnumChoice(click.Choice[str]):
     """Choice made from Enum."""
 
-    # Need any due to the private member only existing on subclasses through
-    # what I assume is a metaclass construction.
-    def __init__(self, enum: Any) -> None:
+    def __init__(self, enum: type[Enum]) -> None:
         """Construct EnumChoice from Enum."""
         self.__enum = enum
 
