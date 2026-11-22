@@ -96,9 +96,8 @@ jobs:
         run: poetry install
       - name: poetry run pytest --cov
         run: poetry run pytest --cov --cov-report=xml
-      # A fork's pull request can't mint an OIDC token. codecov-action detects
-      # the fork, skips OIDC, and uploads without a token under the fork's
-      # owner:branch label, which Codecov accepts for a public repository.
+      # Forks get no OIDC token, so the action uploads their coverage without
+      # one. Codecov accepts tokenless uploads for a public repository.
       - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           use_oidc: true
