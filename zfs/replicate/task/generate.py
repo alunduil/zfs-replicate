@@ -36,14 +36,14 @@ def generate(
             tasks.extend(_send_snapshots(remote, local_snaps))
             continue
 
-        lefts, middles, rights = venn(local_snaps, remote_snapshots[destination])
+        groups = venn(local_snaps, remote_snapshots[destination])
 
-        send_tasks = _send_snapshots(remote, lefts)
-        destroy_tasks = _destroy_snapshots(destination, rights)
+        send_tasks = _send_snapshots(remote, groups.left_only)
+        destroy_tasks = _destroy_snapshots(destination, groups.right_only)
 
         # execute() runs actions in the order they first appear, so merging
         # these branches would change what runs first.
-        if middles:
+        if groups.common:
             tasks.extend(send_tasks)
 
             if follow_delete:
