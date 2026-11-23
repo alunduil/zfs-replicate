@@ -27,7 +27,7 @@ jobs:
 
   fix-renovate-hooks:
     name: Fix hooks on the Renovate branch
-    uses: alunduil/renovate-config/.github/workflows/fix-renovate-hooks.yml@01aca3ab8cd0d247dd2a4460b52010036c25bab0 # main
+    uses: alunduil/renovate-config/.github/workflows/fix-renovate-hooks.yml@b72e36f63efb7c260c0be487950cd6720dd3af80 # main
     permissions:
       contents: read
       id-token: write
