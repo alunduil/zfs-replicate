@@ -20,16 +20,17 @@ def inits(elements: Sequence[T]) -> Sequence[Sequence[T]]:
 
 
 class Venn(NamedTuple, Generic[T]):
-    """The three groups of a venn diagram of two lists."""
+    """The three groups of a venn diagram of two lists.
+
+    ``left_only`` holds the elements of the left list that the right list
+    lacks.  ``common`` holds the elements that both lists contain, in the
+    left list's order.  ``right_only`` holds the elements of the right list
+    that the left list lacks.
+    """
 
     left_only: list[T]
-    """Elements of the left list that the right list lacks."""
-
     common: list[T]
-    """Elements that both lists contain, in the left list's order."""
-
     right_only: list[T]
-    """Elements of the right list that the left list lacks."""
 
 
 def venn(
