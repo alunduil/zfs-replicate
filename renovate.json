@@ -4,7 +4,9 @@
     "github>alunduil/renovate-config",
     "github>alunduil/renovate-config:automerge-minor",
     ":automergeDigest",
-    ":rebaseStalePrs"
+    ":rebaseStalePrs",
+    "github>alunduil/renovate-config:hold-release-tool(pypi:poetry)",
+    "github>alunduil/renovate-config:hold-release-tool(uv)"
   ],
   "packageRules": [
     {
