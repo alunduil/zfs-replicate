@@ -4,8 +4,8 @@ description: Run the packaged test suite against the wheel and the sdist in dist
 # Catches a module or test file missing from `packages`: the suite runs
 # against what each distribution ships, not the checkout.
 #
-# Callers check out the repository and run setup-poetry first: the test
-# dependencies come from its poetry.lock.
+# Callers check out the repository and run setup-uv first, since the test
+# dependencies come from the checkout's uv.lock.
 runs:
   using: composite
   steps:
@@ -24,12 +24,12 @@ runs:
         tar --extract --gzip --file "${sdists[0]}" --directory "${packaged_tests}" \
           --strip-components=1 --wildcards '*/zfs_test/*' '*/pyproject.toml'
 
-        poetry install --only main,test --no-root
-        venv="$(poetry env info --path)"
+        uv sync --locked --no-install-project
+        venv="${PWD}/.venv"
         for distribution in "${wheels[0]}" "${sdists[0]}"; do
-          # --no-deps keeps the pins poetry.lock installed above, so an
+          # --no-deps keeps the pins uv.lock installed above, so an
           # upstream release cannot redden this step.
-          "${venv}/bin/pip" install --no-deps "${distribution}"
+          uv pip install --no-deps "${distribution}"
           (cd "${packaged_tests}" && "${venv}/bin/pytest")
-          "${venv}/bin/pip" uninstall --yes zfs-replicate
+          uv pip uninstall zfs-replicate
         done

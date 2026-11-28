@@ -1,15 +1,48 @@
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "uv_build"
+requires = ["uv_build>=0.13.10,<0.14"]
+
+[dependency-groups]
+mutation = ["mutmut==3.8.1"]
+test = [
+  "hypothesis==6.170.17",
+  # The floor is the first release past GHSA-6w46-j5rx-g56g (tmpdir handling);
+  # anything older resolves into the advisory range and fails dependency review.
+  "pytest==9.2.0",
+  "pytest-cov==7.1.0",
+  "pytest-mock==3.17.0",
+  "pytest-randomly==5.1.0"
+]
 
 [project]
 authors = [{ name = "Alex Brandt", email = "alunduil@gmail.com" }]
+# The Python version classifiers list the CPython releases ci.yml tests.
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: System Administrators",
+  "Natural Language :: English",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Programming Language :: Python :: 3.15",
+  "Topic :: System",
+  "Topic :: System :: Archiving",
+  "Topic :: System :: Filesystems"
+]
+# click.Choice became subscriptable in 8.2, which EnumChoice requires. The
+# ceilings guard click-log, which declares no click bound of its own and is
+# dormant upstream, so a major bump on either side has no upstream fix.
+dependencies = ["click>=8.2,<9", "click-log>=0.4.0,<0.5"]
 description = "ZFS Snapshot Replicator"
-# classifiers and dependencies are dynamic so Poetry generates the Python-version
-# and license classifiers from the constraints and keeps its richer dependency syntax.
-dynamic = ["classifiers", "dependencies"]
 keywords = ["zfs", "replication", "backup", "remote"]
 license = "BSD-2-Clause"
+license-files = ["LICENSE"]
 name = "zfs-replicate"
 readme = "README.md"
 requires-python = ">=3.11,<4.0"
@@ -44,47 +77,6 @@ source_paths = ["zfs"]
 
 [tool.mypy]
 strict = true
-
-[tool.poetry]
-classifiers = [
-  "Development Status :: 5 - Production/Stable",
-  "Environment :: Console",
-  "Intended Audience :: End Users/Desktop",
-  "Intended Audience :: System Administrators",
-  "Natural Language :: English",
-  "Operating System :: POSIX :: Linux",
-  "Programming Language :: Python :: 3 :: Only",
-  "Topic :: System",
-  "Topic :: System :: Archiving",
-  "Topic :: System :: Filesystems"
-]
-packages = [{ include = "zfs" }, { include = "zfs_test", format = "sdist" }]
-requires-poetry = ">=2.0"
-
-[tool.poetry.dependencies]
-# click.Choice became subscriptable in 8.2, which EnumChoice requires. The
-# ceilings guard click-log, which declares no click bound of its own and is
-# dormant upstream, so a major bump on either side has no upstream fix.
-click = ">=8.2,<9"
-click-log = ">=0.4.0,<0.5"
-python = "^3.11"
-
-[tool.poetry.group.mutation]
-# Optional so the pull request test legs skip mutmut and the libcst and textual
-# trees behind it.
-optional = true
-
-[tool.poetry.group.mutation.dependencies]
-mutmut = "==3.8.1"
-
-[tool.poetry.group.test.dependencies]
-hypothesis = "6.170.17"
-# The floor is the first release past GHSA-6w46-j5rx-g56g (tmpdir handling);
-# anything older resolves into the advisory range and fails dependency review.
-pytest = "==9.2.0"
-pytest-cov = "==7.1.0"
-pytest-mock = "==3.17.0"
-pytest-randomly = "==5.1.0"
 
 [tool.pytest.ini_options]
 # Coverage is off here so the version matrix and mutmut's per-mutant runs
@@ -171,6 +163,19 @@ select = [
 # D203/D211 and D212/D213 are incompatible pairs; naming a convention settles
 # each one instead of leaving ruff to warn and choose.
 convention = "pep257"
+
+[tool.uv]
+# Leaving out mutation keeps mutmut, libcst, and textual out of the pull
+# request test legs.
+default-groups = ["test"]
+
+[tool.uv.build-backend]
+module-name = "zfs"
+module-root = ""
+# zfs is a namespace package with no __init__.py.
+namespace = true
+# The sdist carries the suite so downstream packagers can test the build.
+source-include = ["zfs_test/**"]
 
 [tool.vulture]
 paths = ["zfs", "zfs_test"]

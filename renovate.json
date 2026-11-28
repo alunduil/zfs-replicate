@@ -4,14 +4,19 @@
     "github>alunduil/renovate-config",
     "github>alunduil/renovate-config:automerge-minor",
     ":automergeDigest",
-    "github>alunduil/renovate-config:hold-release-tool(pypi:poetry)",
-    "github>alunduil/renovate-config:hold-release-tool(uv)"
+    "github>alunduil/renovate-config:hold-release-tool(uv)",
+    "github>alunduil/renovate-config:hold-release-tool(uv_build)"
   ],
   "packageRules": [
     {
-      "description": "Poetry locks the newest in-range release, not the one Renovate targeted, so Renovate rejects the lockfile an in-range update writes. :pinDevDependencies misses these groups because a Poetry group's depType is its name",
-      "matchDepTypes": ["mutation", "test"],
+      "description": "Pin PEP 735 groups, which :pinDevDependencies misses. Within a range, uv locks the newest release rather than the one Renovate targeted, and Renovate rejects the result",
+      "matchDepTypes": ["dependency-groups"],
       "rangeStrategy": "pin"
+    },
+    {
+      "description": "Update uv and uv_build together: uv builds with its bundled uv_build only while the build-system range admits uv's own version",
+      "matchDepNames": ["uv", "uv_build"],
+      "groupName": "uv"
     },
     {
       "description": "A pull request held for review picks up main's fixes only by rebasing. A matching package rule from an extended preset overrides a top-level rebaseWhen",

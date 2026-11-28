@@ -1,8 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(poetry run pytest:*)",
-      "Bash(poetry run zfs-replicate --help:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run zfs-replicate --help:*)",
       "Bash(pre-commit run:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "poetry install --quiet && pre-commit install --quiet --install-hooks"
+            "command": "uv sync --quiet && pre-commit install --quiet --install-hooks"
           }
         ]
       }

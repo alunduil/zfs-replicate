@@ -44,8 +44,8 @@ issue.
 ## Getting started
 
 1. Create your own fork of zfs-replicate
-1. If not using Visual Studio Code, run `poetry install`
-1. If not using Visual Studio Code, run `eval "$(poetry env activate)"`
+1. If not using Visual Studio Code, run `uv sync`
+1. If not using Visual Studio Code, run `source .venv/bin/activate`
 1. Run `pre-commit install` in your local checkout
 1. Make the changes in your fork, following the
    [code conventions](docs/reference/code-conventions.md)
@@ -69,7 +69,7 @@ Small change examples:
 When creating an issue for a bug or unexpected behaviour, make sure you include
 the following information:
 
-1. A link to a paste with your `poetry.lock` file if available
+1. A link to a paste with your `uv.lock` file if available
 1. A link to a paste with your `/etc/os-release` file (or similar for Mac or
    Windows)
 1. What command did you run? _Remove passwords or secrets if present_

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Render a failed dependency-ceiling run as a create-an-issue body.
 #
-# Run after `poetry update`. Before it, `poetry show` reports the locked
-# versions, not the ones that failed.
+# Run after `uv sync --upgrade`. Before it, `uv tree` reports the committed
+# lock's versions, not the ones that failed.
 set -euo pipefail
 
 : "${ISSUE_FILE:=dependency-ceiling-issue.md}"
@@ -21,7 +21,7 @@ run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
   echo "against the newest runtime releases pyproject.toml allows:"
   echo
   echo '```text'
-  poetry show --only main --top-level
+  uv tree --frozen --depth 1 --no-default-groups
   echo '```'
   echo
   echo "See [the failing run]($run_url). Fix the incompatibility, or"

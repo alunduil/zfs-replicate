@@ -9,9 +9,8 @@
 default_install_hook_types:
   - pre-commit
   - commit-msg
-# mise lock generates these files. mise.lock records each sidecar's digest, so
-# a hook that rewrites one breaks the locked install.
-exclude: ^(mise\.lock|\.mise/)
+# mise lock generates this file and would undo any hook's reformatting.
+exclude: ^mise\.lock$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -46,7 +45,7 @@ repos:
         # export to Any, which strict mode then reports as an untyped
         # decorator at each of the ~25 call sites.
         #
-        # The pins are the versions poetry.lock resolves, so mypy reads the
+        # The pins are the versions uv.lock resolves, so mypy reads the
         # annotations the suite runs against.
         language: python
         additional_dependencies:
@@ -64,7 +63,7 @@ repos:
     hooks:
       - id: pretty-format-toml
         args: [--autofix]
-        exclude: poetry\.lock
+        exclude: uv\.lock
         # toml-sort's formatting changes between releases and the hook sets no
         # upper bound, so without a pin a cache rebuild reformats
         # pyproject.toml.
