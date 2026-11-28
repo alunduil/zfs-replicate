@@ -34,17 +34,17 @@ class TestVenn:
     @given(sets(integers()), sets(integers()))
     def test_subsets(self, lefts: set[int], rights: set[int]) -> None:
         """All combinations of venn with subsets."""
-        r_lefts, r_middles, r_rights = sut.venn(list(lefts), list(lefts | rights))
+        result = sut.venn(list(lefts), list(lefts | rights))
 
-        assert (set(r_lefts), set(r_middles), set(r_rights)) == (
+        assert (set(result.left_only), set(result.common), set(result.right_only)) == (
             set(),
             lefts,
             rights - lefts,
         )
 
-        r_lefts, r_middles, r_rights = sut.venn(list(lefts | rights), list(rights))
+        result = sut.venn(list(lefts | rights), list(rights))
 
-        assert (set(r_lefts), set(r_middles), set(r_rights)) == (
+        assert (set(result.left_only), set(result.common), set(result.right_only)) == (
             lefts - rights,
             rights,
             set(),
@@ -56,10 +56,6 @@ class TestVenn:
         e_lefts = list(filter(lambda x: x % 2 == 0, both))
         e_rights = list(filter(lambda x: x % 2 != 0, both))
 
-        r_lefts, r_middles, r_rights = sut.venn(list(e_lefts), list(e_rights))
+        result = sut.venn(list(e_lefts), list(e_rights))
 
-        assert (list(r_lefts), list(r_middles), list(r_rights)) == (
-            e_lefts,
-            [],
-            e_rights,
-        )
+        assert result == sut.Venn(left_only=e_lefts, common=[], right_only=e_rights)
