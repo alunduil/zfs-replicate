@@ -8,7 +8,7 @@
 		"ghcr.io/devcontainers/features/git:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {},
 		"ghcr.io/devcontainers/features/python:1": {},
-		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers/features/node:2": {},
 		"ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
 	},
 	// One volume per workspace keeps Claude's conversations across rebuilds.
