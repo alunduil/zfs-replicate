@@ -10,6 +10,6 @@ permissions:
 jobs:
   rerun-renovate-commit-checks:
     name: Re-run Renovate commit checks
-    uses: alunduil/renovate-config/.github/workflows/rerun-renovate-commit-checks.yml@6fac420ccbfb40f96d14c624d58138c40828d03c # main
+    uses: alunduil/renovate-config/.github/workflows/rerun-renovate-commit-checks.yml@6f40eb9dfbeb4d863b83c55141a12afdc084d767 # main
     permissions:
       actions: write
