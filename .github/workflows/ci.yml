@@ -51,7 +51,8 @@ jobs:
         # Every non-EOL CPython release, per
         # https://devguide.python.org/versions/. The oldest entry matches the
         # requires-python floor in pyproject.toml, so removing it raises the
-        # floor: a breaking change.
+        # floor: a breaking change. pyproject.toml's classifiers list the same
+        # releases.
         python-version:
           - "3.11"  # EOL 2027-10
           - "3.12"  # EOL 2028-10
@@ -60,15 +61,15 @@ jobs:
           - "3.15"  # EOL 2031-10
     steps: &python-tests-steps
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: ./.github/actions/setup-poetry
+      - uses: ./.github/actions/setup-uv
         with:
           python-version: ${{ matrix.python-version }}
-      - name: poetry install
-        run: poetry install
-      - name: poetry run pytest
-        run: poetry run pytest
-      - name: poetry run zfs-replicate --help
-        run: poetry run -- zfs-replicate --help
+      - name: uv sync
+        run: uv sync --locked
+      - name: uv run pytest
+        run: uv run --locked pytest
+      - name: uv run zfs-replicate --help
+        run: uv run --locked -- zfs-replicate --help
 
   # A failure on the newest CPython warns ahead of the matrix without blocking
   # a merge.
@@ -98,11 +99,11 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: ./.github/actions/setup-poetry
-      - name: poetry install
-        run: poetry install
-      - name: poetry run pytest --cov
-        run: poetry run pytest --cov --cov-report=xml
+      - uses: ./.github/actions/setup-uv
+      - name: uv sync
+        run: uv sync --locked
+      - name: uv run pytest --cov
+        run: uv run --locked pytest --cov --cov-report=xml
       # Forks get no OIDC token, so the action uploads their coverage without
       # one. Codecov accepts tokenless uploads for a public repository.
       - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
@@ -117,11 +118,11 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: ./.github/actions/setup-poetry
-      - name: poetry build
-        run: poetry build
-      - name: poetry check
-        run: poetry check
+      - uses: ./.github/actions/setup-uv
+      - name: uv build
+        run: uv build
+      - name: uv lock --check
+        run: uv lock --check
       - uses: ./.github/actions/test-distribution
 
   # Squash-merge lands the PR title as the commit message, so the title, not the

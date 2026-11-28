@@ -101,24 +101,24 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: ./.github/actions/setup-poetry
-      - name: poetry install --with mutation
-        run: poetry install --with mutation
+      - uses: ./.github/actions/setup-uv
+      - name: uv sync --group mutation
+        run: uv sync --locked --group mutation
       # Serial keeps the verdicts reproducible: the parallel runner
       # mis-attributes child exit codes here, so the same mutant reports killed
       # on one run and survived on the next.
-      - name: poetry run mutmut run
+      - name: uv run mutmut run
         env:
           # The first mutant of each function exercises every step below at a
           # fraction of the full sweep's runtime.
           MUTANTS: ${{ inputs.dry-run && 'zfs.*__mutmut_1' || '' }}
-        run: poetry run mutmut run --max-children 1 ${MUTANTS:+"$MUTANTS"}
+        run: uv run --locked mutmut run --max-children 1 ${MUTANTS:+"$MUTANTS"}
       # No `if: always()`: a sweep that died partway exports a partial tally,
       # and the issue is better left holding the last number a full run
       # produced.
       - name: Render the score
         run: |
-          poetry run mutmut export-cicd-stats
+          uv run --locked mutmut export-cicd-stats
           .github/scripts/mutation-summary.sh
 
       # Title comes from the file's front matter, not from `with`. Updating one
@@ -146,14 +146,14 @@ jobs:
       issues: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: ./.github/actions/setup-poetry
-      # Installers and downstream packagers never see poetry.lock, so this
+      - uses: ./.github/actions/setup-uv
+      # Installers and downstream packagers never see uv.lock, so this
       # resolves the ranges without it.
-      - name: poetry update
-        run: poetry update
-      - name: poetry run pytest
+      - name: uv sync --upgrade
+        run: uv sync --upgrade
+      - name: uv run pytest
         id: pytest
-        run: poetry run pytest
+        run: uv run pytest
 
       # A failed update is usually an index outage, so it reddens the run
       # without filing an issue that blames a dependency.

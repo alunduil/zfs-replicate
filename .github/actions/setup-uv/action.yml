@@ -1,7 +1,7 @@
-name: Set up Poetry
-description: Install Poetry and Python for a given version, with optional tool and download caches.
+name: Set up uv
+description: Install uv from mise.lock and Python for a given version, with an optional tool cache.
 
-# No `poetry install`: callers that run project code install the environment
+# No `uv sync`: callers that run project code install the environment
 # themselves, so callers that only build or inspect skip the cost.
 #
 # A local composite action can't check out the repo it lives in, so
@@ -13,23 +13,32 @@ inputs:
       root so that uv and pyenv leave local shells unpinned.
     required: false
   cache:
-    description: Restore and save the mise tool cache and Poetry's download cache.
+    description: Restore and save the mise tool cache.
     required: false
     default: "true"
 
 runs:
   using: composite
   steps:
-    # setup-python's poetry cache asks Poetry for its cache path, so Poetry
-    # installs first.
-    - name: install poetry
+    - name: install uv
       uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
       with:
         cache: ${{ inputs.cache }}
     - name: setup python
+      id: python
       uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
       with:
         python-version: ${{ inputs.python-version }}
         # setup-python warns when it receives both inputs.
         python-version-file: ${{ inputs.python-version == '' && '.github/.python-version' || '' }}
-        cache: ${{ inputs.cache == 'true' && 'poetry' || '' }}
+    # uv would otherwise prefer a Python it manages, or download one, over the
+    # matrix interpreter.
+    - name: point uv at that python
+      shell: bash
+      env:
+        PYTHON_PATH: ${{ steps.python.outputs.python-path }}
+      run: |
+        {
+          echo "UV_PYTHON=${PYTHON_PATH}"
+          echo "UV_PYTHON_DOWNLOADS=never"
+        } >> "${GITHUB_ENV}"

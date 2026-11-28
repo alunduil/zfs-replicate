@@ -2,25 +2,6 @@
 
 lockfile_version = 3
 
-[[tools."pypi:poetry"]]
-version = "2.5.1"
-backend = "pypi:poetry"
-specifiers = ["2.5.1"]
-uv = { path = ".mise/locks/pypi-poetry/2.5.1~30ebe673", digest = "sha256:8338a653ad1515949bc69cc619fbef9e6beca23e5e41f7dbce9ba092800f6f39" }
-
-[tools."pypi:poetry".options]
-python = "3.14"
-
-[[tools.python]]
-version = "3.14.10"
-backend = "core:python"
-specifiers = ["3.14"]
-
-[tools.python."platforms.linux-x64"]
-checksum = "sha256:4d3c16c59ed0802a3d1d34d8bce504b15ceeaff39d62dadecc6a9fa803412aed"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.14.10+20261026-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
-provenance = "github-attestations"
-
 [[tools.uv]]
 version = "0.13.10"
 backend = "aqua:astral-sh/uv"
