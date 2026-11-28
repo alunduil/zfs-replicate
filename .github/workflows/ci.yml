@@ -32,6 +32,13 @@ jobs:
       contents: read
       id-token: write
 
+  check-renovate-commits:
+    name: Check Renovate branch commits
+    uses: alunduil/renovate-config/.github/workflows/check-renovate-commits.yml@6052341d076d02929cd58ba8a5245d4cf13955af # main
+    permissions:
+      contents: read
+      pull-requests: read
+
   python-tests:
     # Matrix jobs take the explicit name verbatim, so interpolate the version
     # or every leg collides on one check name.
