@@ -14,7 +14,7 @@
       "rangeStrategy": "pin"
     },
     {
-      "description": "Rebase every Renovate branch once master moves, so a pull request held for review picks up master's fixes",
+      "description": "Rebase every Renovate branch once main moves, so a pull request held for review picks up main's fixes",
       "matchPackageNames": ["*"],
       "rebaseWhen": "behind-base-branch"
     }
