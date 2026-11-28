@@ -3,10 +3,9 @@
 lockfile_version = 3
 
 [[tools."pypi:poetry"]]
-version = "2.5.1"
+version = "2.5.2"
 backend = "pypi:poetry"
-specifiers = ["2.5.1"]
-uv = { path = ".mise/locks/pypi-poetry/2.5.1~30ebe673", digest = "sha256:8338a653ad1515949bc69cc619fbef9e6beca23e5e41f7dbce9ba092800f6f39" }
+specifiers = ["2.5.2"]
 
 [tools."pypi:poetry".options]
 python = "3.14"
