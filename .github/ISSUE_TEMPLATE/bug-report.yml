@@ -64,5 +64,5 @@ body:
     attributes:
       label: Environment detail
       description: >-
-        Link or paste your `poetry.lock` and `/etc/os-release` (or the
+        Link or paste your `uv.lock` and `/etc/os-release` (or the
         equivalent for your platform) if they help narrow the problem.

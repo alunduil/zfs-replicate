@@ -5,7 +5,8 @@
 Reach for these before writing a `curl` call, a manual API
 request, or a one-off `Bash` helper.
 
-- **Dependencies:** `Poetry`, resolved from `pyproject.toml`.
+- **Dependencies:** `uv`, resolved from `pyproject.toml` into
+  `uv.lock`.
 - **Development shell:** `.devcontainer/`. No `Nix` expressions
   live here: `nixpkgs` packages `zfs-replicate` upstream, so a
   local derivation would be a second definition to keep in sync.
@@ -21,8 +22,8 @@ request, or a one-off `Bash` helper.
   [docs/reference/code-conventions.md](docs/reference/code-conventions.md).
 - **Entry point:** `zfs.replicate.cli.main:main`, installed as
   `zfs-replicate`.
-- **Session setup:** a `SessionStart` hook already ran `poetry
-  install` and `pre-commit install`. Machine-specific overrides
+- **Session setup:** a `SessionStart` hook already ran `uv sync`
+  and `pre-commit install`. Machine-specific overrides
   belong in `.claude/settings.local.json`.
 
 ## Scope discipline

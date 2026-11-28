@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # 1) Project Python dependencies.
-poetry install
+uv sync
 
 # 2) Install the pre-commit hook into the local clone.
 pre-commit install
