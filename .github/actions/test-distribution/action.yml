@@ -25,11 +25,13 @@ runs:
           --strip-components=1 --wildcards '*/zfs_test/*' '*/pyproject.toml'
 
         uv sync --locked --no-install-project
+        # setup-uv's UV_PYTHON would otherwise send uv pip to the runner's
+        # interpreter instead of this environment.
         venv="${PWD}/.venv"
         for distribution in "${wheels[0]}" "${sdists[0]}"; do
           # --no-deps keeps the pins uv.lock installed above, so an
           # upstream release cannot redden this step.
-          uv pip install --no-deps "${distribution}"
+          uv pip install --python "${venv}/bin/python" --no-deps "${distribution}"
           (cd "${packaged_tests}" && "${venv}/bin/pytest")
-          uv pip uninstall zfs-replicate
+          uv pip uninstall --python "${venv}/bin/python" zfs-replicate
         done
