@@ -2,7 +2,6 @@
 locked = true
 
 [tools]
-# A pypi: tool's locked install needs a dependency graph sidecar that
-# Renovate's `mise lock` doesn't write, so every tool here uses a binary
-# backend (renovatebot/renovate#47884).
+# Every tool here uses a binary backend. Renovate's `mise lock` doesn't write
+# the dependency graph a pypi: tool's locked install needs.
 uv = "0.13.10"

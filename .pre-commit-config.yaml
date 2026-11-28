@@ -9,8 +9,7 @@
 default_install_hook_types:
   - pre-commit
   - commit-msg
-# mise lock generates this file, so a hook that reformats it fights the next
-# regeneration.
+# mise lock generates this file and would undo any hook's reformatting.
 exclude: ^mise\.lock$
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks

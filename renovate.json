@@ -9,12 +9,12 @@
   ],
   "packageRules": [
     {
-      "description": "uv locks the newest in-range release, not the one Renovate targeted, so Renovate rejects the lockfile an in-range update writes. :pinDevDependencies misses PEP 735 groups",
+      "description": "Pin PEP 735 groups, which :pinDevDependencies misses. Within a range, uv locks the newest release rather than the one Renovate targeted, and Renovate rejects the result",
       "matchDepTypes": ["dependency-groups"],
       "rangeStrategy": "pin"
     },
     {
-      "description": "uv builds with its bundled uv_build only while the build-system range admits uv's own version, so the two move in one pull request",
+      "description": "Update uv and uv_build together: uv builds with its bundled uv_build only while the build-system range admits uv's own version",
       "matchDepNames": ["uv", "uv_build"],
       "groupName": "uv"
     },

@@ -4,8 +4,8 @@ description: Run the packaged test suite against the wheel and the sdist in dist
 # Catches a module or test file missing from `packages`: the suite runs
 # against what each distribution ships, not the checkout.
 #
-# Callers check out the repository and run setup-uv first: the test
-# dependencies come from its uv.lock.
+# Callers check out the repository and run setup-uv first, since the test
+# dependencies come from the checkout's uv.lock.
 runs:
   using: composite
   steps:

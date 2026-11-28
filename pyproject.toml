@@ -165,14 +165,14 @@ select = [
 convention = "pep257"
 
 [tool.uv]
-# The mutation group stays out of a plain sync, so the pull request test legs
-# skip mutmut and the libcst and textual trees behind it.
+# Leaving out mutation keeps mutmut, libcst, and textual out of the pull
+# request test legs.
 default-groups = ["test"]
 
 [tool.uv.build-backend]
 module-name = "zfs"
 module-root = ""
-# zfs has no __init__.py: zfs.replicate is a namespace package beneath it.
+# zfs is a namespace package with no __init__.py.
 namespace = true
 # The sdist carries the suite so downstream packagers can test the build.
 source-include = ["zfs_test/**"]
